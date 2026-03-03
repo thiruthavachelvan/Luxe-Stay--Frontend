@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Lato", system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --color-luxury-gold: #D4AF37;
+  --color-luxury-gold-hover: #F3E5AB;
+  /* Brighter gold for hover */
+  --color-luxury-dark: #0F1626;
+  /* Main deep blue-black background */
+  --color-luxury-card: #1A2235;
+  /* Slightly lighter blue-black for cards */
+  --color-luxury-border: rgba(255, 255, 255, 0.1);
+  --color-luxury-text: #F8FAFC;
+  --color-luxury-muted: #94A3B8;
+  --color-luxury-blue: #D4AF37;
+  /* Alias luxury-blue to gold to naturally convert old blue elements to gold */
+  --color-luxury-blue-hover: #F3E5AB;
+  --color-luxury-sidebar: #0B101E;
+  /* Darkest tone for sidebar */
+}
+
+@layer base {
+  body {
+    @apply bg-luxury-dark text-luxury-text font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-luxury-dark text-luxury-text font-sans antialiased;
+  }
+}
+
+@layer base {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif;
+  }
+}
+
+/* Custom scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-luxury-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-luxury-border rounded-full hover:bg-luxury-muted transition-colors;
+}
+
+/* Base utility for smooth transitions */
+.smooth-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
