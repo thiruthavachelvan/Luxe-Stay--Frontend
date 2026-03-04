@@ -4,6 +4,7 @@ import { Building2, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const SignUpPage = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ const SignUpPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ fullName, email, password }),
             });
 
             const data = await response.json();
@@ -116,6 +117,28 @@ const SignUpPage = () => {
                                 {error}
                             </div>
                         )}
+
+                        {/* Full Name Input */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-luxury-muted uppercase tracking-wider">
+                                Full Name
+                            </label>
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-luxury-muted group-focus-within:text-luxury-blue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="John Doe"
+                                    className="w-full bg-[#1A1D27] border border-transparent rounded-lg py-3 pl-12 pr-4 text-white placeholder-luxury-muted/50 focus:outline-none focus:border-luxury-blue/50 focus:bg-[#1A1D27]/80 transition-all font-medium"
+                                    required
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                />
+                            </div>
+                        </div>
 
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-luxury-muted uppercase tracking-wider">

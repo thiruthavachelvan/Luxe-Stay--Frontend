@@ -83,6 +83,18 @@ const UserDashboard = () => {
 
     const [viewingBooking, setViewingBooking] = useState(null);
 
+    const getExclusiveBenefits = (tier) => {
+        if (!tier || tier === 'None') return [];
+        switch (tier) {
+            case 'Silver': return ['Welcome Drink', 'Late Check-out (1 PM)'];
+            case 'Gold': return ['Welcome Drink', 'Late Check-out (2 PM)', 'Room Upgrade (Subject to availability)'];
+            case 'Platinum': return ['Welcome Drink', 'Late Check-out (4 PM)', 'Room Upgrade', 'Complimentary Breakfast', 'Lounge Access'];
+            case 'Diamond': return ['Welcome Drink', 'Late Check-out (Flexible)', 'Suite Upgrade', 'Complimentary Breakfast', 'Lounge Access', 'Spa Access (1 hr)'];
+            case 'Black Card': return ['Dedicated Butler', 'Anytime Check-in/out', 'Presidential Suite Upgrade', 'All Meals Complimentary', 'Unlimited Spa'];
+            default: return [];
+        }
+    };
+
     const navigate = useNavigate();
 
     const loadScript = (src) => {
@@ -2111,14 +2123,15 @@ const UserDashboard = () => {
                                     </div>
                                 )}
 
-                                {viewingBooking.addOns && viewingBooking.addOns.length > 0 && (
+                                {((viewingBooking.addOns && viewingBooking.addOns.length > 0) || getExclusiveBenefits(profile?.membershipTier).length > 0) && (
                                     <div>
                                         <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-luxury-border/20 pb-3 mb-4 flex items-center gap-2">
                                             <Crown className="w-4 h-4 text-luxury-gold" />
-                                            Add-on Amenities & Benefits
+                                            Add-on Amenities & Exclusive Benefits
                                         </h4>
                                         <div className="grid gap-3">
-                                            {viewingBooking.addOns.map((addon, idx) => (
+                                            {/* Standard Add-ons */}
+                                            {viewingBooking.addOns?.map((addon, idx) => (
                                                 <div key={idx} className="bg-luxury-dark/40 border border-luxury-border/20 p-4 rounded-xl flex items-center justify-between group/addon">
                                                     <div className="flex-1">
                                                         <p className="text-sm font-bold text-white flex items-center gap-2">
@@ -2145,6 +2158,19 @@ const UserDashboard = () => {
                                                             Use Now
                                                         </button>
                                                     )}
+                                                </div>
+                                            ))}
+
+                                            {/* Tier Exclusive Benefits */}
+                                            {getExclusiveBenefits(profile?.membershipTier).map((benefit, idx) => (
+                                                <div key={`benefit-${idx}`} className="bg-luxury-gold/5 border border-luxury-gold/20 p-4 rounded-xl flex items-center justify-between">
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-bold text-luxury-gold flex items-center gap-2">
+                                                            <Star className="w-3.5 h-3.5" />
+                                                            {benefit}
+                                                            <span className="text-[8px] px-1.5 py-0.5 rounded uppercase border bg-luxury-gold/10 text-luxury-gold border-luxury-gold/30">Tier Benefit</span>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>

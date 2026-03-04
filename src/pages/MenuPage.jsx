@@ -76,6 +76,20 @@ const MenuPage = () => {
         });
     };
 
+    const decreaseQuantity = (itemId) => {
+        setCart(prev => {
+            const existing = prev.find(cartItem => cartItem.menuItem._id === itemId);
+            if (existing && existing.quantity > 1) {
+                return prev.map(cartItem =>
+                    cartItem.menuItem._id === itemId
+                        ? { ...cartItem, quantity: cartItem.quantity - 1 }
+                        : cartItem
+                );
+            }
+            return prev.filter(cartItem => cartItem.menuItem._id !== itemId);
+        });
+    };
+
     const removeFromCart = (itemId) => {
         setCart(prev => prev.filter(cartItem => cartItem.menuItem._id !== itemId));
     };
@@ -362,8 +376,18 @@ const MenuPage = () => {
                                         <img src={cartItem.menuItem.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200"} className="w-20 h-20 object-cover rounded-xl" alt={cartItem.menuItem.name} />
                                         <div className="flex-1">
                                             <h4 className="text-sm font-bold text-white line-clamp-1">{cartItem.menuItem.name}</h4>
-                                            <p className="text-xs text-luxury-muted mb-2">₹{cartItem.priceAtOrder} x {cartItem.quantity}</p>
-                                            <p className="text-sm font-bold text-luxury-blue">₹{cartItem.priceAtOrder * cartItem.quantity}</p>
+
+                                            <div className="flex items-center justify-between mt-3">
+                                                <div className="flex items-center bg-[#1A1D27] rounded-lg border border-luxury-border/30 p-1">
+                                                    <button onClick={() => decreaseQuantity(cartItem.menuItem._id)} className="w-7 h-7 flex items-center justify-center text-white hover:bg-white/10 rounded-md transition-colors active:scale-95 text-lg font-medium leading-none">-</button>
+                                                    <span className="w-8 text-center text-xs font-bold text-white">{cartItem.quantity}</span>
+                                                    <button onClick={() => addToCart(cartItem.menuItem)} className="w-7 h-7 flex items-center justify-center text-white hover:bg-white/10 rounded-md transition-colors active:scale-95 text-lg font-medium leading-none">+</button>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-[10px] text-luxury-muted font-bold tracking-wider uppercase">₹{cartItem.priceAtOrder} each</p>
+                                                    <p className="text-sm font-bold text-luxury-blue mt-0.5">₹{cartItem.priceAtOrder * cartItem.quantity}</p>
+                                                </div>
+                                            </div>
                                         </div>
                                         <button onClick={() => removeFromCart(cartItem.menuItem._id)} className="text-luxury-muted hover:text-red-500 transition-colors p-2">
                                             ✕

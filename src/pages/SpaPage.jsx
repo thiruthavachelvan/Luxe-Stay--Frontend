@@ -1,6 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Droplets, Sparkles, Wind, ArrowRight, Flower, Clock } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { User, Droplets, Sparkles, Wind, ArrowRight, Flower, Clock, X, CheckCircle2 } from 'lucide-react';
+
+const loadScript = (src) => {
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
 import Footer from '../components/Footer';
 
 const SpaPage = () => {
@@ -38,9 +49,158 @@ const SpaPage = () => {
         }
     ];
 
+    const [bookings, setBookings] = useState([]);
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
+        if (user) {
+            fetchBookings();
+        }
     }, []);
+
+    const fetchBookings = async () => {
+        try {
+            const token = sessionStorage.getItem('userToken');
+            const res = await fetch(`${__API_BASE__}/api/auth/my-bookings`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const active = data.filter(b => b.status === 'Confirmed' || b.status === 'CheckedIn');
+                setBookings(active);
+            }
+        } catch (error) {
+            console.error('Error fetching bookings', error);
+        }
+    };
+
+    const handleBookSpaClick = (service) => {
+        if (!user) {
+            toast.error('Please sign in to book a spa treatment.');
+            navigate('/login');
+            return;
+        }
+        if (bookings.length === 0) {
+            toast.error('You need an active hotel booking to add a spa treatment. Please book a room first!');
+            return;
+        }
+        setSelectedService(service);
+        setIsBookingModalOpen(true);
+    };
+
+    const proceedWithPayment = async (booking) => {
+        setIsProcessing(true);
+        try {
+            const token = sessionStorage.getItem('userToken');
+            const spaPrice = 1999;
+
+            const orderRes = await fetch(`${__API_BASE__}/api/payment/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ amount: spaPrice })
+            });
+
+            if (!orderRes.ok) throw new Error('Order creation failed');
+            const orderData = await orderRes.json();
+
+            // Check for Dummy keys Mock Order
+            const isMockOrder = orderData.id?.startsWith('order_mock_');
+            if (isMockOrder) {
+                const mockPaymentId = 'pay_mock_' + Math.random().toString(36).substr(2, 9);
+                const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        razorpay_order_id: orderData.id,
+                        razorpay_payment_id: mockPaymentId,
+                        razorpay_signature: 'mock_signature'
+                    })
+                });
+                const verifyData = await verifyRes.json();
+                if (verifyData.success) {
+                    const addSpaRes = await fetch(`${__API_BASE__}/api/auth/bookings/${booking._id}/add-spa`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ amount: spaPrice, transactionId: mockPaymentId })
+                    });
+                    if (addSpaRes.ok) {
+                        toast.success(`${selectedService?.title} added successfully! You can view it in your dashboard.`);
+                        setIsBookingModalOpen(false);
+                        fetchBookings(); // refresh
+                    } else {
+                        toast.error('Failed to add spa to booking.');
+                    }
+                } else {
+                    toast.error('Mock payment verification failed.');
+                }
+                setIsProcessing(false);
+                return;
+            }
+
+            if (!(await loadScript('https://checkout.razorpay.com/v1/checkout.js'))) {
+                toast.error('Razorpay failed to load');
+                setIsProcessing(false);
+                return;
+            }
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "LuxeStay Spa",
+                description: selectedService?.title || 'Add-on Spa Treatment',
+                order_id: orderData.id,
+                handler: async function (response) {
+                    setIsProcessing(true);
+                    try {
+                        const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+                        const verifyData = await verifyRes.json();
+                        if (verifyData.success) {
+                            const addSpaRes = await fetch(`${__API_BASE__}/api/auth/bookings/${booking._id}/add-spa`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                body: JSON.stringify({ amount: spaPrice, transactionId: response.razorpay_payment_id })
+                            });
+                            if (addSpaRes.ok) {
+                                toast.success(`${selectedService?.title} added successfully!`);
+                                setIsBookingModalOpen(false);
+                                fetchBookings();
+                            } else {
+                                toast.error('Failed to add spa to booking.');
+                            }
+                        }
+                    } catch (e) {
+                        toast.error('Payment verification failed.');
+                    } finally {
+                        setIsProcessing(false);
+                    }
+                },
+                prefill: { name: user.name || user.fullName || 'Guest', email: user.email || '' },
+                theme: { color: '#D4AF37' }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                toast.error(response.error.description);
+                setIsProcessing(false);
+            });
+            rzp.open();
+        } catch (error) {
+            console.error('Spa payment error:', error);
+            toast.error('Something went wrong during payment initialization.');
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#0F1626] font-sans text-white selection:bg-[#D4AF37] selection:text-[#0F1626]">
@@ -168,6 +328,13 @@ const SpaPage = () => {
                                         <p className="text-sm text-gray-400 font-light leading-relaxed mb-6 flex-1">
                                             {service.description}
                                         </p>
+                                        <button
+                                            onClick={() => handleBookSpaClick(service)}
+                                            className="mt-auto w-full py-3 bg-[#D4AF37] text-[#0F1626] rounded-xl font-bold text-sm shadow-lg shadow-[#D4AF37]/20 hover:bg-[#F3E5AB] transition-colors flex items-center justify-center gap-2 active:scale-95"
+                                        >
+                                            Book This Treatment
+                                            <ArrowRight className="w-4 h-4" />
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -201,7 +368,59 @@ const SpaPage = () => {
                 </section>
             </main>
 
+            {/* Booking selection Modal */}
+            {isBookingModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-[#1A2235] w-full max-w-md rounded-[2rem] border border-white/10 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-white/10 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-2xl font-bold font-serif italic text-white">Select Booking</h3>
+                                <p className="text-sm text-[#D4AF37] mt-1 font-medium">{selectedService?.title}</p>
+                            </div>
+                            <button onClick={() => !isProcessing && setIsBookingModalOpen(false)} className="p-2 bg-white/5 rounded-full text-gray-400 hover:text-white hover:bg-red-500/20 transition-all">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-8 space-y-4 max-h-[60vh] overflow-y-auto">
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-4">You have {bookings.length} active stay(s)</p>
+
+                            {bookings.map((booking) => {
+                                const hasSpa = booking.addOns?.some(a => a.name === 'Spa Service');
+                                return (
+                                    <div key={booking._id} className="p-4 bg-[#0F1626] border border-white/10 rounded-2xl">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h4 className="font-bold text-white">{booking.room?.type || 'Suite'}</h4>
+                                            <span className="text-[10px] font-bold px-2 py-1 bg-[#D4AF37]/20 text-[#D4AF37] rounded-md uppercase tracking-widest">{booking.status}</span>
+                                        </div>
+                                        <div className="text-xs text-gray-400 space-y-1 mb-4">
+                                            <p>Check-in: {new Date(booking.checkInDate).toLocaleDateString()}</p>
+                                            <p>Check-out: {new Date(booking.checkOutDate).toLocaleDateString()}</p>
+                                        </div>
+                                        {hasSpa ? (
+                                            <div className="flex items-center gap-2 text-green-400 bg-green-400/10 p-3 rounded-xl border border-green-400/20">
+                                                <CheckCircle2 className="w-4 h-4" />
+                                                <span className="text-xs font-bold">Spa package already active</span>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => proceedWithPayment(booking)}
+                                                disabled={isProcessing}
+                                                className="w-full py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-bold text-sm transition-colors flex justify-between items-center px-4 disabled:opacity-50"
+                                            >
+                                                <span>Apply to this stay</span>
+                                                {isProcessing ? <span className="text-[#D4AF37]">Processing...</span> : <span className="text-[#D4AF37]">₹1,999</span>}
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
+            <Toaster position="top-right" />
         </div>
     );
 };
