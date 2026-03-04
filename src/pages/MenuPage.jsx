@@ -43,7 +43,7 @@ const MenuPage = () => {
         setFetchingMenu(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            let url = `http://localhost:5000/api/auth/menu?category=${selectedCategory}`;
+            let url = `${__API_BASE__}/api/auth/menu?category=${selectedCategory}`;
 
             const response = await fetch(url, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -97,7 +97,7 @@ const MenuPage = () => {
             }
 
             // Create Order
-            const orderRes = await fetch('http://localhost:5000/api/payment/create-order', {
+            const orderRes = await fetch('__API_BASE__/api/payment/create-order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const MenuPage = () => {
                     setIsProcessing(true);
 
                     // Verify Payment
-                    const verifyRes = await fetch('http://localhost:5000/api/payment/verify', {
+                    const verifyRes = await fetch('__API_BASE__/api/payment/verify', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ const MenuPage = () => {
                     const verifyData = await verifyRes.json();
                     if (verifyData.success) {
                         // Place Food Order
-                        const responseOrder = await fetch('http://localhost:5000/api/auth/food-order', {
+                        const responseOrder = await fetch('__API_BASE__/api/auth/food-order', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -402,3 +402,7 @@ const MenuPage = () => {
 };
 
 export default MenuPage;
+
+
+
+

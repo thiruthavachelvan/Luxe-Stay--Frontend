@@ -176,3 +176,7 @@ const AmenitiesPage = () => {
 };
 
 export default AmenitiesPage;
+
+
+
+

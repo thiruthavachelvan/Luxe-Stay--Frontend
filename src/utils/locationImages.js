@@ -19,3 +19,7 @@ export const locationImages = {
 export const getLocationImage = (city) => {
     return locationImages[city] || locationImages['default'];
 };
+
+
+
+

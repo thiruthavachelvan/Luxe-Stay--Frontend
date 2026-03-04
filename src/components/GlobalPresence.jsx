@@ -19,7 +19,7 @@ const GlobalPresence = () => {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/public/locations');
+                const res = await fetch('__API_BASE__/api/public/locations');
                 if (res.ok) {
                     const data = await res.json();
                     setLocations(data.filter(loc => loc.status === 'Active').slice(0, 3));
@@ -130,3 +130,7 @@ const GlobalPresence = () => {
 };
 
 export default GlobalPresence;
+
+
+
+

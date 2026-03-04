@@ -53,7 +53,7 @@ const Hero = () => {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/public/locations');
+                const res = await fetch('__API_BASE__/api/public/locations');
                 if (res.ok) {
                     const data = await res.json();
                     const activeLocations = data.filter(l => l.status === 'Active');
@@ -302,3 +302,7 @@ const SearchField = ({ label, icon, children, hasBorder }) => (
 );
 
 export default Hero;
+
+
+
+

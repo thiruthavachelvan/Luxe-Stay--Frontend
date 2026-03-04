@@ -18,7 +18,7 @@ const DiscoverRooms = () => {
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/public/rooms');
+                const res = await fetch('__API_BASE__/api/public/rooms');
                 if (res.ok) {
                     const data = await res.json();
                     setRooms(data.slice(0, 4));
@@ -122,3 +122,7 @@ const DiscoverRooms = () => {
 };
 
 export default DiscoverRooms;
+
+
+
+

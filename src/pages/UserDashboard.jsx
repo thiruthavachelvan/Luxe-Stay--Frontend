@@ -115,11 +115,11 @@ const UserDashboard = () => {
 
         try {
             // Fetch Profile
-            const profileRes = await fetch('http://localhost:5000/api/auth/profile', { headers });
+            const profileRes = await fetch('__API_BASE__/api/auth/profile', { headers });
             if (profileRes.ok) setProfile(await profileRes.json());
 
             // Fetch Bookings
-            const bookingsRes = await fetch('http://localhost:5000/api/auth/my-bookings', { headers });
+            const bookingsRes = await fetch('__API_BASE__/api/auth/my-bookings', { headers });
             if (bookingsRes.ok) {
                 const data = await bookingsRes.json();
                 data.sort((a, b) => {
@@ -131,14 +131,14 @@ const UserDashboard = () => {
             }
 
             // Fetch Payments
-            const paymentsRes = await fetch('http://localhost:5000/api/auth/payment-history', { headers });
+            const paymentsRes = await fetch('__API_BASE__/api/auth/payment-history', { headers });
             if (paymentsRes.ok) setPayments(await paymentsRes.json());
 
             // Fetch Queries
-            const queriesRes = await fetch('http://localhost:5000/api/support/my-queries', { headers });
+            const queriesRes = await fetch('__API_BASE__/api/support/my-queries', { headers });
             if (queriesRes.ok) setQueries(await queriesRes.json());
 
-            const notifRes = await fetch('http://localhost:5000/api/auth/notifications', { headers });
+            const notifRes = await fetch('__API_BASE__/api/auth/notifications', { headers });
             if (notifRes.ok) {
                 const data = await notifRes.json();
                 setNotifications(data);
@@ -146,7 +146,7 @@ const UserDashboard = () => {
             }
 
             // Fetch Dining Reservations
-            const reservationsRes = await fetch('http://localhost:5000/api/reservations/my-reservations', { headers });
+            const reservationsRes = await fetch('__API_BASE__/api/reservations/my-reservations', { headers });
             if (reservationsRes.ok) setDiningReservations(await reservationsRes.json());
 
             setLoading(false);
@@ -164,7 +164,7 @@ const UserDashboard = () => {
 
         try {
             // 1. Create Order
-            const orderRes = await fetch('http://localhost:5000/api/auth/membership/create-order', {
+            const orderRes = await fetch('__API_BASE__/api/auth/membership/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ tier: tierName, overridePrice })
@@ -181,7 +181,7 @@ const UserDashboard = () => {
             // 2a. MOCK path — bypass Razorpay entirely
             if (isMockOrder) {
                 const mockPaymentId = 'pay_mock_' + Math.random().toString(36).substr(2, 9);
-                const verifyRes = await fetch('http://localhost:5000/api/auth/membership/verify', {
+                const verifyRes = await fetch('__API_BASE__/api/auth/membership/verify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({
@@ -218,7 +218,7 @@ const UserDashboard = () => {
                 order_id: order.id,
                 handler: async function (response) {
                     try {
-                        const verifyRes = await fetch('http://localhost:5000/api/auth/membership/verify', {
+                        const verifyRes = await fetch('__API_BASE__/api/auth/membership/verify', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                             body: JSON.stringify({
@@ -268,7 +268,7 @@ const UserDashboard = () => {
     // ── Generic coupon validator ──────────────────────────
     const validateCoupon = async (code, amount, appliesTo) => {
         const res = await fetch(
-            `http://localhost:5000/api/public/coupons/validate?code=${encodeURIComponent(code)}&amount=${amount}&appliesTo=${appliesTo}`
+            `${__API_BASE__}/api/public/coupons/validate?code=${encodeURIComponent(code)}&amount=${amount}&appliesTo=${appliesTo}`
         );
         return res.json();
     };
@@ -335,7 +335,7 @@ const UserDashboard = () => {
     const handleMarkAsRead = async (id) => {
         try {
             const token = sessionStorage.getItem('userToken');
-            await fetch(`http://localhost:5000/api/auth/notifications/${id}/read`, {
+            await fetch(`${__API_BASE__}/api/auth/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -349,7 +349,7 @@ const UserDashboard = () => {
     const handleClearNotifications = async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/auth/notifications/clear`, {
+            const res = await fetch(`${__API_BASE__}/api/auth/notifications/clear`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -366,7 +366,7 @@ const UserDashboard = () => {
         e.preventDefault();
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('__API_BASE__/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -658,7 +658,7 @@ const UserDashboard = () => {
         if (!bookingToCancel) return;
         const token = sessionStorage.getItem('userToken');
         try {
-            const res = await fetch(`http://localhost:5000/api/auth/bookings/${bookingToCancel._id}/cancel`, {
+            const res = await fetch(`${__API_BASE__}/api/auth/bookings/${bookingToCancel._id}/cancel`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -680,7 +680,7 @@ const UserDashboard = () => {
     const handleCheckIn = async (bookingId) => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/auth/bookings/${bookingId}/check-in`, {
+            const res = await fetch(`${__API_BASE__}/api/auth/bookings/${bookingId}/check-in`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -699,7 +699,7 @@ const UserDashboard = () => {
     const handleCheckOut = async (bookingId) => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/auth/bookings/${bookingId}/check-out`, {
+            const res = await fetch(`${__API_BASE__}/api/auth/bookings/${bookingId}/check-out`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -724,7 +724,7 @@ const UserDashboard = () => {
     const submitSupportQuery = async (subject, message, priority = 'Standard') => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/support/submit', {
+            const res = await fetch('__API_BASE__/api/support/submit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -794,7 +794,7 @@ const UserDashboard = () => {
             const completedIds = bookings.filter(b => b.status === 'CheckedOut' || b.status === 'Completed').map(b => b._id);
             const checks = await Promise.all(
                 completedIds.map(id =>
-                    fetch(`http://localhost:5000/api/reviews/check/${id}`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
+                    fetch(`${__API_BASE__}/api/reviews/check/${id}`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
                 )
             );
             const reviewed = {};
@@ -812,7 +812,7 @@ const UserDashboard = () => {
         setReviewError('');
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/reviews', {
+            const res = await fetch('__API_BASE__/api/reviews', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(reviewForm)
@@ -1179,7 +1179,7 @@ const UserDashboard = () => {
             }
 
             // Create Order
-            const orderRes = await fetch('http://localhost:5000/api/payment/create-order', {
+            const orderRes = await fetch('__API_BASE__/api/payment/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ amount: outstandingAmount })
@@ -1199,7 +1199,7 @@ const UserDashboard = () => {
                     try {
                         setLoading(true);
                         // Verify
-                        const verifyRes = await fetch('http://localhost:5000/api/payment/verify', {
+                        const verifyRes = await fetch('__API_BASE__/api/payment/verify', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                             body: JSON.stringify({
@@ -1212,7 +1212,7 @@ const UserDashboard = () => {
                         const verifyData = await verifyRes.json();
                         if (verifyData.success) {
                             // Settle Folio
-                            const settleRes = await fetch(`http://localhost:5000/api/auth/bookings/${booking._id}/settle-folio`, {
+                            const settleRes = await fetch(`${__API_BASE__}/api/auth/bookings/${booking._id}/settle-folio`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                 body: JSON.stringify({
@@ -1960,3 +1960,7 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
+
+
+

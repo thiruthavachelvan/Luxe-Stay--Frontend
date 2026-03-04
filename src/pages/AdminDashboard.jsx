@@ -284,7 +284,7 @@ const AdminDashboard = () => {
         setFetchingStaff(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const url = `http://localhost:5000/api/auth/admin/staff${locationId !== 'all' ? `?locationId=${locationId}` : ''}`;
+            const url = `${__API_BASE__}/api/auth/admin/staff${locationId !== 'all' ? `?locationId=${locationId}` : ''}`;
             const response = await fetch(url, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -305,7 +305,7 @@ const AdminDashboard = () => {
         setFetchingLocations(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/locations', {
+            const response = await fetch('__API_BASE__/api/auth/admin/locations', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -329,7 +329,7 @@ const AdminDashboard = () => {
         setFetchingRooms(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const url = `http://localhost:5000/api/auth/admin/rooms/${locationId}${floor !== 'All Floors' ? `?floor=${floor}` : ''}`;
+            const url = `${__API_BASE__}/api/auth/admin/rooms/${locationId}${floor !== 'All Floors' ? `?floor=${floor}` : ''}`;
             const response = await fetch(url, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -350,7 +350,7 @@ const AdminDashboard = () => {
         setFetchingMenu(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            let url = `http://localhost:5000/api/auth/admin/menu?category=${category}`;
+            let url = `${__API_BASE__}/api/auth/admin/menu?category=${category}`;
             if (locationId) url += `&locationId=${locationId}`;
 
             const response = await fetch(url, {
@@ -369,7 +369,7 @@ const AdminDashboard = () => {
         setFetchingOrders(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/food-orders', {
+            const response = await fetch('__API_BASE__/api/auth/admin/food-orders', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -387,7 +387,7 @@ const AdminDashboard = () => {
         setFetchingQueries(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/support/admin/all', {
+            const res = await fetch('__API_BASE__/api/support/admin/all', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -405,7 +405,7 @@ const AdminDashboard = () => {
         setFetchingReservations(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/reservations', {
+            const response = await fetch('__API_BASE__/api/auth/admin/reservations', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -420,7 +420,7 @@ const AdminDashboard = () => {
     const handleConfirmReservation = async (id) => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/reservations/${id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/reservations/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -442,7 +442,7 @@ const AdminDashboard = () => {
         if (!responseText.trim()) return;
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/support/admin/${queryId}/respond`, {
+            const res = await fetch(`${__API_BASE__}/api/support/admin/${queryId}/respond`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ response: responseText })
@@ -462,7 +462,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/menu', {
+            const response = await fetch('__API_BASE__/api/auth/admin/menu', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -487,7 +487,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/menu/${selectedMenuItemForEdit._id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/menu/${selectedMenuItemForEdit._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -511,7 +511,7 @@ const AdminDashboard = () => {
         if (!window.confirm('Decommission this culinary asset?')) return;
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/menu/${id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/menu/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -527,7 +527,7 @@ const AdminDashboard = () => {
     const fetchNotifications = async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/notifications', {
+            const response = await fetch('__API_BASE__/api/auth/admin/notifications', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -543,7 +543,7 @@ const AdminDashboard = () => {
     const handleMarkAsRead = async (id) => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/notifications/${id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/notifications/${id}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -557,7 +557,7 @@ const AdminDashboard = () => {
         if (!window.confirm('Erase all system alerts?')) return;
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/notifications', {
+            const response = await fetch('__API_BASE__/api/auth/admin/notifications', {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -590,7 +590,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/rooms/${selectedRoomForEdit._id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/rooms/${selectedRoomForEdit._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -622,7 +622,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/bookings/${bookingId}/${action}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/bookings/${bookingId}/${action}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -668,7 +668,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/rooms', {
+            const response = await fetch('__API_BASE__/api/auth/admin/rooms', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -776,7 +776,7 @@ const AdminDashboard = () => {
     const fetchStats = async (range = 'month') => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/auth/admin/stats?range=${range}`, {
+            const res = await fetch(`${__API_BASE__}/api/auth/admin/stats?range=${range}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -792,7 +792,7 @@ const AdminDashboard = () => {
         setFetchingReviews(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/reviews/admin/all', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('__API_BASE__/api/reviews/admin/all', { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setAdminReviews(await res.json());
         } catch (err) { console.error(err); } finally { setFetchingReviews(false); }
     };
@@ -801,7 +801,7 @@ const AdminDashboard = () => {
         setFetchingAdminBookings(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/auth/admin/bookings', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('__API_BASE__/api/auth/admin/bookings', { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setAdminBookings(await res.json());
         } catch (err) { console.error('Error fetching admin bookings', err); } finally { setFetchingAdminBookings(false); }
     };
@@ -809,7 +809,7 @@ const AdminDashboard = () => {
     const handleDeleteReview = async (id) => {
         if (!window.confirm('Delete this review?')) return;
         const token = sessionStorage.getItem('userToken');
-        const res = await fetch(`http://localhost:5000/api/reviews/admin/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${__API_BASE__}/api/reviews/admin/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) { setSuccess('Review deleted'); fetchAdminReviews(); setTimeout(() => setSuccess(''), 3000); }
     };
 
@@ -817,21 +817,21 @@ const AdminDashboard = () => {
         setFetchingContacts(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/contact/admin/all', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('__API_BASE__/api/contact/admin/all', { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setAdminContacts(await res.json());
         } catch (err) { console.error(err); } finally { setFetchingContacts(false); }
     };
 
     const handleUpdateContactStatus = async (id, status) => {
         const token = sessionStorage.getItem('userToken');
-        const res = await fetch(`http://localhost:5000/api/contact/admin/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status }) });
+        const res = await fetch(`${__API_BASE__}/api/contact/admin/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status }) });
         if (res.ok) { fetchAdminContacts(); setSuccess(`Marked as ${status}`); setTimeout(() => setSuccess(''), 3000); }
     };
 
     const handleReplyContact = async (id) => {
         if (!contactReplyText.trim()) return;
         const token = sessionStorage.getItem('userToken');
-        const res = await fetch(`http://localhost:5000/api/contact/admin/${id}/reply`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ reply: contactReplyText }) });
+        const res = await fetch(`${__API_BASE__}/api/contact/admin/${id}/reply`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ reply: contactReplyText }) });
         if (res.ok) { setReplyingToContact(null); setContactReplyText(''); fetchAdminContacts(); setSuccess('Reply sent'); setTimeout(() => setSuccess(''), 3000); }
     };
 
@@ -843,7 +843,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/create-staff', {
+            const response = await fetch('__API_BASE__/api/auth/admin/create-staff', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -889,7 +889,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/staff/${selectedStaffForEdit._id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/staff/${selectedStaffForEdit._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -919,7 +919,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/staff/${staffId}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/staff/${staffId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -943,7 +943,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5000/api/auth/admin/locations', {
+            const response = await fetch('__API_BASE__/api/auth/admin/locations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -977,7 +977,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/auth/admin/locations/${selectedLocationForEdit._id}`, {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/locations/${selectedLocationForEdit._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1010,7 +1010,7 @@ const AdminDashboard = () => {
         setFetchingCoupons(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/auth/admin/coupons', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('__API_BASE__/api/auth/admin/coupons', { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setCoupons(await res.json());
         } catch (err) { console.error(err); } finally { setFetchingCoupons(false); }
     };
@@ -1021,8 +1021,8 @@ const AdminDashboard = () => {
         try {
             const token = sessionStorage.getItem('userToken');
             const url = couponFormMode === 'create'
-                ? 'http://localhost:5000/api/auth/admin/coupons'
-                : `http://localhost:5000/api/auth/admin/coupons/${editingCouponId}`;
+                ? '__API_BASE__/api/auth/admin/coupons'
+                : `${__API_BASE__}/api/auth/admin/coupons/${editingCouponId}`;
             const method = couponFormMode === 'create' ? 'POST' : 'PUT';
             const res = await fetch(url, {
                 method,
@@ -1052,7 +1052,7 @@ const AdminDashboard = () => {
     const handleDeleteCoupon = async (id) => {
         if (!window.confirm('Delete this coupon?')) return;
         const token = sessionStorage.getItem('userToken');
-        const res = await fetch(`http://localhost:5000/api/auth/admin/coupons/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${__API_BASE__}/api/auth/admin/coupons/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) { setSuccess('Coupon deleted'); setTimeout(() => setSuccess(''), 3000); fetchCoupons(); }
     };
 
@@ -2185,7 +2185,7 @@ const AdminDashboard = () => {
                                                                         const token = sessionStorage.getItem('userToken');
                                                                         const responseStr = `Your Spa Appointment is confirmed for ${formattedTime}. Please visit the Spa at the mentioned time.`;
 
-                                                                        await fetch(`http://localhost:5000/api/support/admin/${query._id}/respond`, {
+                                                                        await fetch(`${__API_BASE__}/api/support/admin/${query._id}/respond`, {
                                                                             method: 'PUT',
                                                                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                                                             body: JSON.stringify({ response: responseStr })
@@ -2225,7 +2225,7 @@ const AdminDashboard = () => {
                                                                                 const staffId = assignmentDrafts[query._id] !== undefined ? assignmentDrafts[query._id] : (query.assignedTo?._id || '');
                                                                                 if (!staffId) return;
                                                                                 const token = sessionStorage.getItem('userToken');
-                                                                                await fetch(`http://localhost:5000/api/support/admin/${query._id}/assign`, {
+                                                                                await fetch(`${__API_BASE__}/api/support/admin/${query._id}/assign`, {
                                                                                     method: 'PUT',
                                                                                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                                                                     body: JSON.stringify({ assignedTo: staffId })
@@ -2279,7 +2279,7 @@ const AdminDashboard = () => {
                                                         <button
                                                             onClick={async () => {
                                                                 const token = sessionStorage.getItem('userToken');
-                                                                await fetch(`http://localhost:5000/api/support/admin/${query._id}/respond`, {
+                                                                await fetch(`${__API_BASE__}/api/support/admin/${query._id}/respond`, {
                                                                     method: 'PUT',
                                                                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                                                     body: JSON.stringify({ response: 'Closed by admin.' })
@@ -2423,7 +2423,7 @@ const AdminDashboard = () => {
                                                                     const cookId = el?.value;
                                                                     if (!cookId) return;
                                                                     const token = sessionStorage.getItem('userToken');
-                                                                    const res = await fetch(`http://localhost:5000/api/auth/admin/food-orders/${order._id}`, {
+                                                                    const res = await fetch(`${__API_BASE__}/api/auth/admin/food-orders/${order._id}`, {
                                                                         method: 'PUT',
                                                                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                                                         body: JSON.stringify({ assignedTo: cookId, status: 'Assigned' })
@@ -2467,7 +2467,7 @@ const AdminDashboard = () => {
                                                     <button
                                                         onClick={async () => {
                                                             const token = sessionStorage.getItem('userToken');
-                                                            const res = await fetch(`http://localhost:5000/api/auth/admin/food-orders/${order._id}`, {
+                                                            const res = await fetch(`${__API_BASE__}/api/auth/admin/food-orders/${order._id}`, {
                                                                 method: 'PUT',
                                                                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                                                 body: JSON.stringify({ status: 'Completed' })
@@ -2900,7 +2900,7 @@ const AdminDashboard = () => {
                                                         <button
                                                             onClick={async () => {
                                                                 const token = sessionStorage.getItem('userToken');
-                                                                await fetch(`http://localhost:5000/api/auth/admin/coupons/${c._id}`, {
+                                                                await fetch(`${__API_BASE__}/api/auth/admin/coupons/${c._id}`, {
                                                                     method: 'PUT',
                                                                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                                                     body: JSON.stringify({ isFeatured: !c.isFeatured })
@@ -4172,3 +4172,7 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
+
+
+

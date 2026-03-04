@@ -151,7 +151,7 @@ const OffersPage = () => {
     const [seasonalOffers, setSeasonalOffers] = useState(DEFAULT_SEASONAL_OFFERS);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/public/coupons/featured')
+        fetch('__API_BASE__/api/public/coupons/featured')
             .then(r => r.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
@@ -404,3 +404,7 @@ const OffersPage = () => {
 };
 
 export default OffersPage;
+
+
+
+

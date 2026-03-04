@@ -15,7 +15,7 @@ const RestaurantPage = () => {
     useEffect(() => {
         const fetchMenu = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/public/menu');
+                const res = await fetch('__API_BASE__/api/public/menu');
                 if (res.ok) {
                     const data = await res.json();
                     setMenuItems(data);
@@ -289,3 +289,7 @@ const RestaurantPage = () => {
 };
 
 export default RestaurantPage;
+
+
+
+

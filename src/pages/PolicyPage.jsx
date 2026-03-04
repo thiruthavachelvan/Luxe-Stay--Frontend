@@ -308,3 +308,7 @@ const PolicyPage = () => {
 };
 
 export default PolicyPage;
+
+
+
+

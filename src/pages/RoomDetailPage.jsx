@@ -111,12 +111,12 @@ const RoomDetailPage = () => {
     useEffect(() => {
         const fetchRoom = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/public/rooms/${roomId}`);
+                const res = await fetch(`${__API_BASE__}/api/public/rooms/${roomId}`);
                 if (!res.ok) throw new Error('Room not found');
                 const data = await res.json();
                 setRoom(data);
                 // Fetch reviews for this room directly via room ID (most accurate)
-                const rRes = await fetch(`http://localhost:5000/api/reviews/room/${roomId}`);
+                const rRes = await fetch(`${__API_BASE__}/api/reviews/room/${roomId}`);
                 if (rRes.ok) {
                     const rReviews = await rRes.json();
                     setReviews(rReviews || []);
@@ -128,7 +128,7 @@ const RoomDetailPage = () => {
                         // Fall back to location-level reviews by city name
                         const cityName = data.location?.city;
                         if (cityName) {
-                            const locRes = await fetch(`http://localhost:5000/api/reviews/location/${encodeURIComponent(cityName)}`);
+                            const locRes = await fetch(`${__API_BASE__}/api/reviews/location/${encodeURIComponent(cityName)}`);
                             if (locRes.ok) {
                                 const locData = await locRes.json();
                                 setReviews(locData.reviews || []);
@@ -154,7 +154,7 @@ const RoomDetailPage = () => {
             setCheckingAvailability(true);
             try {
                 const queryParams = new URLSearchParams({ checkIn, checkOut });
-                const res = await fetch(`http://localhost:5000/api/public/rooms/${room._id}/availability?${queryParams.toString()}`);
+                const res = await fetch(`${__API_BASE__}/api/public/rooms/${room._id}/availability?${queryParams.toString()}`);
                 if (res.ok) {
                     const data = await res.json();
                     setIsAvailable(data.isAvailable);
@@ -684,3 +684,7 @@ const RoomDetailPage = () => {
 };
 
 export default RoomDetailPage;
+
+
+
+

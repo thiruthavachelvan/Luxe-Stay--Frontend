@@ -150,7 +150,7 @@ const ExploreRoomsPage = () => {
         loadUser();
         window.addEventListener('focus', loadUser);
 
-        fetch('http://localhost:5000/api/public/locations')
+        fetch('__API_BASE__/api/public/locations')
             .then(r => r.json())
             .then(data => {
                 const active = (data || []).filter(l => l.status === 'Active');
@@ -172,7 +172,7 @@ const ExploreRoomsPage = () => {
         const fetchRooms = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`http://localhost:5000/api/public/rooms`);
+                const res = await fetch(`${__API_BASE__}/api/public/rooms`);
                 if (res.ok) {
                     const data = await res.json();
                     setRooms(data);
@@ -193,7 +193,7 @@ const ExploreRoomsPage = () => {
             const ratings = {};
             await Promise.all([...new Set(rooms.map(r => r._id))].map(async id => {
                 try {
-                    const r = await fetch(`http://localhost:5000/api/reviews/room/${id}`);
+                    const r = await fetch(`${__API_BASE__}/api/reviews/room/${id}`);
                     if (r.ok) {
                         const reviews = await r.json();
                         if (reviews.length > 0) {
@@ -689,3 +689,7 @@ const ExploreRoomsPage = () => {
 };
 
 export default ExploreRoomsPage;
+
+
+
+

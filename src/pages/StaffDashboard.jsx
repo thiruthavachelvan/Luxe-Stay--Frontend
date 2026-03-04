@@ -57,7 +57,7 @@ const StaffDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/auth/staff/food-orders', {
+            const res = await fetch('__API_BASE__/api/auth/staff/food-orders', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -76,7 +76,7 @@ const StaffDashboard = () => {
         setLoadingRequests(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/support/staff/my-requests', {
+            const res = await fetch('__API_BASE__/api/support/staff/my-requests', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -94,7 +94,7 @@ const StaffDashboard = () => {
         if (!user) return;
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/auth/notifications', {
+            const res = await fetch('__API_BASE__/api/auth/notifications', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -110,7 +110,7 @@ const StaffDashboard = () => {
     const fetchUserProfile = useCallback(async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('__API_BASE__/api/auth/profile', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -142,7 +142,7 @@ const StaffDashboard = () => {
         setCompletingId(orderId);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/auth/staff/food-orders/${orderId}/complete`, {
+            const res = await fetch(`${__API_BASE__}/api/auth/staff/food-orders/${orderId}/complete`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
             });
@@ -162,7 +162,7 @@ const StaffDashboard = () => {
         setActionId(requestId);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/support/staff/${requestId}/accept`, {
+            const res = await fetch(`${__API_BASE__}/api/support/staff/${requestId}/accept`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -182,7 +182,7 @@ const StaffDashboard = () => {
         setActionId(requestId);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`http://localhost:5000/api/support/staff/${requestId}/complete`, {
+            const res = await fetch(`${__API_BASE__}/api/support/staff/${requestId}/complete`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -201,7 +201,7 @@ const StaffDashboard = () => {
     const handleMarkAsRead = async (id) => {
         try {
             const token = sessionStorage.getItem('userToken');
-            await fetch(`http://localhost:5000/api/auth/notifications/${id}/read`, {
+            await fetch(`${__API_BASE__}/api/auth/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -214,7 +214,7 @@ const StaffDashboard = () => {
     const handleClearNotifications = async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            await fetch('http://localhost:5000/api/auth/notifications/clear', {
+            await fetch('__API_BASE__/api/auth/notifications/clear', {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -701,3 +701,7 @@ const StaffDashboard = () => {
 };
 
 export default StaffDashboard;
+
+
+
+

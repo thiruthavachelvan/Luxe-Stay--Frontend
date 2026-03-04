@@ -35,7 +35,7 @@ const ReviewsPage = () => {
             const params = new URLSearchParams();
             if (filters.rating) params.append('rating', filters.rating);
             if (filters.sort) params.append('sort', filters.sort);
-            const res = await fetch(`http://localhost:5000/api/reviews?${params}`);
+            const res = await fetch(`${__API_BASE__}/api/reviews?${params}`);
             const json = await res.json();
             setData(json);
         } catch { /* show empty state */ } finally {
@@ -234,3 +234,7 @@ const ReviewsPage = () => {
 };
 
 export default ReviewsPage;
+
+
+
+
