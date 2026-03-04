@@ -141,7 +141,7 @@ const PaymentPage = () => {
                 return;
             }
 
-            const orderRes = await fetch('__API_BASE__/api/payment/create-order', {
+            const orderRes = await fetch(`${__API_BASE__}/api/payment/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ amount: finalAmount })
@@ -164,7 +164,7 @@ const PaymentPage = () => {
                 order_id: orderData.id,
                 handler: async function (response) {
                     setIsLoading(true);
-                    const verifyRes = await fetch('__API_BASE__/api/payment/verify', {
+                    const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({
@@ -176,7 +176,7 @@ const PaymentPage = () => {
 
                     const verifyData = await verifyRes.json();
                     if (verifyData.success) {
-                        const bookingRes = await fetch('__API_BASE__/api/auth/bookings', {
+                        const bookingRes = await fetch(`${__API_BASE__}/api/auth/bookings`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                             body: JSON.stringify({
@@ -523,6 +523,7 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
+
 
 
 

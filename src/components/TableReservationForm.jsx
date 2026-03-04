@@ -68,7 +68,7 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
     useEffect(() => {
         const fetchMenu = async () => {
             try {
-                const res = await fetch('__API_BASE__/api/public/menu');
+                const res = await fetch(`${__API_BASE__}/api/public/menu`);
                 if (res.ok) {
                     const data = await res.json();
                     setMenuItems(data);
@@ -151,7 +151,7 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                     return;
                 }
 
-                const orderRes = await fetch('__API_BASE__/api/payment/create-order', {
+                const orderRes = await fetch(`${__API_BASE__}/api/payment/create-order`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                     body: JSON.stringify({ amount: totalAmount })
@@ -170,7 +170,7 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                     handler: async function (response) {
                         setLoading(true);
                         // Verify
-                        const verifyRes = await fetch('__API_BASE__/api/payment/verify', {
+                        const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                             body: JSON.stringify({
@@ -213,7 +213,7 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
     };
 
     const processReservation = async (preBookedMealsList, totalPreBookedAmount, transactionId) => {
-        const response = await fetch('__API_BASE__/api/reservations', {
+        const response = await fetch(`${__API_BASE__}/api/reservations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -523,6 +523,7 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
 };
 
 export default TableReservationForm;
+
 
 
 

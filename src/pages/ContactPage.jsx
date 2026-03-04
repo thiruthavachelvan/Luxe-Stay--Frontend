@@ -61,7 +61,7 @@ const ContactPage = () => {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('__API_BASE__/api/contact', {
+            const res = await fetch(`${__API_BASE__}/api/contact`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form),
@@ -252,6 +252,7 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
+
 
 
 

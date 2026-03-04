@@ -150,7 +150,7 @@ const ExploreRoomsPage = () => {
         loadUser();
         window.addEventListener('focus', loadUser);
 
-        fetch('__API_BASE__/api/public/locations')
+        fetch(`${__API_BASE__}/api/public/locations`)
             .then(r => r.json())
             .then(data => {
                 const active = (data || []).filter(l => l.status === 'Active');
@@ -689,6 +689,7 @@ const ExploreRoomsPage = () => {
 };
 
 export default ExploreRoomsPage;
+
 
 
 

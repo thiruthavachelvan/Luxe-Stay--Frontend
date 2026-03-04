@@ -16,7 +16,7 @@ const LoginPage = () => {
         setError('');
 
         try {
-            const response = await fetch('__API_BASE__/api/auth/login', {
+            const response = await fetch(`${__API_BASE__}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -239,6 +239,7 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
 
 
 

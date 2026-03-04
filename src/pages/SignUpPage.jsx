@@ -16,7 +16,7 @@ const SignUpPage = () => {
         setError('');
 
         try {
-            const response = await fetch('__API_BASE__/api/auth/signup', {
+            const response = await fetch(`${__API_BASE__}/api/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,6 +221,7 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
+
 
 
 

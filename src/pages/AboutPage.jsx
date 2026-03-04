@@ -61,7 +61,7 @@ const AboutPage = () => {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const res = await fetch('__API_BASE__/api/public/locations');
+                const res = await fetch(`${__API_BASE__}/api/public/locations`);
                 if (res.ok) {
                     const data = await res.json();
                     setLocations(data);
@@ -316,6 +316,7 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+
 
 
 

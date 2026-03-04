@@ -57,7 +57,7 @@ const StaffDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/auth/staff/food-orders', {
+            const res = await fetch(`${__API_BASE__}/api/auth/staff/food-orders`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -76,7 +76,7 @@ const StaffDashboard = () => {
         setLoadingRequests(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/support/staff/my-requests', {
+            const res = await fetch(`${__API_BASE__}/api/support/staff/my-requests`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -94,7 +94,7 @@ const StaffDashboard = () => {
         if (!user) return;
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/auth/notifications', {
+            const res = await fetch(`${__API_BASE__}/api/auth/notifications`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -110,7 +110,7 @@ const StaffDashboard = () => {
     const fetchUserProfile = useCallback(async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/auth/profile', {
+            const res = await fetch(`${__API_BASE__}/api/auth/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -214,7 +214,7 @@ const StaffDashboard = () => {
     const handleClearNotifications = async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            await fetch('__API_BASE__/api/auth/notifications/clear', {
+            await fetch(`${__API_BASE__}/api/auth/notifications/clear`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -701,6 +701,7 @@ const StaffDashboard = () => {
 };
 
 export default StaffDashboard;
+
 
 
 

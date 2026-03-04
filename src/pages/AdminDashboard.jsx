@@ -305,7 +305,7 @@ const AdminDashboard = () => {
         setFetchingLocations(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/locations', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/locations`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -369,7 +369,7 @@ const AdminDashboard = () => {
         setFetchingOrders(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/food-orders', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/food-orders`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -387,7 +387,7 @@ const AdminDashboard = () => {
         setFetchingQueries(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/support/admin/all', {
+            const res = await fetch(`${__API_BASE__}/api/support/admin/all`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -405,7 +405,7 @@ const AdminDashboard = () => {
         setFetchingReservations(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/reservations', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/reservations`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -462,7 +462,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/menu', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/menu`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -527,7 +527,7 @@ const AdminDashboard = () => {
     const fetchNotifications = async () => {
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/notifications', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/notifications`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -557,7 +557,7 @@ const AdminDashboard = () => {
         if (!window.confirm('Erase all system alerts?')) return;
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/notifications', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/notifications`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -668,7 +668,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/rooms', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/rooms`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -792,7 +792,7 @@ const AdminDashboard = () => {
         setFetchingReviews(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/reviews/admin/all', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`${__API_BASE__}/api/reviews/admin/all`, { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setAdminReviews(await res.json());
         } catch (err) { console.error(err); } finally { setFetchingReviews(false); }
     };
@@ -801,7 +801,7 @@ const AdminDashboard = () => {
         setFetchingAdminBookings(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/auth/admin/bookings', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`${__API_BASE__}/api/auth/admin/bookings`, { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setAdminBookings(await res.json());
         } catch (err) { console.error('Error fetching admin bookings', err); } finally { setFetchingAdminBookings(false); }
     };
@@ -817,7 +817,7 @@ const AdminDashboard = () => {
         setFetchingContacts(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/contact/admin/all', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`${__API_BASE__}/api/contact/admin/all`, { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setAdminContacts(await res.json());
         } catch (err) { console.error(err); } finally { setFetchingContacts(false); }
     };
@@ -843,7 +843,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/create-staff', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/create-staff`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -943,7 +943,7 @@ const AdminDashboard = () => {
 
         try {
             const token = sessionStorage.getItem('userToken');
-            const response = await fetch('__API_BASE__/api/auth/admin/locations', {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/locations`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1010,7 +1010,7 @@ const AdminDashboard = () => {
         setFetchingCoupons(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch('__API_BASE__/api/auth/admin/coupons', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`${__API_BASE__}/api/auth/admin/coupons`, { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) setCoupons(await res.json());
         } catch (err) { console.error(err); } finally { setFetchingCoupons(false); }
     };
@@ -1021,7 +1021,7 @@ const AdminDashboard = () => {
         try {
             const token = sessionStorage.getItem('userToken');
             const url = couponFormMode === 'create'
-                ? '__API_BASE__/api/auth/admin/coupons'
+                ? `${__API_BASE__}/api/auth/admin/coupons`
                 : `${__API_BASE__}/api/auth/admin/coupons/${editingCouponId}`;
             const method = couponFormMode === 'create' ? 'POST' : 'PUT';
             const res = await fetch(url, {
@@ -4172,6 +4172,7 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
 
 
 
