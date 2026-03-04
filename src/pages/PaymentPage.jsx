@@ -185,6 +185,8 @@ const PaymentPage = () => {
                                 checkIn,
                                 checkOut,
                                 guests: { adults: bookingDetails.adults, children: bookingDetails.children },
+                                guestDetails: bookingDetails.guestDetails,
+                                specialRequests: bookingDetails.specialRequests,
                                 totalPrice: total - couponDiscount,
                                 originalPrice: total,
                                 couponCode: couponCode || null,
@@ -195,8 +197,8 @@ const PaymentPage = () => {
                             })
                         });
                         if (bookingRes.ok) {
-                            navigate('/dashboard', { state: { section: 'bookings' }, replace: true });
-                            setTimeout(() => alert('Booking Confirmed! Welcome to LuxeStay.'), 500);
+                            // Hard redirect to force a completely fresh dashboard load with the bookings tab active
+                            window.location.href = '/dashboard?section=bookings';
                         } else {
                             alert('Booking failed after payment. Please contact support.');
                         }
@@ -226,7 +228,7 @@ const PaymentPage = () => {
     // If no booking details yet, show nothing (redirect is handled in useEffect)
     if (!bookingDetails) return null;
 
-    const { room, checkIn, checkOut, subtotal, serviceFee, occupancyTax, addOns } = bookingDetails;
+    const { room, checkIn, checkOut, subtotal, serviceFee, occupancyTax, addOns, guestDetails } = bookingDetails;
 
     return (
         <div className="min-h-screen bg-luxury-dark flex flex-col font-sans">
@@ -279,6 +281,20 @@ const PaymentPage = () => {
                                         <p className="text-sm text-white font-bold">{new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                     </div>
                                 </div>
+
+                                {guestDetails && guestDetails.length > 0 && (
+                                    <div className="pt-6 border-t border-luxury-border/30">
+                                        <span className="text-[10px] font-bold text-luxury-blue uppercase tracking-widest block mb-2">Guests</span>
+                                        <div className="space-y-2 text-sm text-luxury-muted">
+                                            {guestDetails.map((g, i) => (
+                                                <div key={i} className="flex justify-between">
+                                                    <span>{g.name} <span className="text-[10px] uppercase text-luxury-muted/50 ml-1">({g.type})</span></span>
+                                                    <span>{g.age} yrs</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="space-y-3 pt-6 border-t border-luxury-border/30 text-sm">
                                     <div className="flex justify-between text-luxury-muted">

@@ -20,6 +20,7 @@ import ContactPage from './pages/ContactPage';
 import PolicyPage from './pages/PolicyPage';
 import PaymentPage from './pages/PaymentPage';
 import OffersPage from './pages/OffersPage';
+import GuestDetailsPage from './pages/GuestDetailsPage';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/policies" element={<PolicyPage />} />
+          <Route path="/guest-details" element={<GuestDetailsPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/offers" element={<OffersPage />} />
         </Routes>

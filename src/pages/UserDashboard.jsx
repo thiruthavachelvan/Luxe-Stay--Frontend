@@ -4,6 +4,7 @@ import {
     LayoutDashboard,
     Calendar,
     User,
+    Users,
     CreditCard,
     Headset,
     Bell,
@@ -78,6 +79,8 @@ const UserDashboard = () => {
     const [memberCouponStatus, setMemberCouponStatus] = useState(null);
     const [memberCouponMessage, setMemberCouponMessage] = useState('');
     const [memberCouponValidating, setMemberCouponValidating] = useState(false);
+
+    const [viewingBooking, setViewingBooking] = useState(null);
 
     const navigate = useNavigate();
 
@@ -1040,6 +1043,9 @@ const UserDashboard = () => {
                                             Cancel Stay
                                         </button>
                                     )}
+                                    <button onClick={() => setViewingBooking(booking)} className="p-3 bg-luxury-dark hover:bg-white/5 border border-luxury-border/30 text-white rounded-xl transition-all font-bold text-xs whitespace-nowrap shadow-lg">
+                                        View Details
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1950,6 +1956,78 @@ const UserDashboard = () => {
                                 >
                                     Confirm Cancellation
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Booking Details Modal */}
+                {viewingBooking && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4 text-left">
+                        <div className="bg-luxury-card border border-luxury-border/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar p-8 relative animate-in fade-in zoom-in-95 duration-300 shadow-2xl">
+                            <button onClick={() => setViewingBooking(null)} className="absolute top-6 right-6 text-luxury-muted hover:text-white transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+
+                            <div className="mb-6">
+                                <h3 className="text-2xl font-bold text-white font-serif italic mb-1">Stay Details</h3>
+                                <p className="text-xs text-luxury-muted tracking-widest uppercase">Booking #{viewingBooking._id?.slice(-8)}</p>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-2 gap-4 bg-luxury-dark/40 border border-luxury-border/20 rounded-2xl p-5">
+                                    <div>
+                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest mb-1">Room</p>
+                                        <p className="text-sm font-bold text-white">{viewingBooking.room?.roomType}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest mb-1">Status</p>
+                                        <p className={`text-sm font-bold ${viewingBooking.status === 'Confirmed' || viewingBooking.status === 'CheckedIn' ? 'text-emerald-400' : 'text-luxury-muted'}`}>{viewingBooking.status}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest mb-1">Check-in</p>
+                                        <p className="text-sm text-white">{new Date(viewingBooking.checkIn).toLocaleDateString()}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest mb-1">Check-out</p>
+                                        <p className="text-sm text-white">{new Date(viewingBooking.checkOut).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+
+                                {viewingBooking.guestDetails && viewingBooking.guestDetails.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-luxury-border/20 pb-3 mb-4 flex items-center gap-2">
+                                            <Users className="w-4 h-4 text-luxury-blue" />
+                                            Registered Guests
+                                        </h4>
+                                        <div className="grid gap-3">
+                                            {viewingBooking.guestDetails.map((guest, idx) => (
+                                                <div key={idx} className="bg-luxury-dark/40 border border-luxury-border/20 p-4 rounded-xl flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-sm font-bold text-white flex items-center gap-2">
+                                                            {guest.name}
+                                                            <span className="bg-luxury-blue/10 text-luxury-blue text-[9px] px-1.5 py-0.5 rounded uppercase">{guest.type}</span>
+                                                        </p>
+                                                        <p className="text-[10px] text-luxury-muted mt-0.5">Age: {guest.age} • {guest.gender} {guest.phone && `• ${guest.phone}`}</p>
+                                                    </div>
+                                                    {guest.idType && guest.idNumber && (
+                                                        <div className="text-right">
+                                                            <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest">{guest.idType}</p>
+                                                            <p className="text-xs font-mono text-white/80">{guest.idNumber}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {viewingBooking.specialRequests && (
+                                    <div>
+                                        <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-luxury-border/20 pb-3 mb-4">Special Requests</h4>
+                                        <p className="text-sm text-luxury-muted leading-relaxed italic bg-luxury-dark/40 p-4 border border-luxury-border/20 rounded-xl">"{viewingBooking.specialRequests}"</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

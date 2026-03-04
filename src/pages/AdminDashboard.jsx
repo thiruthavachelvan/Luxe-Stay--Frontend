@@ -34,8 +34,11 @@ import {
     Mail,
     Trash2,
     CheckCircle2,
-    Tag
+    Tag,
+    Download
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const AdminDashboard = () => {
     const [user, setUser] = useState(null);
@@ -64,6 +67,7 @@ const AdminDashboard = () => {
     const [fetchingReservations, setFetchingReservations] = useState(false);
     const [adminBookings, setAdminBookings] = useState([]);
     const [fetchingAdminBookings, setFetchingAdminBookings] = useState(false);
+    const [viewingBooking, setViewingBooking] = useState(null);
     const [respondingTo, setRespondingTo] = useState(null);
     const [spaTimes, setSpaTimes] = useState({});
     const [assignmentDrafts, setAssignmentDrafts] = useState({});
@@ -97,6 +101,10 @@ const AdminDashboard = () => {
     const [couponFormMode, setCouponFormMode] = useState('create'); // 'create' | 'edit'
     const [editingCouponId, setEditingCouponId] = useState(null);
     const [showCouponForm, setShowCouponForm] = useState(false);
+
+    // Analytics Export State
+    const [exportMonth, setExportMonth] = useState('all');
+    const [exportYear, setExportYear] = useState(new Date().getFullYear().toString());
 
     const navigate = useNavigate();
 
@@ -1073,6 +1081,87 @@ const AdminDashboard = () => {
         { id: 'analytics', label: 'Analytics & Reports', icon: TrendingUp, category: 'ENGAGEMENT' },
     ];
 
+    const getFilteredBookings = () => {
+        let filtered = adminBookings || [];
+        if (exportYear !== 'all') {
+            filtered = filtered.filter(b => {
+                const d = new Date(b.createdAt);
+                return d.getFullYear().toString() === exportYear &&
+                    (exportMonth === 'all' || d.getMonth().toString() === exportMonth);
+            });
+        }
+        return filtered;
+    };
+
+    const handleDownloadReport = () => {
+        const filteredBookings = getFilteredBookings();
+
+        const doc = new jsPDF();
+
+        // Header
+        doc.setFillColor(15, 22, 38); // bg-luxury-dark
+        doc.rect(0, 0, 210, 40, 'F');
+
+        doc.setTextColor(212, 175, 55); // luxury-gold
+        doc.setFontSize(28);
+        doc.setFont('helvetica', 'italic');
+        doc.text("LuxeStay Command Center", 105, 20, { align: "center" });
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        let periodText = "All Time";
+        if (exportYear !== 'all') {
+            periodText = exportMonth !== 'all' ? `${new Date(2000, parseInt(exportMonth)).toLocaleString('default', { month: 'long' })} ${exportYear}` : `Year ${exportYear}`;
+        }
+        doc.text(`Executive Analytics Report: ${periodText}`, 105, 30, { align: "center" });
+
+        // Financial Summary
+        const totalRevenueMs = filteredBookings.filter(b => b.status !== 'Cancelled').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+        const totalBookingsMs = filteredBookings.length;
+
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text("Executive Summary", 14, 50);
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total Bookings Generated: ${totalBookingsMs}`, 14, 60);
+        doc.text(`Total Revenue Collected: Rs ${totalRevenueMs.toLocaleString('en-IN')}`, 14, 68);
+
+        // Booking Table
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text("Recent Activity Log", 14, 85);
+
+        const tableColumn = ["Guest Name", "Location", "Dates", "Status", "Amount"];
+        const tableRows = [];
+
+        filteredBookings.slice(0, 50).forEach(booking => {
+            const bookingData = [
+                booking.user?.fullName || 'Guest',
+                booking.location?.city || 'HQ',
+                `${new Date(booking.checkIn).toLocaleDateString()} - ${new Date(booking.checkOut).toLocaleDateString()}`,
+                booking.status,
+                `Rs ${booking.totalPrice?.toLocaleString('en-IN') || 0}`
+            ];
+            tableRows.push(bookingData);
+        });
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 90,
+            theme: 'grid',
+            headStyles: { fillColor: [15, 22, 38], textColor: [212, 175, 55] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            styles: { fontSize: 10, cellPadding: 4 }
+        });
+
+        doc.save(`LuxeStay_Report_${periodText.replace(/ /g, '_')}.pdf`);
+    };
+
     const renderContent = () => {
         switch (activeSection) {
             case 'dashboard':
@@ -1838,6 +1927,7 @@ const AdminDashboard = () => {
                                             <th className="px-8 py-5">Stay Period</th>
                                             <th className="px-8 py-5">Value</th>
                                             <th className="px-8 py-5 text-right">Payment Status</th>
+                                            <th className="px-8 py-5 text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-luxury-border/50">
@@ -1871,6 +1961,14 @@ const AdminDashboard = () => {
                                                         <div className="text-[9px] mt-1 text-luxury-muted uppercase tracking-widest">
                                                             Status: {booking.status}
                                                         </div>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-center">
+                                                        <button
+                                                            onClick={() => setViewingBooking(booking)}
+                                                            className="px-4 py-2 bg-luxury-blue/10 text-luxury-blue hover:bg-luxury-blue hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
+                                                        >
+                                                            View Details
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))
@@ -2935,18 +3033,55 @@ const AdminDashboard = () => {
                 );
 
             case 'analytics':
+                const filteredList = getFilteredBookings();
+                const filteredRev = filteredList.filter(b => b.status !== 'Cancelled').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
                 return (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
-                        <div>
-                            <h2 className="text-3xl font-bold text-white font-serif italic">Analytics & Reporting</h2>
-                            <p className="text-sm text-luxury-muted mt-1 uppercase tracking-widest font-bold">Booking Trends · Occupancy · Revenue · Reviews</p>
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div>
+                                <h2 className="text-3xl font-bold text-white font-serif italic">Analytics & Reporting</h2>
+                                <p className="text-sm text-luxury-muted mt-1 uppercase tracking-widest font-bold">Booking Trends · Occupancy · Revenue · Reviews</p>
+                            </div>
+
+                            <div className="flex items-center gap-4 bg-luxury-card p-3 rounded-xl border border-luxury-border">
+                                <div className="flex items-center gap-3">
+                                    <select
+                                        value={exportMonth}
+                                        onChange={(e) => setExportMonth(e.target.value)}
+                                        className="bg-luxury-dark border border-luxury-border/50 rounded-lg px-3 py-2 text-white text-xs font-bold uppercase outline-none focus:border-luxury-gold transition-colors"
+                                    >
+                                        <option value="all">All Months</option>
+                                        {[...Array(12).keys()].map(i => (
+                                            <option key={i} value={i.toString()}>{new Date(2000, i).toLocaleString('default', { month: 'long' })}</option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        value={exportYear}
+                                        onChange={(e) => setExportYear(e.target.value)}
+                                        className="bg-luxury-dark border border-luxury-border/50 rounded-lg px-3 py-2 text-white text-xs font-bold uppercase outline-none focus:border-luxury-gold transition-colors"
+                                    >
+                                        <option value="all">All Years</option>
+                                        {[2024, 2025, 2026, 2027].map(y => (
+                                            <option key={y} value={y.toString()}>{y}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <button
+                                    onClick={handleDownloadReport}
+                                    className="flex items-center gap-2 px-5 py-2 bg-[#D4AF37] hover:bg-[#C5A017] text-[#0F1626] rounded-lg transition-all font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] transform hover:-translate-y-0.5"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Download PDF Report
+                                </button>
+                            </div>
                         </div>
 
                         {/* KPI Summary Row */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                             {[
-                                { label: 'Total Bookings', value: dashboardStats?.totalBookings ?? '—', sub: 'All time', icon: Calendar, color: 'from-blue-500/20 to-transparent', iconColor: 'text-luxury-blue' },
-                                { label: 'Total Revenue', value: dashboardStats?.totalRevenue ? `₹${Number(dashboardStats.totalRevenue).toLocaleString('en-IN')}` : '—', sub: 'All time', icon: TrendingUp, color: 'from-green-500/20 to-transparent', iconColor: 'text-green-400' },
+                                { label: 'Filtered Bookings', value: filteredList.length, sub: 'Selected Period', icon: Calendar, color: 'from-blue-500/20 to-transparent', iconColor: 'text-luxury-blue' },
+                                { label: 'Filtered Revenue', value: `₹${filteredRev.toLocaleString('en-IN')}`, sub: 'Selected Period', icon: TrendingUp, color: 'from-green-500/20 to-transparent', iconColor: 'text-green-400' },
                                 { label: 'Avg Occupancy', value: dashboardStats?.occupancyRate ? `${dashboardStats.occupancyRate}%` : (dashboardStats?.rooms ? `${Math.round((dashboardStats.occupiedRooms / dashboardStats.rooms) * 100)}%` : '—'), sub: 'Current period', icon: Building, color: 'from-purple-500/20 to-transparent', iconColor: 'text-purple-400' },
                                 { label: 'Total Reviews', value: dashboardStats?.totalReviews ?? (adminReviews?.length ?? '—'), sub: 'Submitted', icon: Star, color: 'from-amber-500/20 to-transparent', iconColor: 'text-amber-400' },
                             ].map((kpi, i) => {
@@ -2973,7 +3108,7 @@ const AdminDashboard = () => {
                                 {(() => {
                                     const statuses = ['Confirmed', 'CheckedIn', 'CheckedOut', 'Cancelled'];
                                     const colors = { Confirmed: 'bg-blue-500', CheckedIn: 'bg-green-500', CheckedOut: 'bg-amber-400', Cancelled: 'bg-red-500' };
-                                    const counts = statuses.map(s => (adminBookings || []).filter(b => b.status === s).length);
+                                    const counts = statuses.map(s => filteredList.filter(b => b.status === s).length);
                                     const total = counts.reduce((a, b) => a + b, 0) || 1;
                                     return (
                                         <div className="space-y-4">
@@ -3022,7 +3157,7 @@ const AdminDashboard = () => {
                         <div className="bg-luxury-card border border-luxury-border rounded-2xl p-8">
                             <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-400" /> Revenue by Location</h3>
                             {(() => {
-                                const bookings = (adminBookings || []).filter(b => b.status !== 'Cancelled');
+                                const bookings = filteredList.filter(b => b.status !== 'Cancelled');
                                 const byLocation = {};
                                 bookings.forEach(b => {
                                     const city = b.room?.location?.city || b.location?.city || 'Unknown';
@@ -4164,6 +4299,128 @@ const AdminDashboard = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Booking Details Modal */}
+            {viewingBooking && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-luxury-dark/90 backdrop-blur-sm">
+                    <div className="bg-luxury-card border border-luxury-border w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-luxury-border flex items-center justify-between bg-luxury-dark/50 shrink-0">
+                            <div>
+                                <h3 className="text-xl font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                    <Shield className="w-5 h-5 text-luxury-gold" />
+                                    Reservation Dossier
+                                </h3>
+                                <p className="text-[10px] text-luxury-muted uppercase tracking-widest mt-1">
+                                    Booking ID: {viewingBooking._id}
+                                </p>
+                            </div>
+                            <button onClick={() => setViewingBooking(null)} className="p-2 text-luxury-muted hover:bg-white/5 hover:text-white transition-all rounded-full">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-8">
+                            {/* General Stay Info */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-luxury-dark/30 p-6 rounded-xl border border-luxury-border/50">
+                                <div>
+                                    <p className="text-[10px] text-luxury-muted uppercase tracking-widest mb-1">Primary Guest</p>
+                                    <p className="text-white font-bold">{viewingBooking.user?.fullName || viewingBooking.user?.email}</p>
+                                    <p className="text-sm text-luxury-muted">{viewingBooking.user?.email}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-luxury-muted uppercase tracking-widest mb-1">Location & Room</p>
+                                    <p className="text-white font-bold">{viewingBooking.location?.city || 'Unknown Location'}</p>
+                                    <p className="text-sm text-luxury-muted">{viewingBooking.room?.type || viewingBooking.room?.roomType} {viewingBooking.room?.roomNumber ? `(Room ${viewingBooking.room.roomNumber})` : ''}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-luxury-muted uppercase tracking-widest mb-1">Duration</p>
+                                    <p className="text-white font-bold">{new Date(viewingBooking.checkIn).toLocaleDateString('en-GB')} to {new Date(viewingBooking.checkOut).toLocaleDateString('en-GB')}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-luxury-muted uppercase tracking-widest mb-1">Payment & Status</p>
+                                    <p className="text-luxury-gold font-bold">₹{viewingBooking.totalPrice?.toLocaleString()}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${viewingBooking.paymentStatus === 'Paid' ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                                            {viewingBooking.paymentStatus || 'Pending'}
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-luxury-blue/10 text-luxury-blue`}>
+                                            {viewingBooking.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Guest Details List */}
+                            <div>
+                                <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-luxury-border/50 pb-2">
+                                    <Users className="w-4 h-4 text-luxury-blue" />
+                                    Registered Guests
+                                </h4>
+                                {viewingBooking.guestDetails && viewingBooking.guestDetails.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {viewingBooking.guestDetails.map((guest, idx) => (
+                                            <div key={idx} className="bg-luxury-card border border-luxury-border/50 p-4 rounded-xl hover:border-luxury-blue/30 transition-all">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <h5 className="font-bold text-white text-sm">{guest.name || 'Unnamed Guest'}</h5>
+                                                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest ${guest.type === 'adult' ? 'bg-luxury-gold/10 text-luxury-gold border border-luxury-gold/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'}`}>
+                                                        {guest.type}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-1.5 text-xs text-luxury-muted">
+                                                    <div className="flex justify-between">
+                                                        <span>Age & Gender:</span>
+                                                        <span className="text-white">{guest.age || '—'} yrs, {guest.gender || '—'}</span>
+                                                    </div>
+                                                    {guest.type === 'adult' && (
+                                                        <>
+                                                            <div className="flex justify-between">
+                                                                <span>Phone:</span>
+                                                                <span className="text-white">{guest.phone || '—'}</span>
+                                                            </div>
+                                                            {guest.email && (
+                                                                <div className="flex justify-between">
+                                                                    <span>Email:</span>
+                                                                    <span className="text-white truncate max-w-[120px]" title={guest.email}>{guest.email}</span>
+                                                                </div>
+                                                            )}
+                                                            <div className="flex justify-between mt-2 pt-2 border-t border-luxury-border/30">
+                                                                <span>{guest.idType || 'ID'}:</span>
+                                                                <span className="text-white font-mono text-[10px]">{guest.idNumber || '—'}</span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-luxury-muted text-sm italic">No detailed guest records found for this booking.</p>
+                                )}
+                            </div>
+
+                            {/* Special Requests */}
+                            {viewingBooking.specialRequests && (
+                                <div className="bg-luxury-blue/5 border border-luxury-blue/20 rounded-xl p-5">
+                                    <h4 className="text-[10px] font-bold text-luxury-blue uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <BellRing className="w-3 h-3" />
+                                        Special Requests / Notes
+                                    </h4>
+                                    <p className="text-sm text-white/90 italic leading-relaxed">
+                                        "{viewingBooking.specialRequests}"
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="p-6 border-t border-luxury-border bg-luxury-dark/50 shrink-0 flex justify-end">
+                            <button
+                                onClick={() => setViewingBooking(null)}
+                                className="px-6 py-2.5 bg-luxury-dark border border-luxury-border hover:bg-white/5 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
+                            >
+                                Close Dossier
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

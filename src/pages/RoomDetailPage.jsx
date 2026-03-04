@@ -206,7 +206,7 @@ const RoomDetailPage = () => {
             };
         });
 
-        navigate('/payment', {
+        navigate('/guest-details', {
             state: {
                 roomId: room._id,
                 room,
