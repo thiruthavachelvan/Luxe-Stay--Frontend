@@ -82,6 +82,7 @@ const UserDashboard = () => {
     const [memberCouponValidating, setMemberCouponValidating] = useState(false);
 
     const [viewingBooking, setViewingBooking] = useState(null);
+    const [spaBillBooking, setSpaBillBooking] = useState(null);
 
     const getExclusiveBenefits = (tier) => {
         if (!tier || tier === 'None') return [];
@@ -300,6 +301,7 @@ const UserDashboard = () => {
     };
 
     const handleAddSpa = async (booking) => {
+        setSpaBillBooking(null);
         try {
             const token = sessionStorage.getItem('userToken');
             const spaPrice = 1999; // Same as catalog
@@ -310,8 +312,13 @@ const UserDashboard = () => {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ amount: spaPrice })
             });
-            if (!orderRes.ok) throw new Error('Order creation failed');
+            if (!orderRes.ok) {
+                const errorData = await orderRes.json();
+                console.error('Spa Order Error:', errorData);
+                throw new Error('Order creation failed');
+            }
             const orderData = await orderRes.json();
+            console.log('Spa Order Created:', orderData);
 
             // 2. Razorpay
             if (!(await loadScript('https://checkout.razorpay.com/v1/checkout.js'))) {
@@ -337,16 +344,23 @@ const UserDashboard = () => {
                         })
                     });
                     const verifyData = await verifyRes.json();
+                    console.log('Spa Payment Verification:', verifyData);
                     if (verifyData.success) {
+                        console.log('Triggering Backend add-spa...');
                         const addSpaRes = await fetch(`${__API_BASE__}/api/auth/bookings/${booking._id}/add-spa`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                             body: JSON.stringify({ amount: spaPrice, transactionId: response.razorpay_payment_id })
                         });
+                        console.log('Add-Spa Response:', addSpaRes.status);
                         if (addSpaRes.ok) {
+                            console.log('Spa added successfully on backend');
                             toast.success('Spa added successfully!');
                             fetchAllData();
                             setViewingBooking(null);
+                        } else {
+                            const addSpaError = await addSpaRes.json();
+                            console.error('Add-Spa Backend Error:', addSpaError);
                         }
                     }
                 },
@@ -681,7 +695,7 @@ const UserDashboard = () => {
                             { title: 'Order Food', sub: 'Gourmet room service', icon: Utensils, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); navigate('/menu'); } },
                             { title: 'Request Cleaning', sub: 'Fresh towels & turnover', icon: Wind, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Cleaning'); } },
                             { title: 'Book Transport', sub: 'Luxury fleet at your door', icon: Car, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Transport'); } },
-                            { title: 'Spa & Wellness', sub: 'Book treatments & massage', icon: Flower2, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Spa'); } },
+                            { title: 'Spa & Wellness', sub: 'Book treatments & massage', icon: Flower2, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); setSpaBillBooking(displayedBooking); } },
                         ].map((service, i) => (
                             <button
                                 key={i}
@@ -2185,7 +2199,7 @@ const UserDashboard = () => {
                                             <p className="text-xs text-luxury-muted mt-1">Book a rejuvenating 60-minute spa treatment to complete your experience.</p>
                                         </div>
                                         <button
-                                            onClick={() => handleAddSpa(viewingBooking)}
+                                            onClick={() => setSpaBillBooking(viewingBooking)}
                                             className="px-6 py-2 bg-luxury-gold text-zinc-900 rounded-xl text-xs font-bold hover:bg-yellow-400 transition-all shadow-lg shadow-luxury-gold/20"
                                         >
                                             Add Spa Treatment (₹1,999)
@@ -2199,6 +2213,68 @@ const UserDashboard = () => {
                                         <p className="text-sm text-luxury-muted leading-relaxed italic bg-luxury-dark/40 p-4 border border-luxury-border/20 rounded-xl">"{viewingBooking.specialRequests}"</p>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Spa Bill Modal */}
+                {spaBillBooking && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-luxury-dark/95 backdrop-blur-2xl">
+                        <div className="bg-luxury-card border border-luxury-gold/30 w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                            {/* Header */}
+                            <div className="p-8 border-b border-luxury-border/50 text-center relative overflow-hidden">
+                                <div className="absolute inset-0 bg-luxury-gold/5 blur-3xl rounded-full translate-y-1/2"></div>
+                                <div className="relative z-10">
+                                    <div className="w-16 h-16 bg-luxury-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-luxury-gold/30 shadow-lg shadow-luxury-gold/10">
+                                        <Flower2 className="w-8 h-8 text-luxury-gold" />
+                                    </div>
+                                    <h3 className="text-2xl font-serif italic text-white mb-2">Spa & Wellness</h3>
+                                    <p className="text-xs text-luxury-muted font-bold tracking-widest uppercase">Invoice & Payment</p>
+                                </div>
+                            </div>
+
+                            {/* Bill Content */}
+                            <div className="p-8 space-y-6">
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-luxury-muted font-medium">Guest</span>
+                                        <span className="text-white font-bold">{spaBillBooking.user?.fullName || profile?.fullName || 'Valued Guest'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-luxury-muted font-medium">Booking Reference</span>
+                                        <span className="text-white font-mono">{spaBillBooking._id.slice(-6).toUpperCase()}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-luxury-muted font-medium">Service</span>
+                                        <span className="text-white font-medium">60-Min Restorative Session</span>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-luxury-border/50 pt-6">
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <p className="text-[10px] text-luxury-muted font-bold uppercase tracking-widest mb-1">Total Payable</p>
+                                            <p className="text-3xl text-luxury-gold font-bold">₹1,999</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="p-6 bg-luxury-dark/50 border-t border-luxury-border/50 flex gap-4">
+                                <button
+                                    onClick={() => setSpaBillBooking(null)}
+                                    className="px-6 py-4 bg-transparent border border-luxury-border hover:bg-white/5 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all w-1/3"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleAddSpa(spaBillBooking)}
+                                    className="flex-1 py-4 bg-luxury-gold text-zinc-900 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-luxury-gold/90 transition-all shadow-xl shadow-luxury-gold/20 flex items-center justify-center gap-2"
+                                >
+                                    Proceed to Payment <ChevronRight className="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
                     </div>

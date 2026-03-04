@@ -340,10 +340,21 @@ const MenuPage = () => {
                                                 <p className="text-2xl font-bold text-white font-serif">₹{item.price}</p>
                                             )}
                                         </div>
-                                        <button onClick={() => addToCart(item)} className="flex items-center gap-2 px-6 py-2.5 bg-luxury-blue text-white rounded-xl font-bold text-xs hover:bg-luxury-blue-hover transition-all shadow-lg active:scale-95 group/btn">
-                                            Add to Cart
-                                            <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                        </button>
+                                        {(() => {
+                                            const cartItem = cart.find(c => c.menuItem._id === item._id);
+                                            return cartItem ? (
+                                                <div className="flex items-center bg-[#1A1D27] rounded-xl border border-luxury-border/30 p-1">
+                                                    <button onClick={() => decreaseQuantity(item._id)} className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors active:scale-95 text-xl font-medium leading-none mb-0.5">-</button>
+                                                    <span className="w-8 text-center text-sm font-bold text-white">{cartItem.quantity}</span>
+                                                    <button onClick={() => addToCart(item)} className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors active:scale-95 text-xl font-medium leading-none mb-0.5">+</button>
+                                                </div>
+                                            ) : (
+                                                <button onClick={() => addToCart(item)} className="flex items-center gap-2 px-6 py-2.5 bg-luxury-blue text-white rounded-xl font-bold text-xs hover:bg-luxury-blue-hover transition-all shadow-lg active:scale-95 group/btn">
+                                                    Add to Cart
+                                                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                                </button>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             </div>

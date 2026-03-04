@@ -4638,6 +4638,8 @@ const AdminDashboard = () => {
                                                                     type="datetime-local"
                                                                     value={adminSpaDates[`${viewingBooking._id}_${addon.name}`] || ''}
                                                                     onChange={(e) => setAdminSpaDates({ ...adminSpaDates, [`${viewingBooking._id}_${addon.name}`]: e.target.value })}
+                                                                    min={viewingBooking.checkIn ? new Date(new Date(viewingBooking.checkIn).getTime() - new Date(viewingBooking.checkIn).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : undefined}
+                                                                    max={viewingBooking.checkOut ? new Date(new Date(viewingBooking.checkOut).getTime() - new Date(viewingBooking.checkOut).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : undefined}
                                                                     style={{ colorScheme: 'dark' }}
                                                                     className="w-full bg-luxury-dark border border-luxury-border rounded-lg py-2 px-3 text-white text-xs outline-none focus:border-luxury-blue transition-all"
                                                                 />
