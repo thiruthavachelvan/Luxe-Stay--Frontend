@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
@@ -196,10 +197,10 @@ const UserDashboard = () => {
                 });
                 const verifyData = await verifyRes.json();
                 if (verifyRes.ok && verifyData.success) {
-                    alert(`✅ Successfully upgraded to ${tierName}! Your membership is now active.`);
+                    toast.success(`Successfully upgraded to ${tierName}! Your membership is now active.`);
                     fetchAllData();
                 } else {
-                    alert(verifyData.message || 'Membership activation failed.');
+                    toast.error(verifyData.message || 'Membership activation failed.');
                 }
                 setLoading(false);
                 return;
@@ -207,7 +208,7 @@ const UserDashboard = () => {
 
             // 2b. REAL Razorpay path
             if (!(await loadScript('https://checkout.razorpay.com/v1/checkout.js'))) {
-                alert('Razorpay SDK failed to load. Are you online?');
+                toast.error('Razorpay SDK failed to load. Are you online?');
                 setLoading(false);
                 return;
             }
@@ -233,14 +234,14 @@ const UserDashboard = () => {
                         });
                         const verifyData = await verifyRes.json();
                         if (verifyRes.ok && verifyData.success) {
-                            alert(`✅ Successfully upgraded to ${tierName}! Your membership is now active.`);
+                            toast.success(`Successfully upgraded to ${tierName}! Your membership is now active.`);
                             fetchAllData();
                         } else {
-                            alert(verifyData.message || 'Payment verification failed');
+                            toast.error(verifyData.message || 'Payment verification failed');
                         }
                     } catch (verifyErr) {
                         console.error('Membership verification error:', verifyErr);
-                        alert('An unexpected error occurred verifying your membership.');
+                        toast.error('An unexpected error occurred verifying your membership.');
                     }
                 },
                 prefill: { name: profile.fullName || 'Guest', email: profile.email || '' },
@@ -249,13 +250,13 @@ const UserDashboard = () => {
 
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
-                alert(response.error.description);
+                toast.error(response.error.description);
             });
             rzp.open();
 
         } catch (err) {
             console.error('Membership Order Error:', err);
-            alert(err.message || 'An error occurred initiating purchase.');
+            toast.error(err.message || 'An error occurred initiating purchase.');
         } finally {
             setLoading(false);
         }
@@ -382,9 +383,9 @@ const UserDashboard = () => {
                 const data = await res.json();
                 setProfile(data);
                 setIsEditingProfile(false);
-                alert('Profile updated successfully.');
+                toast.success('Profile updated successfully.');
             } else {
-                alert('Failed to update profile.');
+                toast.error('Failed to update profile.');
             }
         } catch (err) {
             console.error('Error updating profile:', err);
@@ -460,7 +461,7 @@ const UserDashboard = () => {
                         <button onClick={() => setActiveSection('bookings')} className="px-8 py-3.5 bg-luxury-blue text-white rounded-xl font-bold hover:bg-luxury-blue-hover transition-all shadow-xl shadow-luxury-blue/30 active:scale-95">
                             {hasActiveStay ? 'View Active Stay' : 'My Bookings'}
                         </button>
-                        <button onClick={() => { if (!hasActiveStay) return alert('Concierge services are exclusively available during an active stay.'); setActiveSection('support'); }} className="px-8 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all active:scale-95">
+                        <button onClick={() => { if (!hasActiveStay) return toast.error('Concierge services are exclusively available during an active stay.'); setActiveSection('support'); }} className="px-8 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all active:scale-95">
                             Contact Concierge
                         </button>
                     </div>
@@ -579,10 +580,10 @@ const UserDashboard = () => {
                             <h3 className="text-sm font-bold text-white uppercase tracking-widest">In-Stay Services</h3>
                         </div>
                         {[
-                            { title: 'Order Food', sub: 'Gourmet room service', icon: Utensils, action: () => { if (!hasActiveStay) return alert('Available during active stays only.'); navigate('/menu'); } },
-                            { title: 'Request Cleaning', sub: 'Fresh towels & turnover', icon: Wind, action: () => { if (!hasActiveStay) return alert('Available during active stays only.'); handleServiceRequest('Cleaning'); } },
-                            { title: 'Book Transport', sub: 'Luxury fleet at your door', icon: Car, action: () => { if (!hasActiveStay) return alert('Available during active stays only.'); handleServiceRequest('Transport'); } },
-                            { title: 'Spa & Wellness', sub: 'Book treatments & massage', icon: Flower2, action: () => { if (!hasActiveStay) return alert('Available during active stays only.'); handleServiceRequest('Spa'); } },
+                            { title: 'Order Food', sub: 'Gourmet room service', icon: Utensils, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); navigate('/menu'); } },
+                            { title: 'Request Cleaning', sub: 'Fresh towels & turnover', icon: Wind, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Cleaning'); } },
+                            { title: 'Book Transport', sub: 'Luxury fleet at your door', icon: Car, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Transport'); } },
+                            { title: 'Spa & Wellness', sub: 'Book treatments & massage', icon: Flower2, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Spa'); } },
                         ].map((service, i) => (
                             <button
                                 key={i}
@@ -666,17 +667,17 @@ const UserDashboard = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
-                alert('Reservation cancelled successfully.');
+                toast.success('Reservation cancelled successfully.');
                 setCancelModalOpen(false);
                 setBookingToCancel(null);
                 fetchAllData();
             } else {
                 const data = await res.json();
-                alert(data.message || 'Failed to cancel booking.');
+                toast.error(data.message || 'Failed to cancel booking.');
             }
         } catch (err) {
             console.error('Error cancelling booking:', err);
-            alert('An error occurred while cancelling.');
+            toast.error('An error occurred while cancelling.');
         }
     };
 
@@ -688,14 +689,15 @@ const UserDashboard = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
-                alert('Checked in successfully. Enjoy your stay!');
+                toast.success('Checked in successfully. Enjoy your stay!');
                 fetchAllData();
             } else {
                 const data = await res.json();
-                alert(data.message || 'Failed to check in.');
+                toast.error(data.message || 'Failed to check in.');
             }
         } catch (err) {
             console.error('Check-in error:', err);
+            toast.error('Check-in error occurred.');
         }
     };
 
@@ -707,7 +709,7 @@ const UserDashboard = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
-                alert('Checked out successfully. We hope to see you again!');
+                toast.success('Checked out successfully. We hope to see you again!');
                 // Optimistically update local booking list so the Review form dropdown renders correctly instantly
                 setBookings(prev => prev.map(b => b._id === bookingId ? { ...b, status: 'CheckedOut' } : b));
 
@@ -717,10 +719,11 @@ const UserDashboard = () => {
                 fetchAllData();
             } else {
                 const data = await res.json();
-                alert(data.message || 'Failed to check out.');
+                toast.error(data.message || 'Failed to check out.');
             }
         } catch (err) {
             console.error('Check-out error:', err);
+            toast.error('Check-out error occurred.');
         }
     };
 
@@ -753,14 +756,14 @@ const UserDashboard = () => {
         const message = e.target.message.value;
         const priority = e.target.priority.value;
 
-        if (!subject || !message) return alert('Please provide both subject and message.');
+        if (!subject || !message) return toast.error('Please provide both subject and message.');
 
         const success = await submitSupportQuery(subject, message, priority);
         if (success) {
             e.target.reset();
-            alert('Your query has been dispatched to our concierge.');
+            toast.success('Your query has been dispatched to our concierge.');
         } else {
-            alert('Failed to dispatch query. Please try again.');
+            toast.error('Failed to dispatch query. Please try again.');
         }
     };
 

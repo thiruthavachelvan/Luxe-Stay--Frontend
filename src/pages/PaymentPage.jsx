@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, MapPin, CreditCard, Wallet, Bitcoin, AlertTriangle, Lock, ChevronRight, CheckCircle2, Tag, X } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -136,7 +137,7 @@ const PaymentPage = () => {
         try {
             const resScript = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
             if (!resScript) {
-                alert('Razorpay SDK failed to load. Are you online?');
+                toast.error('Razorpay SDK failed to load. Are you online?');
                 setIsLoading(false);
                 return;
             }
@@ -148,7 +149,7 @@ const PaymentPage = () => {
             });
 
             if (!orderRes.ok) {
-                alert('Server error creating order.');
+                toast.error('Server error creating order.');
                 setIsLoading(false);
                 return;
             }
@@ -197,13 +198,16 @@ const PaymentPage = () => {
                             })
                         });
                         if (bookingRes.ok) {
-                            // Hard redirect to force a completely fresh dashboard load with the bookings tab active
-                            window.location.href = '/dashboard?section=bookings';
+                            toast.success('Payment Successful! Confirmation email sent.');
+                            // Short delay to let the toast be seen before redirect
+                            setTimeout(() => {
+                                window.location.href = '/dashboard?section=bookings';
+                            }, 2000);
                         } else {
-                            alert('Booking failed after payment. Please contact support.');
+                            toast.error('Booking failed after payment. Please contact support.');
                         }
                     } else {
-                        alert('Payment verification failed');
+                        toast.error('Payment verification failed');
                     }
                     setIsLoading(false);
                 },
@@ -213,14 +217,14 @@ const PaymentPage = () => {
 
             const rzp1 = new window.Razorpay(options);
             rzp1.on('payment.failed', function (response) {
-                alert(response.error.description);
+                toast.error(response.error.description);
                 setIsLoading(false);
             });
             rzp1.open();
 
         } catch (error) {
             console.error('Payment Error:', error);
-            alert('An error occurred during payment processing.');
+            toast.error('An error occurred during payment processing.');
             setIsLoading(false);
         }
     };

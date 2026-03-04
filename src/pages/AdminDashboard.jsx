@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import {
     Users,
@@ -35,7 +36,10 @@ import {
     Trash2,
     CheckCircle2,
     Tag,
-    Download
+    Megaphone,
+    Send,
+    Download,
+    Menu
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -43,6 +47,7 @@ import autoTable from 'jspdf-autotable';
 const AdminDashboard = () => {
     const [user, setUser] = useState(null);
     const [activeSection, setActiveSection] = useState('dashboard');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [staffMembers, setStaffMembers] = useState([]);
     const [locations, setLocations] = useState([]);
     const [rooms, setRooms] = useState([]);
@@ -67,6 +72,8 @@ const AdminDashboard = () => {
     const [fetchingReservations, setFetchingReservations] = useState(false);
     const [adminBookings, setAdminBookings] = useState([]);
     const [fetchingAdminBookings, setFetchingAdminBookings] = useState(false);
+    const [bulkOffer, setBulkOffer] = useState({ title: '', description: '', code: '' });
+    const [sendingOffer, setSendingOffer] = useState(false);
     const [viewingBooking, setViewingBooking] = useState(null);
     const [respondingTo, setRespondingTo] = useState(null);
     const [spaTimes, setSpaTimes] = useState({});
@@ -1071,6 +1078,7 @@ const AdminDashboard = () => {
         { id: 'locations', label: 'Location Mgmt', icon: Map, category: 'MAIN MENU' },
         { id: 'rooms', label: 'Room Mgmt', icon: Bed, category: 'MAIN MENU' },
         { id: 'bookings', label: 'Booking Mgmt', icon: Calendar, category: 'MAIN MENU' },
+        { id: 'marketing', label: 'Marketing', icon: Megaphone, category: 'MAIN MENU' },
         { id: 'restaurant', label: 'Restaurant Menu', icon: Utensils, category: 'SERVICES' },
         { id: 'kitchen-orders', label: 'Kitchen Orders', icon: Clock, category: 'SERVICES' },
         { id: 'room-service', label: 'Room Service', icon: BellRing, category: 'SERVICES' },
@@ -1091,6 +1099,30 @@ const AdminDashboard = () => {
             });
         }
         return filtered;
+    };
+
+    const handleSendOffer = async () => {
+        setSendingOffer(true);
+        try {
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/send-offer`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('userToken')}`
+                },
+                body: JSON.stringify(bulkOffer)
+            });
+
+            if (!response.ok) throw new Error('Failed to send campaign');
+
+            toast.success('Marketing campaign launched successfully!');
+            setBulkOffer({ title: '', description: '', code: '' });
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message);
+        } finally {
+            setSendingOffer(false);
+        }
     };
 
     const handleDownloadReport = () => {
@@ -1203,6 +1235,27 @@ const AdminDashboard = () => {
                                     <p className="text-[10px] text-luxury-muted uppercase tracking-[0.15em] font-bold">{stat.label}</p>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Marketing Quick-Access */}
+                        <div className="mb-10 p-8 rounded-2xl bg-gradient-to-br from-luxury-blue/10 to-transparent border border-luxury-blue/20 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-luxury-blue/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+                            <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 bg-luxury-blue rounded-2xl flex items-center justify-center shadow-lg shadow-luxury-blue/20 group-hover:scale-110 transition-transform duration-500">
+                                    <Megaphone className="w-8 h-8 text-white" />
+                                </div>
+                                <div className="z-10">
+                                    <h3 className="text-xl font-bold text-white mb-1">Growth & Engagement</h3>
+                                    <p className="text-sm text-luxury-muted max-w-md">Launch exclusive seasonal offers and broadcast marketing campaigns to your global resident network.</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setActiveSection('marketing')}
+                                className="z-10 px-8 py-4 bg-luxury-blue hover:bg-luxury-blue-hover text-white rounded-xl font-bold transition-all shadow-lg shadow-luxury-blue/20 flex items-center gap-2 group/btn"
+                            >
+                                <span className="uppercase tracking-widest text-xs">Manage Campaigns</span>
+                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            </button>
                         </div>
 
 
@@ -1976,6 +2029,94 @@ const AdminDashboard = () => {
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                    </div>
+                );
+            case 'marketing':
+                return (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto space-y-8">
+                        <div className="text-center">
+                            <h2 className="text-3xl font-bold text-white font-serif italic mb-2">Marketing Campaigns</h2>
+                            <p className="text-luxury-muted">Broadcast exclusive offers and announcements to all LuxeStay residents.</p>
+                        </div>
+
+                        <div className="bg-luxury-card border border-luxury-border rounded-2xl p-10 shadow-2xl relative overflow-hidden">
+                            {/* Decorative background element */}
+                            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-luxury-blue/5 rounded-full blur-3xl"></div>
+
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSendOffer();
+                            }} className="space-y-8 relative z-10">
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-bold text-luxury-muted uppercase tracking-[0.2em] ml-1">Campaign Title</label>
+                                        <div className="relative group">
+                                            <input
+                                                type="text"
+                                                placeholder="e.g., Summer Refresh 2024"
+                                                className="w-full bg-luxury-dark border border-luxury-border focus:border-luxury-blue rounded-xl p-4 text-white outline-none transition-all placeholder:text-white/10"
+                                                required
+                                                value={bulkOffer.title}
+                                                onChange={(e) => setBulkOffer({ ...bulkOffer, title: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-bold text-luxury-muted uppercase tracking-[0.2em] ml-1">Promo Code</label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <Tag className="w-4 h-4 text-luxury-blue" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g., SUMMER40"
+                                                className="w-full bg-luxury-dark border border-luxury-border focus:border-luxury-blue rounded-xl p-4 pl-12 text-white outline-none transition-all font-mono tracking-widest uppercase placeholder:text-white/10"
+                                                required
+                                                value={bulkOffer.code}
+                                                onChange={(e) => setBulkOffer({ ...bulkOffer, code: e.target.value.toUpperCase() })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-xs font-bold text-luxury-muted uppercase tracking-[0.2em] ml-1">Campaign Description</label>
+                                    <textarea
+                                        placeholder="Describe the exclusivity of this offer..."
+                                        rows="5"
+                                        className="w-full bg-luxury-dark border border-luxury-border focus:border-luxury-blue rounded-xl p-4 text-white outline-none transition-all resize-none placeholder:text-white/10"
+                                        required
+                                        value={bulkOffer.description}
+                                        onChange={(e) => setBulkOffer({ ...bulkOffer, description: e.target.value })}
+                                    ></textarea>
+                                </div>
+
+                                <div className="pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={sendingOffer}
+                                        className="w-full py-5 bg-luxury-blue hover:bg-luxury-blue-hover text-white rounded-xl font-bold transition-all shadow-[0_0_25px_rgba(30,64,175,0.3)] disabled:opacity-50 flex items-center justify-center gap-3 active:scale-[0.98]"
+                                    >
+                                        {sendingOffer ? (
+                                            <>
+                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                <span>Broadcasting to Residents...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send className="w-5 h-5" />
+                                                <span>Launch Campaign Blast</span>
+                                            </>
+                                        )}
+                                    </button>
+                                    <p className="text-center text-[10px] text-luxury-muted uppercase tracking-widest mt-6">
+                                        Note: This will send an immediate email broadcast to all registered members.
+                                    </p>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 );
@@ -3237,16 +3378,28 @@ const AdminDashboard = () => {
 
     return (
         <div className="min-h-screen bg-luxury-dark text-luxury-text selection:bg-luxury-gold selection:text-white flex overflow-hidden">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-luxury-dark/60 backdrop-blur-sm z-[45] lg:hidden animate-in fade-in duration-300"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-72 bg-[#11141D] border-r border-luxury-border flex flex-col z-[50] fixed inset-y-0 hidden lg:flex">
+            <aside className={`w-72 bg-[#11141D] border-r border-luxury-border flex flex-col z-[50] fixed inset-y-0 transition-transform duration-500 ease-in-out transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
                 {/* Logo Section — fixed at top */}
-                <div className="flex-shrink-0 px-8 pt-8 pb-6 w-full">
+                <div className="flex-shrink-0 px-8 pt-8 pb-6 w-full flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-luxury-blue rounded-xl flex items-center justify-center shadow-lg shadow-luxury-blue/20">
                             <Building className="w-7 h-7 text-white" />
                         </div>
                         <h1 className="text-2xl font-bold text-white tracking-tight">Hotel Central</h1>
                     </div>
+                    {/* Mobile Close Button */}
+                    <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-luxury-muted hover:text-white transition-colors">
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
 
                 {/* Navigation Menu — scrollable */}
@@ -3259,7 +3412,10 @@ const AdminDashboard = () => {
                                     {sidebarItems.filter(item => item.category === category).map((item) => (
                                         <button
                                             key={item.id}
-                                            onClick={() => setActiveSection(item.id)}
+                                            onClick={() => {
+                                                setActiveSection(item.id);
+                                                setIsSidebarOpen(false); // Close sidebar on selection (mobile)
+                                            }}
                                             className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group ${activeSection === item.id ? 'bg-luxury-blue/10 text-luxury-blue' : 'text-luxury-muted hover:text-white hover:bg-white/5'
                                                 }`}
                                         >
@@ -3296,10 +3452,19 @@ const AdminDashboard = () => {
                 <div className="max-w-[1600px] w-full mx-auto mt-6 px-4 md:px-12 pb-20">
                     {/* Top Bar Decoration */}
                     <div className="flex items-center justify-between mb-12 py-6 border-b border-luxury-border">
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-luxury-muted uppercase tracking-widest">Admin Command Center</span>
-                            <span className="w-1 h-1 rounded-full bg-luxury-blue"></span>
-                            <span className="text-xs font-serif italic text-luxury-gold capitalize">{activeSection.replace('-', ' ')}</span>
+                        <div className="flex items-center gap-4">
+                            {/* Mobile Toggle */}
+                            <button
+                                onClick={() => setIsSidebarOpen(true)}
+                                className="p-2 lg:hidden bg-white/5 rounded-xl text-luxury-muted hover:text-white transition-all hover:bg-white/10 active:scale-95"
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <span className="hidden sm:inline text-xs font-bold text-luxury-muted uppercase tracking-widest">Admin Command Center</span>
+                                <span className="hidden sm:inline w-1 h-1 rounded-full bg-luxury-blue"></span>
+                                <span className="text-xs font-serif italic text-luxury-gold capitalize">{activeSection.replace('-', ' ')}</span>
+                            </div>
                         </div>
                         <div className="flex items-center gap-6">
                             {/* Notification Hub */}
