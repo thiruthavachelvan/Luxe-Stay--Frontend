@@ -194,7 +194,8 @@ const PaymentPage = () => {
                                 discountAmount: couponDiscount,
                                 paymentStatus: paymentSchedule === 'full' ? 'Paid' : 'Advance Paid',
                                 paymentMethod: paymentMethod === 'card' ? 'Credit / Debit Card' : paymentMethod === 'upi' ? 'UPI' : 'Cryptocurrency',
-                                transactionId: response.razorpay_payment_id
+                                transactionId: response.razorpay_payment_id,
+                                addOns: addOns || []
                             })
                         });
                         if (bookingRes.ok) {

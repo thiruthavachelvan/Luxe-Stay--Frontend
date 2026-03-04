@@ -263,6 +263,92 @@ const UserDashboard = () => {
     };
     // ────────────────────────────────────────────────────
 
+    const handleUseAmenity = async (bookingId, amenityName) => {
+        try {
+            const token = sessionStorage.getItem('userToken');
+            const res = await fetch(`${__API_BASE__}/api/auth/bookings/${bookingId}/amenities/${encodeURIComponent(amenityName)}/use`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                toast.success(`${amenityName} marked as used.`);
+                fetchAllData();
+                // Update viewingBooking state to reflect change
+                const updatedBookings = bookings.map(b => b._id === bookingId ? { ...b, addOns: b.addOns.map(a => a.name === amenityName ? { ...a, usageStatus: 'used' } : a) } : b);
+                const updated = updatedBookings.find(b => b._id === bookingId);
+                setViewingBooking(updated);
+            } else {
+                const data = await res.json();
+                toast.error(data.message || 'Error updating amenity status.');
+            }
+        } catch (error) {
+            console.error('Error using amenity:', error);
+            toast.error('Failed to update amenity usage.');
+        }
+    };
+
+    const handleAddSpa = async (booking) => {
+        try {
+            const token = sessionStorage.getItem('userToken');
+            const spaPrice = 1999; // Same as catalog
+
+            // 1. Order
+            const orderRes = await fetch(`${__API_BASE__}/api/payment/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ amount: spaPrice })
+            });
+            if (!orderRes.ok) throw new Error('Order creation failed');
+            const orderData = await orderRes.json();
+
+            // 2. Razorpay
+            if (!(await loadScript('https://checkout.razorpay.com/v1/checkout.js'))) {
+                toast.error('Razorpay failed to load');
+                return;
+            }
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "LuxeStay Spa",
+                description: "Add-on Spa Treatment",
+                order_id: orderData.id,
+                handler: async function (response) {
+                    const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    });
+                    const verifyData = await verifyRes.json();
+                    if (verifyData.success) {
+                        const addSpaRes = await fetch(`${__API_BASE__}/api/auth/bookings/${booking._id}/add-spa`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({ amount: spaPrice, transactionId: response.razorpay_payment_id })
+                        });
+                        if (addSpaRes.ok) {
+                            toast.success('Spa added successfully!');
+                            fetchAllData();
+                            setViewingBooking(null);
+                        }
+                    }
+                },
+                prefill: { name: profile.fullName || 'Guest', email: profile.email || '' },
+                theme: { color: '#D4AF37' }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+        } catch (error) {
+            console.error('Add Spa Error:', error);
+            toast.error('Error adding spa.');
+        }
+    };
+
     const handleLogout = () => {
         sessionStorage.removeItem('userData');
         sessionStorage.removeItem('userToken');
@@ -2022,6 +2108,62 @@ const UserDashboard = () => {
                                                 </div>
                                             ))}
                                         </div>
+                                    </div>
+                                )}
+
+                                {viewingBooking.addOns && viewingBooking.addOns.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-luxury-border/20 pb-3 mb-4 flex items-center gap-2">
+                                            <Crown className="w-4 h-4 text-luxury-gold" />
+                                            Add-on Amenities & Benefits
+                                        </h4>
+                                        <div className="grid gap-3">
+                                            {viewingBooking.addOns.map((addon, idx) => (
+                                                <div key={idx} className="bg-luxury-dark/40 border border-luxury-border/20 p-4 rounded-xl flex items-center justify-between group/addon">
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-bold text-white flex items-center gap-2">
+                                                            {addon.name}
+                                                            <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase border ${addon.usageStatus === 'used'
+                                                                ? 'bg-green-500/10 text-green-500 border-green-500/30'
+                                                                : 'bg-luxury-blue/10 text-luxury-blue border-luxury-blue/30'
+                                                                }`}>
+                                                                {addon.usageStatus}
+                                                            </span>
+                                                        </p>
+                                                        {addon.spaSchedule && (
+                                                            <p className="text-[10px] text-luxury-gold mt-1 font-bold flex items-center gap-1">
+                                                                <Clock className="w-3 h-3" />
+                                                                Scheduled: {new Date(addon.spaSchedule).toLocaleString()}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    {addon.usageStatus === 'unused' && (
+                                                        <button
+                                                            onClick={() => handleUseAmenity(viewingBooking._id, addon.name)}
+                                                            className="px-3 py-1.5 bg-luxury-blue/10 text-luxury-blue border border-luxury-blue/30 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-luxury-blue hover:text-white transition-all opacity-0 group-hover/addon:opacity-100"
+                                                        >
+                                                            Use Now
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {(!viewingBooking.addOns || !viewingBooking.addOns.some(a => a.name.toLowerCase().includes('spa'))) && (viewingBooking.status === 'Confirmed' || viewingBooking.status === 'CheckedIn') && (
+                                    <div className="bg-luxury-gold/5 border border-luxury-gold/20 p-6 rounded-2xl flex flex-col items-center text-center space-y-3">
+                                        <Flower2 className="w-8 h-8 text-luxury-gold" />
+                                        <div>
+                                            <h4 className="text-sm font-bold text-white">Enhance Your Stay</h4>
+                                            <p className="text-xs text-luxury-muted mt-1">Book a rejuvenating 60-minute spa treatment to complete your experience.</p>
+                                        </div>
+                                        <button
+                                            onClick={() => handleAddSpa(viewingBooking)}
+                                            className="px-6 py-2 bg-luxury-gold text-zinc-900 rounded-xl text-xs font-bold hover:bg-yellow-400 transition-all shadow-lg shadow-luxury-gold/20"
+                                        >
+                                            Add Spa Treatment (₹1,999)
+                                        </button>
                                     </div>
                                 )}
 

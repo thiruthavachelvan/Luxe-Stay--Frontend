@@ -77,6 +77,7 @@ const AdminDashboard = () => {
     const [viewingBooking, setViewingBooking] = useState(null);
     const [respondingTo, setRespondingTo] = useState(null);
     const [spaTimes, setSpaTimes] = useState({});
+    const [adminSpaDates, setAdminSpaDates] = useState({});
     const [assignmentDrafts, setAssignmentDrafts] = useState({});
     const [isReassigning, setIsReassigning] = useState({});
 
@@ -1015,6 +1016,41 @@ const AdminDashboard = () => {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleAssignSpa = async (bookingId, amenityName) => {
+        try {
+            const scheduleDate = adminSpaDates[`${bookingId}_${amenityName}`];
+            if (!scheduleDate) return toast.error("Please select a date and time");
+            const token = sessionStorage.getItem('userToken');
+            const res = await fetch(`${__API_BASE__}/api/auth/admin/bookings/${bookingId}/spa-schedule`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ spaSchedule: scheduleDate, amenityName })
+            });
+
+            if (res.ok) {
+                toast.success('Spa time assigned and user notified');
+                fetchAdminBookings();
+
+                // update local state so modal updates instantly
+                setViewingBooking(prev => {
+                    if (prev && prev._id === bookingId) {
+                        return {
+                            ...prev,
+                            addOns: prev.addOns.map(a => a.name === amenityName ? { ...a, spaSchedule: scheduleDate } : a)
+                        };
+                    }
+                    return prev;
+                });
+            } else {
+                const data = await res.json();
+                toast.error(data.message || 'Error updating schedule');
+            }
+        } catch (error) {
+            console.error('Error assigning spa:', error);
+            toast.error('Failed to assign spa time');
         }
     };
 
@@ -4564,6 +4600,63 @@ const AdminDashboard = () => {
                                     <p className="text-luxury-muted text-sm italic">No detailed guest records found for this booking.</p>
                                 )}
                             </div>
+
+                            {/* Add-on Amenities & Spa Scheduling */}
+                            {viewingBooking.addOns && viewingBooking.addOns.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-luxury-border/50 pb-2">
+                                        <Crown className="w-4 h-4 text-luxury-gold" />
+                                        Add-on Amenities & Benefits
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {viewingBooking.addOns.map((addon, idx) => (
+                                            <div key={idx} className="bg-luxury-dark/40 border border-luxury-border/20 p-5 rounded-xl flex flex-col justify-between">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <p className="text-sm font-bold text-white flex items-center gap-2">
+                                                        {addon.name}
+                                                    </p>
+                                                    <span className={`text-[9px] px-2 py-0.5 rounded uppercase font-bold border ${addon.usageStatus === 'used'
+                                                        ? 'bg-green-500/10 text-green-500 border-green-500/30'
+                                                        : 'bg-luxury-blue/10 text-luxury-blue border-luxury-blue/30'
+                                                        }`}>
+                                                        {addon.usageStatus}
+                                                    </span>
+                                                </div>
+
+                                                {addon.name.toLowerCase().includes('spa') ? (
+                                                    <div className="mt-2 space-y-2 border-t border-luxury-border/20 pt-3">
+                                                        {addon.spaSchedule ? (
+                                                            <div className="flex items-center gap-2 text-xs font-bold text-luxury-gold bg-luxury-gold/5 p-2 rounded-lg border border-luxury-gold/20">
+                                                                <Clock className="w-4 h-4" />
+                                                                Scheduled: {new Date(addon.spaSchedule).toLocaleString()}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex flex-col gap-2">
+                                                                <label className="text-[9px] text-luxury-muted uppercase tracking-widest font-bold">Assign Spa Time</label>
+                                                                <input
+                                                                    type="datetime-local"
+                                                                    value={adminSpaDates[`${viewingBooking._id}_${addon.name}`] || ''}
+                                                                    onChange={(e) => setAdminSpaDates({ ...adminSpaDates, [`${viewingBooking._id}_${addon.name}`]: e.target.value })}
+                                                                    style={{ colorScheme: 'dark' }}
+                                                                    className="w-full bg-luxury-dark border border-luxury-border rounded-lg py-2 px-3 text-white text-xs outline-none focus:border-luxury-blue transition-all"
+                                                                />
+                                                                <button
+                                                                    onClick={() => handleAssignSpa(viewingBooking._id, addon.name)}
+                                                                    className="w-full py-2 bg-luxury-blue/10 hover:bg-luxury-blue border border-luxury-blue/30 text-luxury-blue hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
+                                                                >
+                                                                    Confirm Schedule
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-[10px] text-luxury-muted mt-2 border-t border-luxury-border/20 pt-2">No scheduling required.</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Special Requests */}
                             {viewingBooking.specialRequests && (
