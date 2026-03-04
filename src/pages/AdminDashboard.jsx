@@ -2441,12 +2441,19 @@ const AdminDashboard = () => {
                                                     <div className="w-full md:w-56 border-t md:border-t-0 md:border-l border-luxury-border/50 pt-4 md:pt-0 md:pl-6 flex flex-col gap-3 flex-shrink-0">
                                                         {query.subject?.includes('Spa') ? (
                                                             <>
-                                                                <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest">Set Spa Time</label>
+                                                                <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest flex justify-between">
+                                                                    <span>Set Spa Time</span>
+                                                                    {query.booking && (
+                                                                        <span className="text-luxury-blue">Stay: {new Date(query.booking.checkIn).toLocaleDateString()} - {new Date(query.booking.checkOut).toLocaleDateString()}</span>
+                                                                    )}
+                                                                </label>
                                                                 <input
                                                                     type="datetime-local"
                                                                     id={`spa-time-${query._id}`}
                                                                     value={spaTimes[query._id] || ''}
                                                                     onChange={(e) => setSpaTimes({ ...spaTimes, [query._id]: e.target.value })}
+                                                                    min={query.booking?.checkIn ? new Date(new Date(query.booking.checkIn).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                                                                    max={query.booking?.checkOut ? new Date(new Date(query.booking.checkOut).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
                                                                     style={{ colorScheme: 'dark' }}
                                                                     className="w-full bg-luxury-dark border border-luxury-border rounded-lg py-2.5 px-3 text-white text-xs outline-none focus:border-luxury-blue transition-all"
                                                                 />
