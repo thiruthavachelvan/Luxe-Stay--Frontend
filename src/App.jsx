@@ -4,6 +4,9 @@ import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import VerifyOtpPage from './pages/VerifyOtpPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
@@ -33,6 +36,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/verify-otp" element={<VerifyOtpPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/staff/:role" element={<StaffDashboard />} />
