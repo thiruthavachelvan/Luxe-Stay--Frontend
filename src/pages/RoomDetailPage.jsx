@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import {
     MapPin, Star, Bed, Users, Eye, Maximize2, ChevronRight,
     Wifi, Coffee, Tv, Wind, CheckCircle2, X, ChevronLeft,
     ChevronRight as ChevRight, Shield, Calendar, Minus, Plus,
-    Loader2, Building, ShieldAlert
+    Loader2, Building, ShieldAlert, Sparkles, Navigation
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -28,9 +29,9 @@ const FALLBACK_IMAGES = [
 
 /* ─── Star row helper ─── */
 const StarRow = ({ value, size = 'w-4 h-4' }) => (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map(s => (
-            <Star key={s} className={`${size} ${s <= Math.round(value) ? 'text-amber-400 fill-amber-400' : 'text-luxury-border'} `} />
+            <Star key={s} className={`${size} ${s <= Math.round(value) ? 'text-gold-400 fill-gold-400 shadow-sm' : 'text-white/10'} transition-all`} />
         ))}
     </div>
 );
@@ -261,7 +262,7 @@ const RoomDetailPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-luxury-dark text-luxury-text">
+        <div className="min-h-screen bg-navy-950 text-white selection:bg-gold-400 selection:text-navy-950 font-sans">
             <Navbar />
 
             {/* ─── Lightbox ─── */}
@@ -292,196 +293,218 @@ const RoomDetailPage = () => {
                 </div>
             </div>
 
-            {/* ─── Gallery ─── */}
-            <section className="container mx-auto px-6 py-4">
-                <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[480px] rounded-3xl overflow-hidden">
-                    {/* Main image */}
-                    <div className="col-span-2 row-span-2 relative cursor-pointer group" onClick={() => openLightbox(0)}>
-                        <img src={images[0]} alt="Main" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all" />
-                    </div>
-                    {/* Thumbnails */}
-                    {images.slice(1, 4).map((img, i) => (
-                        <div key={i} className="relative cursor-pointer group overflow-hidden" onClick={() => openLightbox(i + 1)}>
-                            <img src={img} alt={`View ${i + 2}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all" />
-                            {i === 2 && (
-                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center" onClick={() => openLightbox(0)}>
-                                    <span className="text-white font-bold text-sm">View All Photos</span>
+            {/* ─── Hero / Gallery ─── */}
+            <section className="relative h-[85vh] w-full overflow-hidden bg-navy-900">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={lightboxIdx}
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className="absolute inset-0"
+                    >
+                        <img
+                            src={images[lightboxIdx]}
+                            alt={room.type}
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-transparent" />
+                    </motion.div>
+                </AnimatePresence>
+
+                {/* Hero Info Overlay */}
+                <div className="absolute inset-0 flex flex-col justify-end pb-20">
+                    <div className="max-w-7xl mx-auto px-8 w-full">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5, duration: 1 }}
+                        >
+                            <div className="flex items-center gap-4 mb-6">
+                                <span className="px-4 py-1.5 bg-gold-400 text-navy-950 text-[10px] font-black uppercase tracking-[0.3em] rounded-sm shadow-2xl">
+                                    {luxuryStars} Star Sanctuary
+                                </span>
+                                <span className="h-px w-12 bg-gold-400/30" />
+                                <div className="flex items-center gap-2 text-gold-400">
+                                    <MapPin className="w-4 h-4" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">{room.location?.city}</span>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                            <h1 className="text-7xl md:text-8xl font-serif text-white mb-8 leading-none italic">
+                                {room.type.split(' ').map((word, i) => (
+                                    <span key={i} className={i === 0 ? "text-gold-400 block md:inline" : "block md:inline ml-0 md:ml-4"}>
+                                        {word}
+                                    </span>
+                                ))}
+                            </h1>
+                            <div className="flex items-center gap-8 text-white/60">
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gold-400/60 mb-1">Starting From</span>
+                                    <span className="text-3xl font-serif text-white">₹{pricePerNight.toLocaleString()} <span className="text-sm font-sans opacity-40">/ night</span></span>
+                                </div>
+                                <div className="h-12 w-px bg-white/10" />
+                                <button
+                                    onClick={() => openLightbox(0)}
+                                    className="group flex items-center gap-4 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-sm hover:bg-white/10 transition-all"
+                                >
+                                    <Maximize2 className="w-5 h-5 text-gold-400" />
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">View Gallery</span>
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+
+                {/* Thumbnail Navigation */}
+                <div className="absolute right-8 bottom-20 flex flex-col gap-4">
+                    {images.map((img, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setLightboxIdx(i)}
+                            className={`w-16 h-16 rounded-sm overflow-hidden border-2 transition-all duration-500 ${lightboxIdx === i ? 'border-gold-400 scale-110 shadow-2xl' : 'border-white/10 opacity-50 hover:opacity-100'}`}
+                        >
+                            <img src={img} className="w-full h-full object-cover" alt="thumbnail" />
+                        </button>
                     ))}
                 </div>
             </section>
 
             {/* ─── Main Content ─── */}
-            <section className="container mx-auto px-6 py-8">
-                <div className="grid lg:grid-cols-3 gap-10 items-start">
+            <section className="max-w-7xl mx-auto px-8 py-20">
+                <div className="grid lg:grid-cols-3 gap-16 items-start">
 
                     {/* ── Left Column ── */}
-                    <div className="lg:col-span-2 space-y-10">
+                    <div className="lg:col-span-2 space-y-20">
 
-                        {/* Room Header */}
-                        <div>
-                            <div className="flex flex-wrap items-center gap-3 mb-3">
-                                <StarRow value={luxuryStars} />
-                                <span className="text-xs text-luxury-muted font-bold uppercase tracking-widest">{luxuryStars}-Star Luxury</span>
-                                <span className={`px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${isAvailable ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}`}>
-                                    {isAvailable ? 'Available' : 'Occupied'}
+                        {/* Room Header Info */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <div className="flex items-center gap-6 mb-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                                <span className="flex items-center gap-2 text-gold-400">
+                                    <Sparkles className="w-3 h-3" />
+                                    Elite Residence
+                                </span>
+                                <span className="flex items-center gap-2">
+                                    <Navigation className="w-3 h-3" />
+                                    Floor {room.floor}
+                                </span>
+                                <span className={`px-2 py-0.5 border rounded-sm ${isAvailable ? 'border-emerald-500/20 text-emerald-400' : 'border-red-500/20 text-red-400'}`}>
+                                    {isAvailable ? 'Available' : 'Reserved'}
                                 </span>
                             </div>
-                            <h1 className="text-4xl font-bold text-white mb-3">{room.type}</h1>
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-luxury-muted">
-                                <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-luxury-blue" />{room.location?.city || 'LuxeStay Hotel'}</span>
-                                <span className="flex items-center gap-1.5"><Building className="w-4 h-4" />Room {room.roomNumber} · {room.floor}</span>
-                            </div>
-                            {avgRating > 0 && (
-                                <div className="flex items-center gap-2 mt-3">
-                                    <StarRow value={avgRating} size="w-3.5 h-3.5" />
-                                    <span className="text-amber-400 font-bold text-sm">{avgRating}</span>
-                                    <span className="text-luxury-muted text-xs">({reviewCount} reviews)</span>
-                                </div>
-                            )}
-                        </div>
+                            <h2 className="text-5xl font-serif text-white mb-6">Mastering <span className="text-gold-400 italic">Comfort</span></h2>
+                            <p className="text-white/40 leading-relaxed text-sm font-light max-w-2xl">
+                                {room.description || `A masterclass in contemporary elegance, the ${room.type} at LuxeStay ${room.location?.city} defines the higher standard of living. Curated with hand-selected materials and state-of-the-art technology.`}
+                            </p>
+                        </motion.div>
 
-                        {/* Quick Stats */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        {/* Feature Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {[
-                                { icon: Maximize2, label: 'Room Size', value: room.area || '45 m²' },
-                                { icon: Bed, label: 'Bed Type', value: room.bedType || 'King Size' },
-                                { icon: Users, label: 'Capacity', value: `${room.capacity?.adults || 2} Adults${room.capacity?.children ? ` · ${room.capacity.children} Children` : ''}` },
-                                { icon: Eye, label: 'View', value: room.viewType || 'City View' },
+                                { icon: Maximize2, label: 'Spacial Area', value: room.area || '65 m²' },
+                                { icon: Bed, label: 'Sleeping', value: room.bedType || 'Grand King' },
+                                { icon: Users, label: 'Occupancy', value: `${room.capacity?.adults || 2} Adults` },
+                                { icon: Eye, label: 'Perspective', value: room.viewType || 'Unending View' },
                             ].map(({ icon: Icon, label, value }) => (
-                                <div key={label} className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-4 text-center">
-                                    <Icon className="w-5 h-5 text-luxury-blue mx-auto mb-2" />
-                                    <p className="text-[9px] text-luxury-muted uppercase tracking-widest mb-1 font-bold">{label}</p>
-                                    <p className="text-sm font-bold text-white">{value}</p>
+                                <div key={label} className="glass-panel p-6 border-white/5 group hover:bg-gold-400 transition-all duration-500">
+                                    <Icon className="w-5 h-5 text-gold-400 group-hover:text-navy-950 mb-4 transition-colors" />
+                                    <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1 group-hover:text-navy-950/60 font-bold transition-colors">{label}</p>
+                                    <p className="text-xs font-bold text-white group-hover:text-navy-950 transition-colors">{value}</p>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Tabs */}
-                        <div className="flex gap-1 border-b border-luxury-border/30">
-                            {[['description', 'Description'], ['amenities', 'Amenities'], ['reviews', 'Guest Reviews']].map(([id, label]) => (
+                        {/* Tabs - Reimagined */}
+                        <div className="flex gap-12 border-b border-white/5">
+                            {[['description', 'Overview'], ['amenities', 'Amenities'], ['reviews', 'Guest Reviews']].map(([id, label]) => (
                                 <button
                                     key={id}
                                     onClick={() => scrollTo(id === 'description' ? descRef : id === 'amenities' ? amenRef : reviewRef, id)}
-                                    className={`px-5 py-3 text-sm font-bold border-b-2 transition-all -mb-px ${activeTab === id ? 'border-luxury-blue text-luxury-blue' : 'border-transparent text-luxury-muted hover:text-white'}`}
+                                    className={`pb-6 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === id ? 'text-gold-400' : 'text-white/20 hover:text-white'}`}
                                 >
                                     {label}
+                                    {activeTab === id && (
+                                        <motion.div layoutId="tab-active" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold-400" />
+                                    )}
                                 </button>
                             ))}
                         </div>
 
                         {/* Description */}
-                        <div ref={descRef} className="scroll-mt-24">
-                            <h2 className="text-xl font-bold text-white mb-4">Room Description</h2>
-                            <p className="text-luxury-muted leading-relaxed">
-                                {room.description ||
-                                    `Experience the pinnacle of luxury in our ${room.type}. Designed for discerning guests, this beautifully appointed room offers a perfect sanctuary of comfort and elegance. Every detail has been meticulously curated — from the premium bedding and mood lighting to the stunning ${room.viewType || 'city'} views that greet you each morning. Ideal for ${room.capacity?.adults || 2} adults seeking an unforgettable stay at LuxeStay ${room.location?.city || ''}.`
-                                }
-                            </p>
+                        <div ref={descRef} className="scroll-mt-40">
+                            <h3 className="text-3xl font-serif text-white mb-8 italic">The Essence</h3>
+                            <div className="prose prose-invert max-w-none">
+                                <p className="text-white/60 leading-[2] text-lg font-light">
+                                    {room.description ||
+                                        `The ${room.type} represents the absolute pinnacle of our architectural philosophy. Every corner has been considered to provide not just a room, but a rhythmic sequence of experiences. The materials speak of heritage, while the amenities hum with modern precision.`
+                                    }
+                                </p>
+                            </div>
                         </div>
 
                         {/* Amenities */}
-                        <div ref={amenRef} className="scroll-mt-24">
-                            <h2 className="text-xl font-bold text-white mb-5">World-Class Amenities</h2>
+                        <div ref={amenRef} className="scroll-mt-40">
+                            <h3 className="text-3xl font-serif text-white mb-10 italic">Curation of Comfort</h3>
                             {room.amenities?.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     {room.amenities.map((amenity, i) => {
                                         const Icon = amenityIcons[amenity] || CheckCircle2;
                                         return (
-                                            <div key={i} className="flex items-center gap-3 bg-luxury-card border border-luxury-border/20 rounded-xl px-4 py-3">
-                                                <Icon className="w-4 h-4 text-luxury-blue flex-shrink-0" />
-                                                <span className="text-sm text-luxury-text font-medium">{amenity}</span>
+                                            <div key={i} className="flex items-center gap-6 group">
+                                                <div className="w-12 h-12 rounded-sm bg-white/5 border border-white/5 flex items-center justify-center group-hover:bg-gold-400 transition-all duration-500">
+                                                    <Icon className="w-5 h-5 text-gold-400 group-hover:text-navy-950 transition-colors" />
+                                                </div>
+                                                <span className="text-sm text-white/60 font-medium uppercase tracking-widest">{amenity}</span>
                                             </div>
                                         );
                                     })}
                                 </div>
                             ) : (
-                                <p className="text-luxury-muted italic">Amenity details not available.</p>
+                                <p className="text-white/20 italic">Amenity details under curation...</p>
                             )}
                         </div>
 
-                        {/* Benefits */}
-                        {room.benefits?.length > 0 && (
-                            <div>
-                                <h2 className="text-xl font-bold text-white mb-5">Exclusive Benefits</h2>
-                                <div className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-6 space-y-3">
-                                    {room.benefits.map((benefit, i) => (
-                                        <div key={i} className="flex items-start gap-3">
-                                            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                                            <span className="text-sm text-luxury-text">{benefit}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Cancellation Policy */}
-                        <div>
-                            <h2 className="text-xl font-bold text-white mb-4">Cancellation Policy</h2>
-                            <div className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-5 flex gap-4">
-                                <Shield className="w-5 h-5 text-luxury-blue flex-shrink-0 mt-0.5" />
-                                <div>
-                                    <p className="text-white font-semibold text-sm mb-1">Free Cancellation</p>
-                                    <p className="text-luxury-muted text-sm leading-relaxed">Cancel for free up to 48 hours before your check-in date. After that, a charge equivalent to the first night's stay applies. No-shows are non-refundable.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Hotel Info */}
-                        {room.location && (
-                            <div>
-                                <h2 className="text-xl font-bold text-white mb-4">Hotel Information</h2>
-                                <div className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-5 flex items-center gap-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-luxury-blue/10 flex items-center justify-center flex-shrink-0">
-                                        <Building className="w-7 h-7 text-luxury-blue" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-white">LuxeStay {room.location.city}</p>
-                                        <p className="text-luxury-muted text-sm flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{room.location.city} · {room.location.category || 'India'}</p>
-                                        {room.location.description && <p className="text-luxury-muted text-xs mt-1 line-clamp-2">{room.location.description}</p>}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Guest Reviews */}
-                        <div ref={reviewRef} className="scroll-mt-24">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-white">Guest Reviews</h2>
+                        {/* Reviews */}
+                        <div ref={reviewRef} className="scroll-mt-40">
+                            <div className="flex items-center justify-between mb-12">
+                                <h3 className="text-3xl font-serif text-white italic">Guest Chronicles</h3>
                                 {avgRating > 0 && (
-                                    <div className="flex items-center gap-2 bg-luxury-card border border-luxury-border/30 rounded-xl px-4 py-2">
-                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                        <span className="font-bold text-white">{avgRating}</span>
-                                        <span className="text-luxury-muted text-xs">/ 5.0</span>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex -space-x-2">
+                                            {[1, 2, 3].map(i => (
+                                                <div key={i} className="w-8 h-8 rounded-full border-2 border-navy-950 bg-navy-900" />
+                                            ))}
+                                        </div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Trusted by {reviewCount}+ Seekers</span>
                                     </div>
                                 )}
                             </div>
                             {reviews.length === 0 ? (
-                                <div className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-12 text-center">
-                                    <Star className="w-10 h-10 text-luxury-muted/20 mx-auto mb-3" />
-                                    <p className="text-luxury-muted text-sm">No reviews yet for this property. Be the first to share your experience!</p>
+                                <div className="glass-panel border-white/5 p-20 text-center">
+                                    <Star className="w-12 h-12 text-white/5 mx-auto mb-6" />
+                                    <p className="text-white/20 text-[10px] font-bold uppercase tracking-widest">No chronicles yet shared</p>
                                 </div>
                             ) : (
-                                <div className="grid sm:grid-cols-2 gap-5">
+                                <div className="space-y-8">
                                     {reviews.map(review => (
-                                        <div key={review._id} className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-6 space-y-3">
+                                        <div key={review._id} className="glass-panel border-white/5 p-10 space-y-6">
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-full bg-luxury-blue flex items-center justify-center text-white text-xs font-bold">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-sm bg-gold-400 flex items-center justify-center text-navy-950 text-xs font-black">
                                                         {review.user?.fullName?.[0] || 'G'}
                                                     </div>
                                                     <div>
-                                                        <p className="text-white font-semibold text-sm">{review.user?.fullName || 'Guest'}</p>
-                                                        <p className="text-luxury-muted text-[10px]">{new Date(review.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })}</p>
+                                                        <p className="text-white font-bold text-[10px] uppercase tracking-widest">{review.user?.fullName || 'Anonymous'}</p>
+                                                        <p className="text-white/20 text-[9px] uppercase tracking-widest mt-1">{new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                                                     </div>
                                                 </div>
                                                 <StarRow value={review.overallRating} size="w-3 h-3" />
                                             </div>
-                                            <p className="text-luxury-muted text-sm leading-relaxed italic">"{review.comment}"</p>
+                                            <p className="text-white/60 text-lg font-light leading-relaxed italic font-serif">"{review.comment}"</p>
                                         </div>
                                     ))}
                                 </div>
@@ -491,189 +514,102 @@ const RoomDetailPage = () => {
 
                     {/* ── Sticky Booking Widget ── */}
                     <div className="lg:sticky lg:top-28">
-                        <div className="bg-luxury-card border border-luxury-border/30 rounded-[2.5rem] p-7 shadow-2xl space-y-5">
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="glass-panel border-white/5 p-10 overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 p-3">
+                                <div className="px-3 py-1 bg-gold-400 text-navy-950 text-[8px] font-black uppercase tracking-widest rounded-sm">
+                                    Preferred Member Rate
+                                </div>
+                            </div>
+
                             {/* Price */}
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-bold text-white">₹{pricePerNight.toLocaleString()}</span>
-                                <span className="text-luxury-muted text-sm">/night</span>
-                                <span className="ml-auto text-[9px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2 py-1">Best Price</span>
+                            <div className="mb-10">
+                                <span className="text-4xl font-serif text-white italic">₹{pricePerNight.toLocaleString()}</span>
+                                <span className="text-white/20 text-xs uppercase tracking-widest ml-3 font-bold">/ night inclusive</span>
                             </div>
 
-                            {/* Dates */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest block mb-1.5">Check-In</label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-luxury-muted pointer-events-none" />
-                                        <input
-                                            type="date"
-                                            value={checkIn}
-                                            min={dateStr(today)}
-                                            onChange={e => { setCheckIn(e.target.value); if (e.target.value >= checkOut) { const next = new Date(e.target.value); next.setDate(next.getDate() + 1); setCheckOut(dateStr(next)); } }}
-                                            className="w-full bg-luxury-dark border border-luxury-border/30 rounded-xl pl-8 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-luxury-blue/50 [color-scheme:dark]"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest block mb-1.5">Check-Out</label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-luxury-muted pointer-events-none" />
-                                        <input
-                                            type="date"
-                                            value={checkOut}
-                                            min={checkIn}
-                                            onChange={e => setCheckOut(e.target.value)}
-                                            className="w-full bg-luxury-dark border border-luxury-border/30 rounded-xl pl-8 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-luxury-blue/50 [color-scheme:dark]"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Guests */}
-                            {(() => {
-                                const maxAdults = room.capacity?.adults || 4;
-                                const baseChildren = room.capacity?.children ?? 3;
-                                const maxTotalGuests = maxAdults + baseChildren;
-
-                                return (
-                                    <div>
-                                        <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest block mb-1.5">Guests</label>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {/* Adults */}
-                                            <div className="bg-luxury-dark border border-luxury-border/30 rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
-                                                <span className="text-[10px] text-luxury-muted font-bold">Adults</span>
-                                                <div className="flex items-center gap-2">
-                                                    <button onClick={() => setAdults(v => Math.max(1, v - 1))} className="w-6 h-6 rounded-full bg-luxury-border/30 flex items-center justify-center hover:bg-luxury-blue/20 transition-all text-white">
-                                                        <Minus className="w-3 h-3 text-luxury-muted" />
-                                                    </button>
-                                                    <span className="text-white font-bold text-sm w-4 text-center">{adults}</span>
-                                                    <button onClick={() => {
-                                                        const newAdults = Math.min(maxAdults, adults + 1);
-                                                        setAdults(newAdults);
-                                                        if (newAdults + children > maxTotalGuests) {
-                                                            setChildren(maxTotalGuests - newAdults);
-                                                        }
-                                                    }} className="w-6 h-6 rounded-full bg-luxury-border/30 flex items-center justify-center hover:bg-luxury-blue/20 transition-all text-white">
-                                                        <Plus className="w-3 h-3 text-luxury-muted" />
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Children */}
-                                            <div className="bg-luxury-dark border border-luxury-border/30 rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
-                                                <span className="text-[10px] text-luxury-muted font-bold">Children</span>
-                                                <div className="flex items-center gap-2">
-                                                    <button onClick={() => setChildren(v => Math.max(0, v - 1))} className="w-6 h-6 rounded-full bg-luxury-border/30 flex items-center justify-center hover:bg-luxury-blue/20 transition-all text-white">
-                                                        <Minus className="w-3 h-3 text-luxury-muted" />
-                                                    </button>
-                                                    <span className="text-white font-bold text-sm w-4 text-center">{children}</span>
-                                                    <button onClick={() => setChildren(v => Math.min(maxTotalGuests - adults, v + 1))} className="w-6 h-6 rounded-full bg-luxury-border/30 flex items-center justify-center hover:bg-luxury-blue/20 transition-all text-white">
-                                                        <Plus className="w-3 h-3 text-luxury-muted" />
-                                                    </button>
-                                                </div>
-                                            </div>
+                            <div className="space-y-8">
+                                {/* Dates - Reimagined */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="group">
+                                        <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] block mb-3 group-hover:text-gold-400 transition-colors">Arriving</label>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gold-400/40" />
+                                            <input
+                                                type="date"
+                                                value={checkIn}
+                                                min={dateStr(today)}
+                                                onChange={e => { setCheckIn(e.target.value); if (e.target.value >= checkOut) { const next = new Date(e.target.value); next.setDate(next.getDate() + 1); setCheckOut(dateStr(next)); } }}
+                                                className="w-full bg-transparent border-b border-white/5 py-3 pl-8 text-xs text-white focus:outline-none focus:border-gold-400 transition-all [color-scheme:dark]"
+                                            />
                                         </div>
                                     </div>
-                                );
-                            })()}
-
-                            {/* Optional Add-Ons */}
-                            {(() => {
-                                const included = new Set((room.benefits || []).map(b => BENEFIT_TO_ADDON[b]).filter(Boolean));
-                                const available = ADDON_CATALOG.filter(a => !included.has(a.id));
-                                if (available.length === 0) return null;
-                                return (
-                                    <div>
-                                        <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest block mb-2">Optional Add-Ons</label>
-                                        <div className="space-y-2">
-                                            {available.map(addon => {
-                                                const isSelected = selectedAddOns.includes(addon.id);
-                                                return (
-                                                    <button
-                                                        key={addon.id}
-                                                        type="button"
-                                                        onClick={() => toggleAddOn(addon.id)}
-                                                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-xs transition-all ${isSelected
-                                                            ? 'bg-luxury-blue/10 border-luxury-blue/50 text-white'
-                                                            : 'bg-luxury-dark/60 border-luxury-border/20 text-luxury-muted hover:border-luxury-blue/30'
-                                                            }`}
-                                                    >
-                                                        <span className="flex items-center gap-2">
-                                                            <span>{addon.icon}</span>
-                                                            <span className={isSelected ? 'text-white font-medium' : ''}>{addon.label}</span>
-                                                        </span>
-                                                        <span className="flex items-center gap-1.5 flex-shrink-0">
-                                                            <span className={isSelected ? 'text-luxury-blue font-bold' : 'text-luxury-muted'}>
-                                                                +₹{addon.price.toLocaleString()}{addon.per === 'night' ? '/night' : ''}
-                                                            </span>
-                                                            <span className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-luxury-blue border-luxury-blue' : 'border-luxury-border'
-                                                                }`}>
-                                                                {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
-                                                            </span>
-                                                        </span>
-                                                    </button>
-                                                );
-                                            })}
+                                    <div className="group">
+                                        <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] block mb-3 group-hover:text-gold-400 transition-colors">Departing</label>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gold-400/40" />
+                                            <input
+                                                type="date"
+                                                value={checkOut}
+                                                min={checkIn}
+                                                onChange={e => setCheckOut(e.target.value)}
+                                                className="w-full bg-transparent border-b border-white/5 py-3 pl-8 text-xs text-white focus:outline-none focus:border-gold-400 transition-all [color-scheme:dark]"
+                                            />
                                         </div>
                                     </div>
-                                );
-                            })()}
+                                </div>
 
-                            {/* Price breakdown */}
-                            <div className="bg-luxury-dark/50 rounded-2xl p-4 space-y-2.5 border border-luxury-border/20">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-luxury-muted">₹{pricePerNight.toLocaleString()} × {nights} night{nights > 1 ? 's' : ''}</span>
-                                    <span className="text-white font-semibold">₹{subtotal.toLocaleString()}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-luxury-muted">Service fee</span>
-                                    <span className="text-white">₹{serviceFee.toLocaleString()}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-luxury-muted">Occupancy tax</span>
-                                    <span className="text-white">₹{occupancyTax.toLocaleString()}</span>
-                                </div>
-                                {addOnTotal > 0 && (
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-luxury-muted">Add-ons ({selectedAddOns.length})</span>
-                                        <span className="text-luxury-blue">+₹{addOnTotal.toLocaleString()}</span>
+                                {/* Guests */}
+                                <div className="space-y-4">
+                                    <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] block">Residence Count</label>
+                                    <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Adults</span>
+                                        <div className="flex items-center gap-6">
+                                            <button onClick={() => setAdults(v => Math.max(1, v - 1))} className="text-white/20 hover:text-gold-400 transition-colors disabled:opacity-0" disabled={adults <= 1}><Minus className="w-4 h-4" /></button>
+                                            <span className="text-sm font-serif italic text-white w-4 text-center">{adults}</span>
+                                            <button onClick={() => setAdults(v => Math.min(room.capacity?.adults || 4, v + 1))} className="text-white/20 hover:text-gold-400 transition-colors"><Plus className="w-4 h-4" /></button>
+                                        </div>
                                     </div>
-                                )}
-                                <div className="border-t border-luxury-border/30 pt-2.5 flex items-center justify-between">
-                                    <span className="font-bold text-white">Total</span>
-                                    <span className="font-bold text-xl text-luxury-blue">₹{total.toLocaleString()}</span>
                                 </div>
-                            </div>
 
-                            {/* Cancellation & Refund Policy */}
-                            <div className="bg-luxury-dark/40 border border-luxury-border/20 rounded-2xl p-4">
-                                <h4 className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest mb-2 flex items-center gap-2">
-                                    <ShieldAlert className="w-3.5 h-3.5 text-luxury-blue" />
-                                    Cancellation & Refund Policy
-                                </h4>
-                                <div className="text-[10px] text-luxury-muted leading-relaxed space-y-2">
-                                    <p>Users who have completed full payment for their booking are eligible for tiered refunds:</p>
-                                    <ul className="list-disc pl-4 space-y-1">
-                                        <li><span className="text-white font-medium">Immediate cancellation:</span> 75% refund</li>
-                                        <li><span className="text-white font-medium">&gt;2 days before check-in:</span> 50% refund</li>
-                                        <li><span className="text-white font-medium">1 day before check-in:</span> 25% refund</li>
-                                        <li><span className="text-white font-medium">On/after check-in:</span> No refund</li>
-                                    </ul>
-                                    <p className="pt-1 border-t border-white/5"><span className="text-yellow-500 font-medium">Note:</span> For users selecting the advance payment option (25%), the advance payment is strictly non-refundable to secure the room exclusively.</p>
+                                {/* Summary */}
+                                <div className="space-y-4 pt-10 border-t border-white/5">
+                                    <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                        <span className="text-white/40">{nights} Nights Residency</span>
+                                        <span className="text-white">₹{subtotal.toLocaleString()}</span>
+                                    </div>
+                                    {addOnTotal > 0 && (
+                                        <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-gold-400">
+                                            <span>Curated Add-ons</span>
+                                            <span>+₹{addOnTotal.toLocaleString()}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-end pt-4">
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">Final Valuation</span>
+                                        <span className="text-4xl font-serif text-gold-400 italic">₹{total.toLocaleString()}</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* CTA */}
-                            <button
-                                onClick={handleBookNow}
-                                disabled={!isAvailable || checkingAvailability}
-                                className={`w-full py-4 rounded-2xl font-bold text-sm transition-all shadow-xl tracking-wide ${isAvailable && !checkingAvailability
-                                    ? 'bg-luxury-blue text-white hover:bg-luxury-blue-hover shadow-luxury-blue/20'
-                                    : 'bg-luxury-border/20 text-luxury-muted cursor-not-allowed'}`}
-                            >
-                                {checkingAvailability ? 'Checking Dates...' : isAvailable ? 'Book Now' : 'Not Available for Dates'}
-                            </button>
-                        </div>
+                                {/* CTA */}
+                                <button
+                                    onClick={handleBookNow}
+                                    disabled={!isAvailable || checkingAvailability}
+                                    className={`w-full py-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.4em] transition-all shadow-2xl relative overflow-hidden group ${isAvailable && !checkingAvailability
+                                        ? 'bg-gold-400 text-navy-950 hover:bg-white hover:shadow-gold-400/20'
+                                        : 'bg-white/5 text-white/10 cursor-not-allowed'}`}
+                                >
+                                    <span className="relative z-10">{checkingAvailability ? 'Verifying Sanctuary...' : isAvailable ? 'Confirm Reservation' : 'Selection Occupied'}</span>
+                                </button>
+
+                                <p className="text-[9px] text-white/20 uppercase tracking-widest text-center leading-relaxed">
+                                    Secure your stay with a 50% luxury deposit. <br />
+                                    Terms & conditions of residency apply.
+                                </p>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>

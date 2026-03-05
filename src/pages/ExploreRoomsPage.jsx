@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { motion } from 'motion/react';
 import {
     Search, Star, Hotel, Globe, ArrowUpDown, Users, Maximize,
     Eye, Wifi, Coffee, Tv, Wind, Loader2, Calendar,
@@ -63,7 +64,7 @@ const useDropdown = () => {
     const Portal = ({ id, children }) =>
         openId !== id ? null : createPortal(
             <div style={{ position: 'fixed', top: pos.top, left: pos.left, minWidth: pos.width, zIndex: 99999 }}
-                className="bg-[#1A2235] border border-white/10 rounded-2xl shadow-2xl p-3 overflow-hidden">
+                className="bg-navy-950/95 backdrop-blur-2xl border border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] p-4 overflow-hidden rounded-sm">
                 {children}
             </div>,
             document.body
@@ -72,21 +73,21 @@ const useDropdown = () => {
     return { openId, open, close, refs: refs.current, Portal };
 };
 
-// ── Sidebar section
+// ── Side section
 const SideSection = ({ title, icon: Icon, children, badge }) => {
     const [open, setOpen] = useState(true);
     return (
-        <div className="border-b border-luxury-border/10 pb-4 mb-4 last:border-0 last:mb-0 last:pb-0">
+        <div className="border-b border-white/5 pb-4 mb-4 last:border-0 last:mb-0 last:pb-0">
             <button onClick={() => setOpen(v => !v)}
-                className="flex items-center justify-between w-full mb-2 group">
-                <div className="flex items-center gap-2">
-                    {Icon && <Icon className="w-3.5 h-3.5 text-luxury-gold" />}
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-luxury-gold">{title}</span>
+                className="flex items-center justify-between w-full mb-3 group">
+                <div className="flex items-center gap-2.5">
+                    {Icon && <Icon className="w-3.5 h-3.5 text-gold-400/60" />}
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 group-hover:text-gold-400 transition-colors">{title}</span>
                     {badge > 0 && (
-                        <span className="w-4 h-4 bg-luxury-blue text-white text-[9px] font-bold rounded-full flex items-center justify-center">{badge}</span>
+                        <span className="w-4 h-4 bg-gold-400 text-navy-950 text-[9px] font-bold rounded-full flex items-center justify-center">{badge}</span>
                     )}
                 </div>
-                <ChevronDown className={`w-3.5 h-3.5 text-luxury-muted transition-transform ${open ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 text-white/20 transition-transform ${open ? 'rotate-180' : ''}`} />
             </button>
             {open && children}
         </div>
@@ -96,16 +97,16 @@ const SideSection = ({ title, icon: Icon, children, badge }) => {
 // ── Top filter chip button
 const FilterBtn = ({ label, icon: Icon, active, count, triggerRef, onClick }) => (
     <button ref={triggerRef} onClick={onClick}
-        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold border transition-all whitespace-nowrap
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-sm text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap
             ${active || count > 0
-                ? 'bg-luxury-blue/15 border-luxury-blue text-luxury-blue shadow'
-                : 'border-luxury-border/20 bg-luxury-card text-luxury-muted hover:text-white hover:border-luxury-blue/40'}`}>
-        {Icon && <Icon className="w-3.5 h-3.5" />}
+                ? 'bg-gold-400 border-gold-400 text-navy-950 shadow-lg shadow-gold-400/10'
+                : 'border-white/5 bg-navy-900/40 text-white/60 hover:text-white hover:border-gold-400/50'}`}>
+        {Icon && <Icon className="w-3 h-3" />}
         {label}
-        {count > 0 && (
-            <span className="w-4 h-4 bg-luxury-blue text-white text-[9px] font-bold rounded-full flex items-center justify-center">{count}</span>
+        {count > 0 && !active && (
+            <span className="w-4 h-4 bg-gold-400 text-navy-950 text-[9px] font-bold rounded-full flex items-center justify-center">{count}</span>
         )}
-        <ChevronDown className={`w-3 h-3 transition-transform ${active ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3 h-3 opacity-40 transition-transform ${active ? 'rotate-180' : ''}`} />
     </button>
 );
 
@@ -253,48 +254,42 @@ const ExploreRoomsPage = () => {
     const ROOM_CATEGORIES = ['All Rooms', 'Single Room', 'Double Room', 'Family Room'];
 
     return (
-        <div className="min-h-screen bg-[#0F1626] text-white font-sans flex flex-col">
+        <div className="min-h-screen bg-navy-950 text-slate-200 font-sans flex flex-col selection:bg-gold-400 selection:text-navy-950">
 
             {/* ── Topbar ─────────────────────────────────────── */}
-            <div className="sticky top-0 z-40 bg-[#0F1626]/96 backdrop-blur border-b border-luxury-border/20">
+            <div className="sticky top-0 z-40 bg-navy-950/80 backdrop-blur-xl border-b border-white/5">
                 {/* brand + search + dates + user */}
-                <div className="flex items-center gap-3 px-4 h-14">
+                <div className="flex items-center gap-6 px-6 h-20">
                     {/* Brand + Home */}
-                    <button onClick={() => navigate('/')} className="flex items-center gap-2 shrink-0 group">
-                        <div className="w-7 h-7 bg-luxury-blue rounded-lg flex items-center justify-center group-hover:bg-luxury-gold transition-colors">
-                            <Hotel className="w-4 h-4 text-white" />
+                    <button onClick={() => navigate('/')} className="flex items-center gap-3 shrink-0 group">
+                        <div className="w-10 h-10 bg-gold-400 rounded-sm flex items-center justify-center group-hover:bg-white transition-colors duration-500">
+                            <Hotel className="w-5 h-5 text-navy-950" />
                         </div>
-                        <span className="font-bold text-luxury-gold font-serif italic text-sm hidden sm:block">LuxeStays</span>
+                        <span className="font-serif text-white text-xl tracking-tight hidden sm:block">LuxeStay <span className="italic text-gold-400">Reimagined</span></span>
                     </button>
 
-                    {/* Back to Home pill */}
-                    <button onClick={() => navigate('/')}
-                        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-luxury-border/30 bg-luxury-card text-luxury-muted text-xs font-semibold hover:text-white hover:border-luxury-blue/50 transition-all shrink-0">
-                        ← Home
-                    </button>
-
-                    <div className="relative flex-1 max-w-xs">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-luxury-muted pointer-events-none" />
+                    <div className="relative flex-1 max-w-sm ml-4">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
                         <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                            placeholder="Search room or number…"
-                            className="w-full bg-luxury-card border border-luxury-border/25 rounded-xl py-2 pl-9 pr-3 text-xs text-white placeholder-luxury-muted focus:outline-none focus:border-luxury-blue" />
+                            placeholder="Find your sanctuary…"
+                            className="w-full bg-white/5 border border-white/5 rounded-sm py-3 pl-12 pr-4 text-xs text-white placeholder-white/20 focus:outline-none focus:border-gold-400/50 transition-all" />
                     </div>
 
-                    <div className="ml-auto flex items-center gap-3">
+                    <div className="ml-auto flex items-center gap-6">
                         {user ? (
                             <button onClick={() => navigate('/dashboard')}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-luxury-card border border-luxury-border/30 hover:border-luxury-gold/50 transition-all group">
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-luxury-gold to-yellow-300 flex items-center justify-center font-bold text-luxury-dark text-sm shrink-0">
+                                className="flex items-center gap-3 px-4 py-2 hover:bg-white/5 transition-all group rounded-sm">
+                                <div className="w-9 h-9 rounded-full bg-gold-400 flex items-center justify-center font-bold text-navy-950 text-xs shrink-0 border border-white/10">
                                     {(user.fullName || 'G')[0]}
                                 </div>
                                 <div className="hidden sm:block text-left">
-                                    <p className="text-[11px] font-bold text-white leading-tight">{user.fullName?.split(' ')[0] || 'Guest'}</p>
-                                    <p className="text-[9px] text-luxury-muted">Dashboard →</p>
+                                    <p className="text-[10px] font-bold text-white uppercase tracking-widest leading-none mb-1">{user.fullName?.split(' ')[0] || 'Guest'}</p>
+                                    <p className="text-[9px] text-gold-400/60 uppercase tracking-widest font-bold">Account</p>
                                 </div>
                             </button>
                         ) : (
                             <button onClick={() => navigate('/login')}
-                                className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-luxury-gold to-yellow-400 text-luxury-dark text-sm font-bold rounded-xl shadow-lg hover:from-yellow-400 hover:to-luxury-gold transition-all hover:shadow-luxury-gold/30">
+                                className="px-8 py-3 bg-gold-400 text-navy-950 text-[11px] font-bold uppercase tracking-widest rounded-sm hover:bg-white transition-all shadow-xl shadow-gold-400/10">
                                 Sign In
                             </button>
                         )}
@@ -315,10 +310,10 @@ const ExploreRoomsPage = () => {
                         onClick={() => open('roomType', btnRefs.roomType.current)}
                     />
                     <Portal id="roomType">
-                        <p className="text-[9px] font-bold text-luxury-gold uppercase tracking-widest mb-2">Room Type</p>
+                        <p className="text-[9px] font-bold text-gold-400 uppercase tracking-widest mb-3 opacity-60">Category</p>
                         {ROOM_CATEGORIES.map(t => (
                             <button key={t} onMouseDown={() => { setSelectedRoomType(t); close(); }}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all ${selectedRoomType === t ? 'bg-luxury-blue/20 text-luxury-blue' : 'text-luxury-muted hover:text-white hover:bg-white/5'}`}>
+                                className={`w-full text-left px-4 py-2.5 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all ${selectedRoomType === t ? 'bg-gold-400 text-navy-950 font-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
                                 {t}
                             </button>
                         ))}
@@ -336,11 +331,11 @@ const ExploreRoomsPage = () => {
                         onClick={() => open('rating', btnRefs.rating.current)}
                     />
                     <Portal id="rating">
-                        <p className="text-[9px] font-bold text-luxury-gold uppercase tracking-widest mb-2">Min Rating</p>
+                        <p className="text-[9px] font-bold text-gold-400 uppercase tracking-widest mb-3 opacity-60">Minimum Standards</p>
                         {[{ v: 0, label: 'Any Rating' }, { v: 3, label: '3★ & above' }, { v: 4, label: '4★ & above' }, { v: 5, label: '5★ Only' }].map(({ v, label }) => (
                             <button key={v} onMouseDown={() => { setMinRating(v); close(); }}
-                                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${minRating === v ? 'bg-luxury-gold/20 text-luxury-gold' : 'text-luxury-muted hover:text-white hover:bg-white/5'}`}>
-                                <Star className="w-3 h-3 fill-current" />{label}
+                                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-sm text[10px] uppercase font-bold tracking-widest transition-all ${minRating === v ? 'bg-gold-400 text-navy-950' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                                <Star className={`w-3 h-3 ${minRating === v ? 'fill-navy-950' : 'fill-gold-400'}`} />{label}
                             </button>
                         ))}
                     </Portal>
@@ -460,8 +455,8 @@ const ExploreRoomsPage = () => {
 
                     {activeCount > 0 && (
                         <button onMouseDown={resetAll}
-                            className="flex items-center gap-1 px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-full text-xs font-bold hover:bg-red-500/20 transition-all whitespace-nowrap shrink-0">
-                            <X className="w-3 h-3" /> Clear ({activeCount})
+                            className="flex items-center gap-2 px-6 py-2.5 bg-red-500/10 border border-red-500/20 text-red-500 rounded-sm text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all whitespace-nowrap shrink-0">
+                            Reset Filters ({activeCount})
                         </button>
                     )}
                 </div>
@@ -471,23 +466,23 @@ const ExploreRoomsPage = () => {
             <div className="flex flex-1 min-h-0">
 
                 {/* LEFT SIDEBAR */}
-                <aside className="w-56 shrink-0 bg-[#111827] border-r border-luxury-border/15 overflow-y-auto sticky top-[108px] hidden md:block" style={{ maxHeight: 'calc(100vh - 108px)' }}>
-                    <div className="p-4">
+                <aside className="w-72 shrink-0 bg-navy-950 border-r border-white/5 overflow-y-auto sticky top-20 hidden lg:block" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+                    <div className="p-8">
 
                         {/* LOCATIONS */}
-                        <SideSection title="Location" icon={MapPin}>
-                            <div className="space-y-0.5">
+                        <SideSection title="The World of LuxeStays" icon={MapPin}>
+                            <div className="space-y-1 mt-4">
                                 {allLocations.map(loc => {
                                     const cnt = rooms.filter(r => r.location?.city === loc.city).length;
                                     const isActive = selectedLocation === loc.city;
                                     return (
                                         <button key={loc._id} onClick={() => { setSelectedLocation(loc.city); setSelectedFloor('All Floors'); }}
-                                            className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-medium transition-all
-                                                ${isActive ? 'bg-luxury-gold/15 text-luxury-gold border border-luxury-gold/30' : 'text-luxury-muted hover:text-white hover:bg-white/5 border border-transparent'}`}>
-                                            <span className="flex items-center gap-2">
-                                                <Globe className="w-3 h-3" />{loc.city}
+                                            className={`flex items-center justify-between w-full px-4 py-3 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all
+                                                ${isActive ? 'bg-gold-400 text-navy-950 shadow-lg shadow-gold-400/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                                            <span className="flex items-center gap-3">
+                                                <Globe className={`w-3 h-3 ${isActive ? 'text-navy-950' : 'text-gold-400/40'}`} />{loc.city}
                                             </span>
-                                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-luxury-gold/20 text-luxury-gold' : 'bg-white/10'}`}>{cnt}</span>
+                                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-black ${isActive ? 'bg-navy-950/20 text-navy-950' : 'bg-white/5 text-white/20'}`}>{cnt}</span>
                                         </button>
                                     );
                                 })}
@@ -495,8 +490,8 @@ const ExploreRoomsPage = () => {
                         </SideSection>
 
                         {/* FLOORS */}
-                        <SideSection title="Floor / Section" icon={Layers}>
-                            <div className="space-y-0.5">
+                        <SideSection title="Architectural Sections" icon={Layers}>
+                            <div className="space-y-1 mt-4">
                                 {FLOORS.map(fl => {
                                     const cnt = fl === 'All Floors'
                                         ? locationRooms.length
@@ -507,18 +502,12 @@ const ExploreRoomsPage = () => {
                                     const isActive = selectedFloor === fl;
                                     return (
                                         <button key={fl} onClick={() => setSelectedFloor(fl)}
-                                            className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-medium transition-all border
+                                            className={`flex items-center justify-between w-full px-4 py-3 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all
                                                 ${isActive
-                                                    ? isLS ? 'bg-amber-600/20 text-amber-400 border-amber-600/40'
-                                                        : isLW ? 'bg-luxury-gold/20 text-luxury-gold border-luxury-gold/40'
-                                                            : 'bg-luxury-blue/15 text-luxury-blue border-luxury-blue/30'
-                                                    : 'text-luxury-muted hover:text-white hover:bg-white/5 border-transparent'}`}>
+                                                    ? 'bg-white/5 text-white border-l-2 border-gold-400 pl-3.5'
+                                                    : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
                                             <span>{fl}</span>
-                                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold
-                                                ${isLS && isActive ? 'bg-amber-600/30 text-amber-400'
-                                                    : isLW && isActive ? 'bg-luxury-gold/30 text-luxury-gold'
-                                                        : isActive ? 'bg-luxury-blue/30 text-luxury-blue'
-                                                            : 'bg-white/10'}`}>{cnt}</span>
+                                            <span className={`text-[9px] font-black ${isActive ? 'text-gold-400' : 'text-white/10'}`}>{cnt}</span>
                                         </button>
                                     );
                                 })}
@@ -529,57 +518,57 @@ const ExploreRoomsPage = () => {
                 </aside>
 
                 {/* MAIN CONTENT */}
-                <main className="flex-1 min-w-0 px-5 py-5">
+                <main className="flex-1 min-w-0 px-10 py-12">
 
                     {/* Heading */}
-                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <div className="flex items-center justify-between mb-16 flex-wrap gap-8">
                         <div>
-                            <div className="flex items-center gap-1.5 text-xs text-luxury-muted mb-1 flex-wrap">
-                                <Globe className="w-3 h-3" /><span>{selectedLocation}</span>
+                            <div className="flex items-center gap-2 text-[10px] text-white/20 font-bold uppercase tracking-[0.3em] mb-4">
+                                <Globe className="w-3 h-3 text-gold-400" />
+                                <span>{selectedLocation}</span>
                                 {selectedFloor !== 'All Floors' && <><ChevronRight className="w-3 h-3" /><span>{selectedFloor}</span></>}
                                 {selectedRoomType !== 'All Rooms' && <><ChevronRight className="w-3 h-3" /><span>{selectedRoomType}</span></>}
                             </div>
-                            <h1 className="text-lg font-bold flex items-center gap-2 flex-wrap">
-                                <span className="text-luxury-gold font-serif italic">{selectedLocation}</span>
-                                <span className="text-white">Hub</span>
+                            <h1 className="text-4xl font-serif text-white flex items-center gap-4 flex-wrap mb-4">
+                                <span className="italic text-gold-400">{selectedLocation}</span> Collection
                                 {selectedFloor === 'Location Special' && (
-                                    <span className="text-[10px] bg-amber-600/20 text-amber-400 px-2 py-0.5 rounded-full border border-amber-600/30">Heritage Collection</span>
+                                    <span className="text-[9px] bg-gold-400/10 text-gold-400 px-3 py-1 rounded-full border border-gold-400/20 uppercase tracking-widest font-black">Heritage</span>
                                 )}
                                 {selectedFloor === 'Luxury Wing' && (
-                                    <span className="text-[10px] bg-luxury-gold/20 text-luxury-gold px-2 py-0.5 rounded-full border border-luxury-gold/30">VIP Wing</span>
+                                    <span className="text-[9px] bg-white/5 text-white px-3 py-1 rounded-full border border-white/10 uppercase tracking-widest font-black">VIP Exclusive</span>
                                 )}
                             </h1>
-                            <p className="text-luxury-muted text-xs mt-0.5">
-                                {filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''}
-                                {' · '}<span className="text-emerald-400">{availableCount} available</span>
-                                {activeCount > 0 && <span className="ml-2 text-luxury-blue">{activeCount} filter{activeCount !== 1 ? 's' : ''} active</span>}
+                            <p className="text-white/40 text-sm font-light">
+                                Showing {filteredRooms.length} sanctuaries · <span className="text-emerald-400/60">{availableCount} available for immediate residency</span>
                             </p>
                         </div>
 
                         {activeOffer && (
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-luxury-gold/10 border border-luxury-gold/30 rounded-xl">
-                                <Star className="w-3.5 h-3.5 text-luxury-gold" />
-                                <span className="text-xs text-white font-bold">Offer: {activeOffer.code}</span>
-                                <button onClick={() => setActiveOffer(null)}><X className="w-3 h-3 text-luxury-muted" /></button>
+                            <div className="flex items-center gap-3 px-5 py-2.5 bg-gold-400/5 border border-gold-400/20 rounded-sm">
+                                <Star className="w-4 h-4 text-gold-400 fill-gold-400" />
+                                <span className="text-[10px] text-white font-black uppercase tracking-widest">Privilege Code: {activeOffer.code}</span>
+                                <button onClick={() => setActiveOffer(null)} className="ml-2"><X className="w-3.5 h-3.5 text-white/20 hover:text-white transition-colors" /></button>
                             </div>
                         )}
                     </div>
 
                     {/* Room Grid */}
                     {loading ? (
-                        <div className="flex items-center justify-center h-64">
-                            <Loader2 className="w-12 h-12 text-luxury-blue animate-spin" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                <div key={i} className="glass-panel aspect-[4/5] rounded-sm animate-pulse" />
+                            ))}
                         </div>
                     ) : filteredRooms.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-center">
-                            <div className="w-16 h-16 rounded-full bg-luxury-card border border-luxury-border/20 flex items-center justify-center mb-4">
-                                <Hotel className="w-8 h-8 text-luxury-muted/30" />
+                        <div className="flex flex-col items-center justify-center h-96 text-center glass-panel rounded-sm">
+                            <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mb-6">
+                                <Hotel className="w-6 h-6 text-white/10" />
                             </div>
-                            <h3 className="text-lg font-bold text-white mb-2">No Rooms Match</h3>
-                            <p className="text-luxury-muted text-sm max-w-xs mb-4">Try adjusting your filters.</p>
+                            <h3 className="text-2xl font-serif text-white mb-3 italic">No Sanctuaries Match Your Criteria</h3>
+                            <p className="text-white/40 text-sm font-light max-w-sm mb-8">Refine your selections to discover your ideal stay.</p>
                             <button onClick={resetAll}
-                                className="px-6 py-2.5 bg-luxury-blue text-white rounded-xl text-sm font-bold hover:bg-luxury-gold transition-colors">
-                                Clear All Filters
+                                className="px-10 py-3 border border-gold-400/30 text-gold-400 text-[10px] font-bold uppercase tracking-widest hover:bg-gold-400 hover:text-navy-950 transition-all">
+                                Clear Preference Filters
                             </button>
                         </div>
                     ) : (
@@ -591,88 +580,81 @@ const ExploreRoomsPage = () => {
                                 const isLW = room.floor === 'Luxury Wing';
 
                                 return (
-                                    <div key={room._id}
+                                    <motion.div
+                                        key={room._id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
                                         onClick={() => isAvailable && navigate(activeOffer ? `/rooms/${room._id}?offerCode=${activeOffer.code}` : `/rooms/${room._id}`)}
-                                        className={`bg-luxury-card rounded-2xl border overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer
-                                            ${isLS ? 'border-amber-600/25 hover:border-amber-500/50'
-                                                : isLW ? 'border-luxury-gold/25 hover:border-luxury-gold/50'
-                                                    : 'border-luxury-border/15 hover:border-luxury-blue/30'}`}>
+                                        className="glass-panel rounded-sm overflow-hidden flex flex-col group cursor-pointer border-white/5 hover:bg-navy-900/60 transition-all duration-500"
+                                    >
 
                                         {/* Image */}
-                                        <div className="relative aspect-[4/3] overflow-hidden">
+                                        <div className="relative aspect-[4/5] overflow-hidden">
                                             <img
                                                 src={room.images?.[0] || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80'}
                                                 alt={room.type}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]"
                                             />
                                             {/* badges top-left */}
-                                            <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
-                                                <span className={`px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded shadow ${isAvailable ? 'bg-emerald-500/90 text-white' : 'bg-red-500/90 text-white'}`}>
-                                                    {isAvailable ? 'Available' : 'Occupied'}
+                                            <div className="absolute top-4 left-4 flex flex-col gap-2">
+                                                <span className={`px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-sm shadow-2xl ${isAvailable ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+                                                    {isAvailable ? 'Available' : 'Reserved'}
                                                 </span>
-                                                {isLS && <span className="px-2 py-0.5 text-[8px] font-bold uppercase rounded shadow bg-amber-600 text-white">Heritage</span>}
-                                                {isLW && <span className="px-2 py-0.5 text-[8px] font-bold uppercase rounded shadow bg-luxury-gold text-luxury-dark">Luxury</span>}
+                                                {isLS && <span className="px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-sm shadow-2xl bg-gold-400 text-navy-950 border border-white/10">Heritage</span>}
+                                                {isLW && <span className="px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-sm shadow-2xl bg-white/10 text-white backdrop-blur-md border border-white/10">Elite</span>}
                                             </div>
-                                            {/* price */}
-                                            <div className="absolute bottom-2.5 right-2.5 bg-luxury-dark/90 backdrop-blur text-white px-2.5 py-1.5 rounded-xl font-bold text-sm border border-luxury-gold/20">
-                                                ₹{room.price?.toLocaleString('en-IN')}
-                                                <span className="text-[9px] font-normal text-luxury-muted ml-1">/night</span>
-                                            </div>
-                                            {/* floor badge */}
-                                            <div className="absolute bottom-2.5 left-2.5 bg-luxury-dark/70 backdrop-blur px-2 py-0.5 rounded-lg text-[9px] flex items-center gap-1 text-luxury-muted">
-                                                <Layers className="w-2.5 h-2.5" />{room.floor}
+
+                                            {/* price overlay */}
+                                            <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-navy-950/80 to-transparent">
+                                                <div className="flex items-end justify-between">
+                                                    <div>
+                                                        <span className="text-[9px] text-white/40 uppercase tracking-widest block mb-1">Nightly Rate</span>
+                                                        <span className="text-2xl font-serif text-white">₹{room.price?.toLocaleString('en-IN')}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-sm">
+                                                        <Star className="w-2.5 h-2.5 text-gold-400 fill-gold-400" />
+                                                        <span className="text-[10px] font-bold text-white">{ratingInfo ? ratingInfo.avg.toFixed(1) : 'NEW'}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Body */}
-                                        <div className="p-3.5 flex-1 flex flex-col">
-                                            <div className="flex items-start justify-between gap-2 mb-1">
-                                                <div className="min-w-0">
-                                                    <h3 className={`text-sm font-bold leading-snug line-clamp-1 ${isLS ? 'text-amber-300' : isLW ? 'text-luxury-gold' : 'text-white group-hover:text-luxury-gold transition-colors'}`}>
-                                                        {room.type}
-                                                    </h3>
-                                                    <div className="flex items-center gap-1">
-                                                        <Hash className="w-2.5 h-2.5 text-luxury-muted" />
-                                                        <span className="text-[10px] font-mono text-luxury-muted">{room.roomNumber}</span>
-                                                    </div>
-                                                </div>
-                                                <div className={`flex items-center gap-1 px-2 py-1 rounded-lg shrink-0 ${ratingInfo ? 'bg-luxury-gold/10 text-luxury-gold' : 'bg-luxury-card border border-luxury-border/20 text-luxury-muted/50'}`}>
-                                                    <Star className="w-3 h-3 fill-current" />
-                                                    <span className="font-bold text-xs">{ratingInfo ? ratingInfo.avg.toFixed(1) : '–'}</span>
-                                                    {ratingInfo && <span className="text-[9px] opacity-60">({ratingInfo.count})</span>}
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <div className="mb-4">
+                                                <h3 className="text-xl font-serif text-white group-hover:text-gold-400 transition-colors mb-2 leading-tight">
+                                                    {room.type}
+                                                </h3>
+                                                <div className="flex items-center gap-4 text-[10px] text-white/40 uppercase tracking-widest font-bold">
+                                                    <span className="flex items-center gap-1.5"><Users className="w-3 h-3 text-gold-400/40" />{getRoomCategory(room)}</span>
+                                                    <span className="flex items-center gap-1.5"><Eye className="w-3 h-3 text-gold-400/40" />{room.viewType || 'Scenic'}</span>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 text-[10px] text-luxury-muted mb-2">
-                                                <span className="flex items-center gap-1"><Users className="w-2.5 h-2.5" />{getRoomCategory(room)}</span>
-                                                {room.viewType && <span className="flex items-center gap-1"><Eye className="w-2.5 h-2.5" />{room.viewType}</span>}
-                                            </div>
-
-                                            <div className="flex flex-wrap gap-1 mb-3">
+                                            <div className="flex flex-wrap gap-2 mb-8">
                                                 {room.amenities?.slice(0, 3).map((a, i) => {
                                                     const Icon = AMENITY_ICONS[a] || Star;
                                                     return (
-                                                        <span key={i} className="px-1.5 py-0.5 bg-luxury-blue/5 border border-luxury-blue/15 text-luxury-blue text-[9px] rounded-full flex items-center gap-1">
-                                                            <Icon className="w-2 h-2" />{a}
+                                                        <span key={i} className="px-3 py-1 bg-white/5 border border-white/5 text-white/60 text-[8px] font-bold uppercase tracking-widest rounded-sm flex items-center gap-2">
+                                                            <Icon className="w-2.5 h-2.5" />{a}
                                                         </span>
                                                     );
                                                 })}
-                                                {room.amenities?.length > 3 && <span className="text-luxury-muted text-[9px]">+{room.amenities.length - 3}</span>}
+                                                {room.amenities?.length > 3 && <span className="text-white/20 text-[8px] font-bold flex items-center">+{room.amenities.length - 3}</span>}
                                             </div>
 
-                                            <div className="mt-auto pt-2 border-t border-luxury-border/10">
+                                            <div className="mt-auto">
                                                 <button
                                                     onClick={e => { e.stopPropagation(); if (!isAvailable) return; navigate(activeOffer ? `/rooms/${room._id}?offerCode=${activeOffer.code}` : `/rooms/${room._id}`); }}
-                                                    className={`w-full py-2 rounded-xl font-bold text-xs transition-all ${isAvailable
-                                                        ? isLS ? 'bg-amber-600 hover:bg-amber-500 text-white shadow hover:shadow-amber-500/30'
-                                                            : isLW ? 'bg-luxury-gold hover:bg-yellow-300 text-luxury-dark shadow hover:shadow-luxury-gold/30'
-                                                                : 'bg-luxury-blue hover:bg-luxury-gold text-white shadow hover:shadow-luxury-blue/30'
-                                                        : 'bg-luxury-card border border-luxury-border/20 text-luxury-muted cursor-not-allowed'}`}>
-                                                    {isAvailable ? 'Book this Room →' : 'Currently Occupied'}
+                                                    className={`w-full py-3.5 rounded-sm font-bold text-[10px] uppercase tracking-[0.2em] transition-all ${isAvailable
+                                                        ? 'bg-gold-400 text-navy-950 hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]'
+                                                        : 'bg-white/5 border border-white/5 text-white/20 cursor-not-allowed'}`}>
+                                                    {isAvailable ? 'Begin Reservation' : 'Reserved Selection'}
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 );
                             })}
                         </div>
