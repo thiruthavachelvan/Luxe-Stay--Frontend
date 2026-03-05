@@ -1,139 +1,109 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Building2, User, LogOut, ChevronDown, LayoutDashboard, Settings } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from "react";
+import { motion, useScroll, useMotionValueEvent } from "motion/react";
+import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import Button from "./ui/Button";
 
-const Navbar = () => {
-    const [scrolled, setScrolled] = useState(false);
-    const [userData, setUserData] = useState(null);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
-    const navigate = useNavigate();
+export default function Navbar() {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { scrollY } = useScroll();
 
-    // Re-read user from localStorage whenever the component mounts or window focuses
-    const loadUser = () => {
-        const stored = sessionStorage.getItem('userData');
-        setUserData(stored ? JSON.parse(stored) : null);
-    };
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        setIsScrolled(latest > 50);
+    });
 
-    useEffect(() => {
-        loadUser();
-        window.addEventListener('focus', loadUser);
-        window.addEventListener('storage', loadUser);
-        return () => {
-            window.removeEventListener('focus', loadUser);
-            window.removeEventListener('storage', loadUser);
-        };
-    }, []);
-
-    useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handler = (e) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                setDropdownOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    const handleLogout = () => {
-        sessionStorage.removeItem('userToken');
-        sessionStorage.removeItem('userData');
-        setUserData(null);
-        setDropdownOpen(false);
-        navigate('/');
-    };
-
-    const firstName = userData?.fullName?.split(' ')[0] || userData?.name?.split(' ')[0] || 'User';
-    const isAdmin = userData?.role === 'admin';
+    const navLinks = [
+        { name: "Home", href: "/" },
+        { name: "Locations", href: "/locations" },
+        { name: "Rooms", href: "/rooms" },
+        { name: "Dining", href: "/restaurant" },
+        { name: "Spa", href: "/spa" },
+        { name: "Amenities", href: "/amenities" },
+        { name: "Offers", href: "/offers" },
+        { name: "Reviews", href: "/reviews" },
+    ];
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-luxury-dark/90 backdrop-blur-md border-b border-luxury-border py-4' : 'bg-transparent py-6'}`}>
-            <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-
-                {/* Logo */}
-                <Link to="/" className="flex items-center gap-2 group">
-                    <div className="p-1.5 bg-luxury-blue rounded group-hover:bg-luxury-blue-hover transition-colors">
-                        <Building2 className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-xl font-bold tracking-widest text-white uppercase">LuxeStays</span>
+        <motion.nav
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${isScrolled
+                    ? "bg-navy-950/80 backdrop-blur-md border-white/5 py-4"
+                    : "bg-transparent border-transparent py-6"
+                }`}
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
+            <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
+                <Link to="/" className="flex items-center gap-2">
+                    <span className="text-2xl font-serif font-bold tracking-widest text-white uppercase">
+                        LUXESTAYS
+                    </span>
+                    <div className="w-2 h-2 rounded-full bg-gold-400 mt-1" />
                 </Link>
 
-                {/* Navigation Links */}
-                <div className="hidden lg:flex items-center gap-8">
-                    <Link to="/" className="text-sm font-medium text-white hover:text-luxury-blue transition-colors">Home</Link>
-                    <Link to="/about" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">About Us</Link>
-                    <Link to="/locations" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Locations</Link>
-                    <Link to="/rooms" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Rooms</Link>
-                    <Link to="/restaurant" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Dining</Link>
-                    <Link to="/spa" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Spa</Link>
-                    <Link to="/amenities" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Amenities</Link>
-                    <Link to="/offers" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Offers</Link>
+                {/* Desktop Nav */}
+                <div className="hidden xl:flex items-center gap-8">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.name}
+                            to={link.href}
+                            className="text-xs font-medium text-white/70 hover:text-gold-400 transition-colors uppercase tracking-widest"
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
                 </div>
 
-                {/* Auth Area */}
-                <div className="hidden lg:flex items-center gap-4">
-                    {userData ? (
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setDropdownOpen(v => !v)}
-                                className="flex items-center gap-2.5 px-4 py-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
-                            >
-                                <div className="w-7 h-7 rounded-full bg-luxury-blue flex items-center justify-center text-white text-xs font-bold">
-                                    {firstName[0].toUpperCase()}
-                                </div>
-                                <span className="text-sm text-white font-medium">{firstName}</span>
-                                <ChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-52 bg-[#1a1f2e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
-                                    <div className="px-4 py-3 border-b border-white/5">
-                                        <p className="text-white text-sm font-bold">{userData.fullName || userData.name}</p>
-                                        <p className="text-gray-500 text-xs mt-0.5">{userData.email}</p>
-                                    </div>
-                                    <div className="p-2">
-                                        <Link
-                                            to={isAdmin ? '/admin' : '/dashboard'}
-                                            onClick={() => setDropdownOpen(false)}
-                                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
-                                        >
-                                            <LayoutDashboard className="w-4 h-4" />
-                                            {isAdmin ? 'Admin Panel' : 'My Dashboard'}
-                                        </Link>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
-                                        >
-                                            <LogOut className="w-4 h-4" />
-                                            Sign Out
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            <Link to="/login" className="text-sm font-medium text-luxury-text hover:text-luxury-blue transition-colors">Login</Link>
-                            <Link to="/signup" className="px-6 py-2 bg-luxury-blue text-white text-sm font-medium rounded hover:bg-luxury-blue-hover transition-colors shadow-[0_0_15px_rgba(30,64,175,0.4)]">Sign Up</Link>
-                        </>
-                    )}
+                <div className="hidden md:flex items-center gap-6">
+                    <Link to="/login" className="text-xs font-medium text-white hover:text-gold-400 transition-colors uppercase tracking-widest">
+                        Login
+                    </Link>
+                    <Link to="/signup">
+                        <Button variant="primary" className="!py-3 !px-6">
+                            Sign Up
+                        </Button>
+                    </Link>
                 </div>
 
+                {/* Mobile Toggle */}
+                <button
+                    className="xl:hidden text-white"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                    {isMobileMenuOpen ? <X /> : <Menu />}
+                </button>
             </div>
-        </nav>
+
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="xl:hidden bg-navy-950 border-b border-white/10"
+                >
+                    <div className="px-6 py-8 flex flex-col gap-6">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                to={link.href}
+                                className="text-lg font-serif text-white/90"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
+                        <div className="h-px bg-white/10 my-2" />
+                        <div className="flex flex-col gap-4">
+                            <Link to="/login" className="text-left text-white/80 uppercase tracking-widest text-sm" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+                            <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                                <Button variant="primary" className="w-full">Sign Up</Button>
+                            </Link>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </motion.nav>
     );
-};
-
-export default Navbar;
-
-
-
-
-
+}

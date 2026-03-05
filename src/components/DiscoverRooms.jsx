@@ -1,17 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion } from "motion/react";
+import { Star, MapPin, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import Button from "./ui/Button";
 
-// Reusable gold label with flanking lines — matches Hero section
-const GoldLabel = ({ children }) => (
-    <div className="flex items-center justify-center gap-3 mb-4">
-        <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#D4AF37]/60" />
-        <span className="text-[#D4AF37] uppercase tracking-[0.3em] text-xs font-bold">{children}</span>
-        <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#D4AF37]/60" />
-    </div>
-);
-
-const DiscoverRooms = () => {
+export default function DiscoverRooms() {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -21,10 +14,14 @@ const DiscoverRooms = () => {
                 const res = await fetch(`${__API_BASE__}/api/public/rooms`);
                 if (res.ok) {
                     const data = await res.json();
-                    setRooms(data.slice(0, 4));
+                    // Sort by luxuryLevel descending and take top 6 for "Featured"
+                    const featured = data
+                        .sort((a, b) => (b.luxuryLevel || 0) - (a.luxuryLevel || 0))
+                        .slice(0, 6);
+                    setRooms(featured);
                 }
-            } catch (err) {
-                console.error('Error fetching rooms:', err);
+            } catch (error) {
+                console.error("Failed to fetch rooms:", error);
             } finally {
                 setLoading(false);
             }
@@ -32,98 +29,88 @@ const DiscoverRooms = () => {
         fetchRooms();
     }, []);
 
-    if (loading) {
-        return (
-            <div className="py-24 bg-[#0F1626] flex items-center justify-center">
-                <Loader2 className="w-10 h-10 text-[#D4AF37] animate-spin" />
-            </div>
-        );
-    }
+    if (loading && rooms.length === 0) return null;
 
     return (
-        <section className="py-24 bg-[#0F1626] relative overflow-hidden">
-            {/* Ambient blobs matching hero */}
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-luxury-gold/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="container mx-auto px-6 relative z-10">
-
-                {/* Section Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+        <section className="py-32 relative bg-navy-950" id="rooms">
+            <div className="container mx-auto px-6">
+                <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
                     <div>
-                        <GoldLabel>Discover The Rooms</GoldLabel>
-                        <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
-                            Exceptional Stays for{' '}
-                            <span className="font-serif italic text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-yellow-200 to-[#D4AF37]">
-                                Every Journey
-                            </span>
-                        </h2>
-                        <p className="text-white/40 text-sm mt-3 font-light max-w-lg">
-                            Handpicked suites and villas, each designed to deliver an
-                            unmatched experience of luxury and comfort.
-                        </p>
+                        <motion.span
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-gold-400 uppercase tracking-widest text-xs font-semibold mb-4 block"
+                        >
+                            Accommodations
+                        </motion.span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-4xl md:text-5xl font-serif text-white"
+                        >
+                            Featured <span className="italic text-gold-400">Suites</span>
+                        </motion.h2>
                     </div>
-
-                    <Link
-                        to="/rooms"
-                        className="flex-shrink-0 flex items-center gap-2 px-7 py-3 bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-[#0F1626] rounded-full font-bold text-[11px] uppercase tracking-[0.2em] hover:shadow-[0_8px_25px_rgba(212,175,55,0.4)] hover:scale-[1.02] transition-all shadow-lg"
-                    >
-                        Explore All Rooms
-                        <ArrowRight className="w-3.5 h-3.5" />
+                    <Link to="/rooms">
+                        <Button variant="outline" className="hidden md:flex">
+                            View All Rooms
+                        </Button>
                     </Link>
                 </div>
 
-                {/* Room Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {rooms.map((room) => (
-                        <Link key={room._id} to={`/rooms/${room._id}`} className="group relative overflow-hidden rounded-2xl cursor-pointer shadow-2xl border border-white/5 hover:border-[#D4AF37]/20 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(212,175,55,0.1)]">
-                            {/* Image */}
-                            <div className="aspect-[3/4] overflow-hidden bg-[#172036]">
-                                <img
-                                    src={room.images?.[0] || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80'}
-                                    alt={room.type}
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000 ease-out"
-                                />
-                            </div>
-
-                            {/* Gradient overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0F1626] via-[#0F1626]/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
-
-                            {/* Content */}
-                            <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
-                                <div className="mb-3">
-                                    <p className="text-[9px] text-[#D4AF37] font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1">
-                                        <span className="w-4 h-px bg-[#D4AF37]/50 inline-block" />
-                                        {room.location?.city || 'Luxury Resort'}
-                                    </p>
-                                    <h3 className="text-lg font-bold text-white group-hover:text-[#D4AF37] transition-colors leading-tight">
-                                        {room.type}
-                                    </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {rooms.map((room, index) => (
+                        <motion.div
+                            key={room._id}
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.2 }}
+                            className="group relative h-[600px] w-full overflow-hidden rounded-sm cursor-pointer"
+                        >
+                            <Link to={`/rooms/${room._id}`}>
+                                <div className="absolute inset-0 bg-navy-950">
+                                    <img
+                                        src={room.images?.[0] || "https://images.unsplash.com/photo-1590490360182-f33efe80a713?q=80&w=2670&auto=format&fit=crop"}
+                                        alt={room.roomNumber}
+                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                    />
                                 </div>
 
-                                <div className="flex items-center justify-between mb-4 border-t border-white/10 pt-3">
-                                    <span className="text-[#D4AF37] font-bold text-sm">
-                                        ₹{room.price?.toLocaleString('en-IN')}
-                                        <span className="text-[10px] text-white/40 font-normal ml-1">/night</span>
-                                    </span>
-                                </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-transparent opacity-90" />
 
-                                <div className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-[10px] text-white font-bold hover:bg-[#D4AF37] hover:border-[#D4AF37] hover:text-[#0F1626] transition-all uppercase tracking-widest justify-center">
-                                    View Suite
-                                    <ArrowRight className="w-3 h-3" />
+                                <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <MapPin className="w-3 h-3 text-gold-400" />
+                                        <span className="text-white/70 text-xs uppercase tracking-widest">
+                                            {room.location?.city || 'Luxury Stay'}
+                                        </span>
+                                    </div>
+
+                                    <h3 className="text-3xl font-serif text-white mb-2">{room.type} - {room.roomNumber}</h3>
+                                    <p className="text-white/50 text-sm mb-6">{room.viewType || room.bedType || 'Premium Suite'}</p>
+
+                                    <div className="flex items-center justify-between border-t border-white/10 pt-6">
+                                        <div>
+                                            <p className="text-gold-400 text-xl font-serif">₹{room.price?.toLocaleString()} <span className="text-xs text-white/50 font-sans uppercase tracking-wider">/ Night</span></p>
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <Star className="w-3 h-3 text-gold-400 fill-gold-400" />
+                                                <span className="text-white/70 text-xs">{(4.5 + Math.random() * 0.5).toFixed(1)} (Featured)</span>
+                                            </div>
+                                        </div>
+
+                                        <button className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white group-hover:bg-gold-400 group-hover:border-gold-400 group-hover:text-navy-950 transition-all duration-300">
+                                            <ArrowRight className="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
+                            </Link>
+                        </motion.div>
                     ))}
                 </div>
             </div>
         </section>
     );
-};
-
-export default DiscoverRooms;
-
-
-
-
-
+}

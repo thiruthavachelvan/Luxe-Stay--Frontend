@@ -1,46 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
-
-  --color-luxury-gold: #d4af37;
-  --color-luxury-gold-hover: #e5c158;
-  --color-luxury-dark: #0b1220;
-  --color-luxury-blue: #3b82f6;
-  --color-luxury-blue-hover: #2563eb;
-  --color-luxury-card: #0f172a;
-  --color-luxury-border: #1e293b;
-  --color-luxury-muted: #94a3b8;
-  --color-luxury-text: #f8fafc;
-
-  /* Reimagined UI Colors */
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  
   --color-navy-950: #0b1220;
   --color-navy-900: #0f1a2e;
   --color-navy-800: #162440;
-  --color-navy-700: #1e293b;
-
+  
   --color-gold-400: #d4af37;
   --color-gold-500: #c5a028;
   --color-gold-600: #b08d1e;
 }
 
 @layer base {
-  * {
-    @apply border-white/5;
-  }
-
   body {
     @apply bg-navy-950 text-slate-200 font-sans antialiased min-h-screen;
     background-image: radial-gradient(circle at 50% 0%, #162440 0%, #0b1220 100%);
   }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  
+  h1, h2, h3, h4, h5, h6 {
     @apply font-serif text-white;
   }
 }
@@ -49,16 +29,13 @@
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: #0b1220;
 }
-
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
@@ -78,8 +55,4 @@
 
 .border-gold {
   border-color: var(--color-gold-400);
-}
-
-.smooth-transition {
-  @apply transition-all duration-300 ease-in-out;
 }
