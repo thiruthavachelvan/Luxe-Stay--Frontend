@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { ChevronRight, User, Users, Info, ArrowRight } from 'lucide-react';
+import { ChevronRight, User, Users, Info, ArrowRight, Tag, Sparkles } from 'lucide-react';
+import { TIER_BENEFITS } from '../utils/membership';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -307,7 +308,52 @@ const GuestDetailsPage = () => {
                                 </div>
 
                                 <div className="space-y-4">
-                                    <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Total Consideration</p>
+                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40">
+                                        <span>Base Residence ({nights} Nights)</span>
+                                        <span>₹{bookingDetails.originalSubtotal?.toLocaleString() || bookingDetails.subtotal?.toLocaleString()}</span>
+                                    </div>
+
+                                    {bookingDetails.membershipDiscount > 0 && (
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-gold-400">
+                                                <span>Exclusive Benefit ({bookingDetails.membershipTier})</span>
+                                                <span>−₹{bookingDetails.membershipDiscount.toLocaleString()}</span>
+                                            </div>
+
+                                            {/* Tier specific perks */}
+                                            {TIER_BENEFITS[bookingDetails.membershipTier] && (
+                                                <div className="p-3 bg-gold-400/5 border border-gold-400/10 rounded-sm space-y-2">
+                                                    <p className="text-[7px] font-black text-gold-400/60 uppercase tracking-widest border-b border-gold-400/10 pb-1">Included Sanctuary Privileges</p>
+                                                    <div className="space-y-1.5">
+                                                        {TIER_BENEFITS[bookingDetails.membershipTier].map((perk, pi) => (
+                                                            <div key={pi} className="flex items-center gap-1.5">
+                                                                <Sparkles className="w-2 h-2 text-gold-400" />
+                                                                <span className="text-[7px] font-bold text-white/40 uppercase tracking-tight">{perk}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {bookingDetails.addOns?.length > 0 && (
+                                        <div className="space-y-2">
+                                            {bookingDetails.addOns.map((addon, i) => (
+                                                <div key={i} className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-white/20">
+                                                    <span>+ {addon.name}</span>
+                                                    <span>₹{addon.price.toLocaleString()}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-white/20 pb-4 border-b border-white/5">
+                                        <span>Taxes & Fees</span>
+                                        <span>₹{(bookingDetails.serviceFee + bookingDetails.occupancyTax).toLocaleString()}</span>
+                                    </div>
+
+                                    <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] pt-4">Total Consideration</p>
                                     <div className="flex items-baseline gap-1">
                                         <span className="text-sm font-serif italic text-gold-400/60 uppercase racking-widest">INR</span>
                                         <p className="text-5xl font-serif italic text-gold-400 tracking-tight">₹{total.toLocaleString()}</p>

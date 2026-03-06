@@ -442,27 +442,6 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleConfirmReservation = async (id) => {
-        try {
-            const token = sessionStorage.getItem('userToken');
-            const response = await fetch(`${__API_BASE__}/api/auth/admin/reservations/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ status: 'Confirmed' })
-            });
-            if (response.ok) {
-                setSuccess('Reservation Confirmed');
-                fetchTableReservations();
-                setTimeout(() => setSuccess(''), 3000);
-            }
-        } catch (err) {
-            setError('Failed to confirm reservation');
-        }
-    };
-
     const handleRespondToQuery = async (queryId) => {
         if (!responseText.trim()) return;
         try {
@@ -1066,6 +1045,27 @@ const AdminDashboard = () => {
     if (!user) return null;
 
     // ── Coupon CRUD helpers ─────────────────────────────────
+    const updateReservationStatus = async (id, status) => {
+        try {
+            const token = sessionStorage.getItem('userToken');
+            const response = await fetch(`${__API_BASE__}/api/auth/admin/reservations/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+            if (response.ok) {
+                setSuccess(`Reservation ${status}`);
+                fetchTableReservations();
+                setTimeout(() => setSuccess(''), 3000);
+            }
+        } catch (err) {
+            setError(`Failed to ${status.toLowerCase()} reservation`);
+        }
+    };
+
     const fetchCoupons = async () => {
         setFetchingCoupons(true);
         try {
@@ -1439,12 +1439,12 @@ const AdminDashboard = () => {
                                                 </div>
 
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-gold-500/10 relative z-10">
-                                                    <div className="space-y-2">
+                                                    <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Suite Unit</p>
                                                         <p className="text-white text-base font-bold font-serif">{booking.room?.roomNumber || '—'}</p>
                                                         <p className="text-[10px] text-luxury-muted font-medium tracking-tight truncate">{booking.room?.type}</p>
                                                     </div>
-                                                    <div className="space-y-2">
+                                                    <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Delegation</p>
                                                         <div className="flex flex-wrap gap-2">
                                                             <div className="flex items-center gap-2 text-white text-[11px] font-bold bg-gold-500/10 border border-gold-500/20 px-3 py-1.5 rounded-xl">
@@ -1458,14 +1458,14 @@ const AdminDashboard = () => {
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="space-y-2">
+                                                    <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Stay Protocol</p>
                                                         <div className="flex flex-col">
                                                             <span className="text-white text-xs font-bold tracking-tight">{new Date(booking.checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                                                             <span className="text-white/30 text-[10px]">to {new Date(booking.checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                                                         </div>
                                                     </div>
-                                                    <div className="space-y-2">
+                                                    <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Account</p>
                                                         <p className="text-gold-400 text-base font-bold font-serif">₹{booking.totalPrice?.toLocaleString()}</p>
                                                         <div className="pt-1">
@@ -1833,14 +1833,14 @@ const AdminDashboard = () => {
                         {/* Main Room Navigation Grid */}
                         <div className="flex gap-12 flex-1 overflow-hidden min-h-0">
                             {/* Floor Sidebar Navigator */}
-                            <div className="w-80 flex flex-col border-r border-gold-500/5 pr-10 overflow-hidden">
+                            <div className="w-64 flex flex-col border-r border-gold-500/5 pr-6 overflow-hidden">
                                 <h3 className="text-[10px] font-black text-gold-500/40 tracking-[0.4em] mb-8 uppercase px-2 italic">Vertical Navigator</h3>
                                 <div className="flex-1 overflow-y-auto space-y-3 pb-8 scrollbar-thin scrollbar-thumb-gold-500/10 hover:scrollbar-thumb-gold-500/20 transition-all">
                                     {floors.map((f) => (
                                         <button
                                             key={f}
                                             onClick={() => setSelectedFloor(f)}
-                                            className={`w-full flex items-center justify-between px-6 py-5 rounded-2xl transition-all duration-500 group relative overflow-hidden ${selectedFloor === f ? 'bg-gold-500/10 text-gold-400 shadow-[inset_0_0_20px_rgba(212,175,55,0.05)] border border-gold-500/20' : 'text-white/40 hover:text-white hover:bg-white/5 border border-transparent'}`}
+                                            className={`w-full flex items-center justify-between px-6 py-3.5 rounded-2xl transition-all duration-500 group relative overflow-hidden ${selectedFloor === f ? 'bg-gold-500/10 text-gold-400 shadow-[inset_0_0_20px_rgba(212,175,55,0.05)] border border-gold-500/20' : 'text-white/40 hover:text-white hover:bg-white/5 border border-transparent'}`}
                                         >
                                             <div className="flex items-center gap-4 relative z-10">
                                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${selectedFloor === f ? 'bg-gold-500 text-navy-950 shadow-lg shadow-gold-500/20 rotate-[10deg]' : 'bg-navy-950 border border-gold-500/10 group-hover:border-gold-500/30'}`}>
@@ -1857,7 +1857,7 @@ const AdminDashboard = () => {
                                 </div>
 
                                 <div className="mt-auto pt-10 border-t border-gold-500/5">
-                                    <div className="p-8 bg-gold-400/5 rounded-[2.5rem] border border-gold-500/10 relative overflow-hidden group hover:border-gold-500/30 transition-all">
+                                    <div className="p-5 bg-gold-400/5 rounded-[1.5rem] border border-gold-500/10 relative overflow-hidden group hover:border-gold-500/30 transition-all">
                                         <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-gold-500/5 rounded-full blur-2xl group-hover:bg-gold-500/10 transition-colors"></div>
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-[pulse_2s_infinite] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
@@ -1884,7 +1884,7 @@ const AdminDashboard = () => {
                                 ) : (
                                     <div className="space-y-16">
                                         {rooms.length > 0 ? (
-                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                                            <div className="flex flex-col gap-4">
                                                 {rooms.map((room) => {
                                                     const viewDate = new Date(roomsViewDate);
                                                     viewDate.setHours(0, 0, 0, 0);
@@ -1904,159 +1904,90 @@ const AdminDashboard = () => {
                                                     const displayStatus = activeBooking ? (activeBooking.status === 'CheckedIn' ? 'Occupied' : 'Reserved') : room.status;
 
                                                     return (
-                                                        <div key={room._id} className="bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-[3rem] overflow-hidden hover:border-gold-500/40 transition-all duration-700 group flex flex-col h-full shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative active:scale-[0.99]">
-                                                            {/* Card Header with Status */}
-                                                            <div className="relative h-72 bg-navy-950 overflow-hidden">
-                                                                <div className="absolute inset-0 group-hover:scale-110 transition-transform duration-1000 ease-in-out">
-                                                                    <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80" alt={room.type} className="w-full h-full object-cover opacity-40 mix-blend-luminosity brightness-50" />
-                                                                    <div className="absolute inset-0 bg-gradient-to-b from-navy-950/80 via-transparent to-navy-900 shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]"></div>
-                                                                </div>
-
-                                                                <div className="absolute top-8 left-8 flex flex-col gap-4 relative z-10">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className={`px-5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl border ${displayStatus === 'Available' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : displayStatus === 'Occupied' ? 'bg-red-500/10 text-red-400 border-red-500/20' : displayStatus === 'Reserved' ? 'bg-gold-500/10 text-gold-400 border-gold-500/20' : 'bg-white/5 text-white/50 border-white/10'}`}>
-                                                                            {displayStatus} State
-                                                                        </span>
-                                                                        <span className="px-5 py-2 rounded-2xl bg-navy-950/80 backdrop-blur-xl text-white text-[9px] font-black uppercase tracking-[0.3em] border border-gold-500/20 shadow-2xl">
-                                                                            Sector {room.roomNumber}
-                                                                        </span>
-                                                                    </div>
-                                                                    {activeBooking && (
-                                                                        <div className="bg-navy-950/90 backdrop-blur-2xl border border-gold-500/20 text-white rounded-[2rem] p-6 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7)] max-w-sm animate-in zoom-in-95 duration-500">
-                                                                            <div className="flex items-center gap-4 mb-4">
-                                                                                <div className="w-10 h-10 rounded-xl bg-gold-400/10 border border-gold-500/20 flex items-center justify-center">
-                                                                                    <User className="w-5 h-5 text-gold-400" />
-                                                                                </div>
-                                                                                <div>
-                                                                                    <span className="text-[10px] font-black text-gold-500/40 uppercase tracking-widest block mb-0.5">Primary Occupant</span>
-                                                                                    <span className="text-sm font-bold text-white font-serif">{activeBooking.user?.fullName || activeBooking.user?.email}</span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="flex items-center justify-between py-4 border-t border-gold-500/10 mb-4">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <Calendar className="w-4 h-4 text-gold-400 opacity-50" />
-                                                                                    <span className="text-[10px] text-white/60 font-medium">{new Date(activeBooking.checkIn).toLocaleDateString()} — {new Date(activeBooking.checkOut).toLocaleDateString()}</span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="flex items-center justify-between pt-2">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <div className={`w-2 h-2 rounded-full ${activeBooking.paymentStatus === 'Paid' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]'}`}></div>
-                                                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${activeBooking.paymentStatus === 'Paid' ? 'text-emerald-400' : 'text-orange-400'}`}>{activeBooking.paymentStatus} Account</span>
-                                                                                </div>
-                                                                                <span className="text-lg font-bold text-gold-400 font-serif">₹{activeBooking.totalPrice?.toLocaleString()}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                <div className="absolute top-8 right-8 bg-gold-500 text-navy-950 px-6 py-2 rounded-2xl shadow-2xl skew-x-[-12deg]">
-                                                                    <div className="skew-x-[12deg] flex items-baseline gap-1">
-                                                                        <span className="text-base font-black">₹{room.price?.toLocaleString()}</span>
-                                                                        <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">/ Night</span>
-                                                                    </div>
+                                                        <div key={room._id} className="bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-2xl overflow-hidden hover:border-gold-500/30 transition-all duration-500 group flex items-center h-32 shadow-xl relative active:scale-[0.995]">
+                                                            {/* Thumbnail Image */}
+                                                            <div className="w-40 h-full relative shrink-0 overflow-hidden bg-navy-950 border-r border-gold-500/10">
+                                                                <img
+                                                                    src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80"
+                                                                    alt={room.type}
+                                                                    className="w-full h-full object-cover opacity-40 mix-blend-luminosity group-hover:scale-110 transition-transform duration-1000"
+                                                                />
+                                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-navy-900/50"></div>
+                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                    <span className="text-white/80 text-[10px] font-black tracking-[0.2em] uppercase">Room {room.roomNumber}</span>
                                                                 </div>
                                                             </div>
 
-                                                            {/* Card Content */}
-                                                            <div className="p-10 flex-1 flex flex-col relative z-20">
-                                                                <div className="flex items-start justify-between mb-8">
-                                                                    <div>
-                                                                        <h4 className="text-3xl font-bold text-white font-serif italic tracking-wide group-hover:text-gold-400 transition-colors duration-500 underline decoration-gold-500/10 underline-offset-8 decoration-2">{room.type} Suite</h4>
-                                                                        <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.4em] font-black mt-4">{room.viewType} Perspective</p>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2 bg-gold-500/10 border border-gold-500/20 px-4 py-2 rounded-2xl shadow-inner group-hover:scale-110 transition-transform">
-                                                                        <Shield className="w-3.5 h-3.5 fill-gold-500 text-gold-500 shadow-lg" />
-                                                                        <span className="text-xs font-black text-gold-400">Class {room.luxuryLevel}.0</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="grid grid-cols-3 gap-6 mb-10">
-                                                                    <div className="flex items-center gap-4 group/item">
-                                                                        <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover/item:border-gold-500/30 transition-all">
-                                                                            <Users className="w-5 h-5 text-gold-400/40 group-hover/item:text-gold-400 transition-colors" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="text-[9px] font-black text-gold-500/30 uppercase tracking-widest block">Quota</span>
-                                                                            <span className="text-xs font-bold text-white/80">{room.capacity.adults}A {room.capacity.children > 0 && `+ ${room.capacity.children}C`}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-4 group/item">
-                                                                        <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover/item:border-gold-500/30 transition-all">
-                                                                            <Bed className="w-5 h-5 text-gold-400/40 group-hover/item:text-gold-400 transition-colors" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="text-[9px] font-black text-gold-500/30 uppercase tracking-widest block">Anchor</span>
-                                                                            <span className="text-xs font-bold text-white/80 truncate max-w-[80px] block">{room.bedType}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-4 group/item">
-                                                                        <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover/item:border-gold-500/30 transition-all">
-                                                                            <Building className="w-5 h-5 text-gold-400/40 group-hover/item:text-gold-400 transition-colors" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="text-[9px] font-black text-gold-500/30 uppercase tracking-widest block">Tier</span>
-                                                                            <span className="text-xs font-bold text-white/80">{room.floor}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="flex flex-wrap gap-3 mb-10">
-                                                                    {room.amenities.slice(0, 4).map((amt, idx) => (
-                                                                        <span key={idx} className="bg-navy-950/50 text-gold-500/60 border border-gold-500/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-inner hover:border-gold-500/40 hover:text-gold-400 transition-all cursor-default translate-y-0 hover:-translate-y-1">
-                                                                            {amt}
+                                                            {/* Core Info - Center */}
+                                                            <div className="flex-1 px-8 flex items-center justify-between min-w-0">
+                                                                <div className="flex flex-col gap-1 min-w-0">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <h4 className="text-lg font-bold text-white font-serif italic truncate group-hover:text-gold-400 transition-colors uppercase tracking-tight">{room.type}</h4>
+                                                                        <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-wider border ${displayStatus === 'Available' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : displayStatus === 'Occupied' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-gold-500/10 text-gold-400 border-gold-500/20'}`}>
+                                                                            {displayStatus}
                                                                         </span>
-                                                                    ))}
-                                                                    {room.amenities.length > 4 && <span className="text-[10px] text-gold-500/30 font-bold self-center ml-2">+{room.amenities.length - 4} More Assets</span>}
+                                                                    </div>
+                                                                    <div className="flex items-center gap-4 text-[9px] text-white/30 uppercase tracking-widest font-bold">
+                                                                        <span className="flex items-center gap-2"><MapPin className="w-3 h-3 text-gold-500/40" /> {room.viewType}</span>
+                                                                        <span className="flex items-center gap-2"><Users className="w-3 h-3 text-gold-500/40" /> {room.capacity.adults}A + {room.capacity.children}C</span>
+                                                                        <span className="flex items-center gap-2"><Shield className="w-3 h-3 text-gold-500/40" /> Tier {room.luxuryLevel}</span>
+                                                                    </div>
                                                                 </div>
 
-                                                                <div className="mt-auto pt-10 border-t border-gold-500/10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                                                                    <div className="flex flex-col gap-2">
-                                                                        <span className="text-[8px] font-black text-gold-500/30 uppercase tracking-[0.3em] italic">Mapping Signature Privileges</span>
-                                                                        <div className="flex gap-6">
-                                                                            {room.benefits.slice(0, 2).map((benefit, idx) => (
-                                                                                <div key={idx} className="flex items-center gap-2 group/ben">
-                                                                                    <div className="w-1.5 h-1.5 rounded-full bg-gold-500/20 group-hover/ben:bg-gold-500 transition-colors"></div>
-                                                                                    <span className="text-[10px] text-white/50 group-hover/ben:text-white transition-colors">{benefit}</span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-6">
-                                                                        <button
-                                                                            onClick={() => handleEditRoomClick(room)}
-                                                                            className="text-[10px] font-black text-white/20 hover:text-gold-400 uppercase tracking-widest transition-all underline underline-offset-8 decoration-transparent hover:decoration-gold-500/40"
-                                                                        >
-                                                                            Refine Schematic
-                                                                        </button>
-
-                                                                        {activeBooking && (
-                                                                            <div className="flex gap-3">
-                                                                                {activeBooking.status === 'Confirmed' && (
-                                                                                    <>
-                                                                                        <button
-                                                                                            onClick={() => handleAdminBookingAction(activeBooking._id, 'check-in')}
-                                                                                            className="px-6 py-3 bg-emerald-500 text-navy-950 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/10 active:scale-95"
-                                                                                        >
-                                                                                            Check In
-                                                                                        </button>
-                                                                                        <button
-                                                                                            onClick={() => handleAdminBookingAction(activeBooking._id, 'cancel')}
-                                                                                            className="px-6 py-3 bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 hover:text-white transition-all active:scale-95"
-                                                                                        >
-                                                                                            Abort
-                                                                                        </button>
-                                                                                    </>
-                                                                                )}
-                                                                                {activeBooking.status === 'CheckedIn' && (
-                                                                                    <button
-                                                                                        onClick={() => handleAdminBookingAction(activeBooking._id, 'check-out')}
-                                                                                        className="px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-navy-950 text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-gold-500 hover:to-gold-300 transition-all shadow-xl shadow-gold-500/10 active:scale-95"
-                                                                                    >
-                                                                                        Check Out
-                                                                                    </button>
-                                                                                )}
+                                                                <div className="hidden xl:flex items-center gap-6 px-6 border-l border-gold-500/5">
+                                                                    {activeBooking ? (
+                                                                        <div className="flex items-center gap-4">
+                                                                            <div className="w-8 h-8 rounded-full bg-gold-400/10 border border-gold-500/20 flex items-center justify-center text-gold-400 font-bold text-xs">{activeBooking.user?.fullName?.charAt(0) || 'G'}</div>
+                                                                            <div className="flex flex-col">
+                                                                                <span className="text-[10px] font-bold text-white max-w-[120px] truncate">{activeBooking.user?.fullName || 'Guest'}</span>
+                                                                                <span className="text-[8px] text-white/30 uppercase tracking-widest">{new Date(activeBooking.checkIn).toLocaleDateString()} Arrival</span>
                                                                             </div>
-                                                                        )}
-                                                                    </div>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="flex items-center gap-2 opacity-15">
+                                                                            <Calendar className="w-3 h-3 text-gold-500/40" />
+                                                                            <span className="text-[7px] text-gold-500/40 uppercase tracking-[0.3em] font-black">Vacant State</span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+
+                                                                <div className="text-right ml-6 shrink-0">
+                                                                    <p className="text-[9px] text-gold-500/40 uppercase tracking-widest font-black mb-1">Standard Yield</p>
+                                                                    <p className="text-xl font-bold text-gold-400 font-serif italic">₹{room.price?.toLocaleString()}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Actions - Right */}
+                                                            <div className="w-48 h-full bg-navy-950/40 flex items-center gap-2 px-6 border-l border-gold-500/10">
+                                                                <button
+                                                                    onClick={() => handleEditRoomClick(room)}
+                                                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:bg-white/10 hover:text-white transition-all group/btn" title="Edit Unit"
+                                                                >
+                                                                    <Edit2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                                                                </button>
+
+                                                                <div className="flex-1">
+                                                                    {activeBooking ? (
+                                                                        activeBooking.status === 'Confirmed' ? (
+                                                                            <button
+                                                                                onClick={() => handleAdminBookingAction(activeBooking._id, 'check-in')}
+                                                                                className="w-full h-10 rounded-xl bg-emerald-500 text-navy-950 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/10"
+                                                                            >
+                                                                                Arrival
+                                                                            </button>
+                                                                        ) : (
+                                                                            <button
+                                                                                onClick={() => handleAdminBookingAction(activeBooking._id, 'check-out')}
+                                                                                className="w-full h-10 rounded-xl bg-gold-500 text-navy-950 text-[10px] font-black uppercase tracking-widest hover:bg-gold-400 transition-all shadow-lg shadow-gold-500/10"
+                                                                            >
+                                                                                Exit
+                                                                            </button>
+                                                                        )
+                                                                    ) : (
+                                                                        <button className="w-full h-10 rounded-xl bg-navy-950 border border-gold-500/10 text-[9px] font-black uppercase tracking-widest text-gold-500/40 cursor-default">
+                                                                            Vacant
+                                                                        </button>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2083,124 +2014,122 @@ const AdminDashboard = () => {
             }
             case 'bookings': {
                 return (
-                    <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                        <div className="bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-[3rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+                    <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-12 pb-20">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
 
-                            <div className="p-10 border-b border-gold-500/10 flex items-center justify-between relative z-10">
-                                <div>
-                                    <h2 className="text-3xl font-bold text-white font-serif italic tracking-wide underline decoration-gold-500/10 underline-offset-8">Reservation Manifest</h2>
-                                    <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.4em] font-black mt-3">Global Command Center</p>
-                                </div>
-                                <button
-                                    onClick={fetchAdminBookings}
-                                    className="flex items-center gap-4 px-8 py-4 bg-navy-950/80 border border-gold-500/10 text-gold-400 rounded-2xl font-bold hover:border-gold-500 transition-all shadow-xl group"
-                                >
-                                    <Clock className={`w-4 h-4 group-hover:rotate-180 transition-transform duration-700 ${fetchingAdminBookings ? 'animate-spin' : ''}`} />
-                                    <span className="text-[10px] uppercase tracking-[0.2em]">Sync Manifest</span>
-                                </button>
+                        <div className="p-10 border-b border-gold-500/10 flex items-center justify-between relative z-10">
+                            <div>
+                                <h2 className="text-3xl font-bold text-white font-serif italic tracking-wide underline decoration-gold-500/10 underline-offset-8">Reservation Manifest</h2>
+                                <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.4em] font-black mt-3">Global Command Center</p>
                             </div>
+                            <button
+                                onClick={fetchAdminBookings}
+                                className="flex items-center gap-4 px-8 py-4 bg-navy-950/80 border border-gold-500/10 text-gold-400 rounded-2xl font-bold hover:border-gold-500 transition-all shadow-xl group"
+                            >
+                                <Clock className={`w-4 h-4 group-hover:rotate-180 transition-transform duration-700 ${fetchingAdminBookings ? 'animate-spin' : ''}`} />
+                                <span className="text-[10px] uppercase tracking-[0.2em]">Sync Manifest</span>
+                            </button>
+                        </div>
 
-                            <div className="overflow-x-auto relative z-10">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="text-[10px] uppercase tracking-[0.3em] text-gold-500/60 bg-navy-950/40 border-b border-gold-500/10">
-                                            <th className="px-10 py-8 font-black">Resident</th>
-                                            <th className="px-10 py-8 font-black">Strategic Hub</th>
-                                            <th className="px-10 py-8 font-black">Stay Protocol</th>
-                                            <th className="px-10 py-8 font-black">Account Value</th>
-                                            <th className="px-10 py-8 font-black text-right">Settlement State</th>
-                                            <th className="px-10 py-8 font-black text-center">Protocol</th>
+                        <div className="overflow-x-auto relative z-10">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="text-[10px] uppercase tracking-[0.3em] text-gold-500/60 bg-navy-950/40 border-b border-gold-500/10">
+                                        <th className="px-10 py-8 font-black">Resident</th>
+                                        <th className="px-10 py-8 font-black">Strategic Hub</th>
+                                        <th className="px-10 py-8 font-black">Stay Protocol</th>
+                                        <th className="px-10 py-8 font-black">Account Value</th>
+                                        <th className="px-10 py-8 font-black text-right">Settlement State</th>
+                                        <th className="px-10 py-8 font-black text-center">Protocol</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gold-500/5">
+                                    {fetchingAdminBookings ? (
+                                        <tr>
+                                            <td colSpan="6" className="px-10 py-32 text-center">
+                                                <div className="flex flex-col items-center justify-center space-y-6">
+                                                    <div className="w-12 h-12 border-2 border-gold-500/10 border-t-gold-500 rounded-full animate-spin"></div>
+                                                    <span className="text-gold-500/30 font-serif italic text-lg tracking-widest animate-pulse">Accessing Archive Registry...</span>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gold-500/5">
-                                        {fetchingAdminBookings ? (
-                                            <tr>
-                                                <td colSpan="6" className="px-10 py-32 text-center">
-                                                    <div className="flex flex-col items-center justify-center space-y-6">
-                                                        <div className="w-12 h-12 border-2 border-gold-500/10 border-t-gold-500 rounded-full animate-spin"></div>
-                                                        <span className="text-gold-500/30 font-serif italic text-lg tracking-widest animate-pulse">Accessing Archive Registry...</span>
+                                    ) : adminBookings.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="px-10 py-32 text-center">
+                                                <div className="flex flex-col items-center justify-center space-y-4">
+                                                    <div className="text-gold-500/30 font-serif italic text-2xl tracking-widest">"The registry remains unwritten."</div>
+                                                    <p className="text-[9px] text-gold-500/20 uppercase tracking-[0.5em] font-black">No active delegations detected in the current cycle.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        adminBookings.map((booking, i) => (
+                                            <tr key={booking._id} className="hover:bg-gold-500/5 transition-all duration-500 group">
+                                                <td className="px-10 py-8">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-xl bg-navy-950 border border-gold-500/20 flex items-center justify-center text-gold-400 font-serif text-lg italic shadow-xl group-hover:scale-110 transition-transform">
+                                                            {(booking.user?.fullName || 'G').charAt(0)}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-bold text-white font-serif text-base tracking-wide group-hover:text-gold-400 transition-colors uppercase italic">{booking.user?.fullName || booking.user?.email?.split('@')[0] || 'Distinguished Guest'}</div>
+                                                            <div className="text-[9px] text-gold-500/40 uppercase tracking-[0.3em] font-black mt-1.5 flex items-center gap-2">
+                                                                <Hash className="w-2.5 h-2.5" /> LUX-{booking._id.slice(-8).toUpperCase()}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                            </tr>
-                                        ) : adminBookings.length === 0 ? (
-                                            <tr>
-                                                <td colSpan="6" className="px-10 py-32 text-center">
-                                                    <div className="flex flex-col items-center justify-center space-y-4">
-                                                        <div className="text-gold-500/30 font-serif italic text-2xl tracking-widest">"The registry remains unwritten."</div>
-                                                        <p className="text-[9px] text-gold-500/20 uppercase tracking-[0.5em] font-black">No active delegations detected in the current cycle.</p>
+                                                <td className="px-10 py-8">
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="text-xs font-bold text-white tracking-widest uppercase flex items-center gap-2">
+                                                            <MapPin className="w-3 h-3 text-gold-400" />
+                                                            {booking.location?.city} Hub
+                                                        </div>
+                                                        <div className="text-[9px] text-gold-500/40 uppercase tracking-widest font-black bg-gold-500/5 px-2 py-0.5 rounded-md border border-gold-500/10 inline-block self-start">
+                                                            {booking.room?.roomType} • SECTOR {booking.room?.roomNumber || 'TBD'}
+                                                        </div>
                                                     </div>
                                                 </td>
+                                                <td className="px-10 py-8">
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-center gap-3 text-white/80 font-serif text-sm italic">
+                                                            <Calendar className="w-3.5 h-3.5 text-gold-400/50" />
+                                                            <span>{new Date(booking.checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                            <span className="text-gold-500/20">—</span>
+                                                            <span>{new Date(booking.checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                        </div>
+                                                        <div className="text-[8px] text-gold-500/30 uppercase tracking-[0.4em] font-black ml-6">Deployment window</div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-10 py-8">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-lg font-bold text-gold-400 font-serif tracking-tight group-hover:scale-105 transition-transform origin-left">₹{booking.totalPrice?.toLocaleString()}</span>
+                                                        <span className="text-[8px] text-gold-500/30 uppercase tracking-widest font-black mt-1 italic">Total Valuation</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-10 py-8 text-right">
+                                                    <div className="flex flex-col items-end gap-2.5">
+                                                        <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] border shadow-lg ${booking.paymentStatus === 'Paid' ? 'border-emerald-500/20 text-emerald-400 bg-emerald-500/5' : booking.paymentStatus === 'Advance Paid' ? 'border-amber-500/20 text-amber-500 bg-amber-500/5' : 'border-red-500/20 text-red-500 bg-red-500/5'}`}>
+                                                            {booking.paymentStatus || 'Pending Recon'}
+                                                        </span>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${booking.status === 'Confirmed' ? 'bg-indigo-500' : booking.status === 'CheckedIn' ? 'bg-emerald-500' : 'bg-white/10'}`}></div>
+                                                            <span className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-black italic">PROTOCOL: {booking.status}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-10 py-8 text-center">
+                                                    <button
+                                                        onClick={() => setViewingBooking(booking)}
+                                                        className="px-6 py-3 bg-navy-950/80 text-gold-400 border border-gold-500/10 hover:border-gold-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-[0.3em] transition-all shadow-xl active:scale-95 group/btn"
+                                                    >
+                                                        <span className="group-hover/btn:tracking-[0.5em] transition-all italic">Inspect Details</span>
+                                                    </button>
+                                                </td>
                                             </tr>
-                                        ) : (
-                                            adminBookings.map((booking, i) => (
-                                                <tr key={booking._id} className="hover:bg-gold-500/5 transition-all duration-500 group">
-                                                    <td className="px-10 py-8">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-12 h-12 rounded-xl bg-navy-950 border border-gold-500/20 flex items-center justify-center text-gold-400 font-serif text-lg italic shadow-xl group-hover:scale-110 transition-transform">
-                                                                {(booking.user?.fullName || 'G').charAt(0)}
-                                                            </div>
-                                                            <div>
-                                                                <div className="font-bold text-white font-serif text-base tracking-wide group-hover:text-gold-400 transition-colors uppercase italic">{booking.user?.fullName || booking.user?.email?.split('@')[0] || 'Distinguished Guest'}</div>
-                                                                <div className="text-[9px] text-gold-500/40 uppercase tracking-[0.3em] font-black mt-1.5 flex items-center gap-2">
-                                                                    <Hash className="w-2.5 h-2.5" /> LUX-{booking._id.slice(-8).toUpperCase()}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-8">
-                                                        <div className="flex flex-col gap-1.5">
-                                                            <div className="text-xs font-bold text-white tracking-widest uppercase flex items-center gap-2">
-                                                                <MapPin className="w-3 h-3 text-gold-400" />
-                                                                {booking.location?.city} Hub
-                                                            </div>
-                                                            <div className="text-[9px] text-gold-500/40 uppercase tracking-widest font-black bg-gold-500/5 px-2 py-0.5 rounded-md border border-gold-500/10 inline-block self-start">
-                                                                {booking.room?.roomType} • SECTOR {booking.room?.roomNumber || 'TBD'}
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-8">
-                                                        <div className="flex flex-col gap-1.5">
-                                                            <div className="flex items-center gap-3 text-white/80 font-serif text-sm italic">
-                                                                <Calendar className="w-3.5 h-3.5 text-gold-400/50" />
-                                                                <span>{new Date(booking.checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                                                                <span className="text-gold-500/20">—</span>
-                                                                <span>{new Date(booking.checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                                                            </div>
-                                                            <div className="text-[8px] text-gold-500/30 uppercase tracking-[0.4em] font-black ml-6">Deployment window</div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-8">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-lg font-bold text-gold-400 font-serif tracking-tight group-hover:scale-105 transition-transform origin-left">₹{booking.totalPrice?.toLocaleString()}</span>
-                                                            <span className="text-[8px] text-gold-500/30 uppercase tracking-widest font-black mt-1 italic">Total Valuation</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-8 text-right">
-                                                        <div className="flex flex-col items-end gap-2.5">
-                                                            <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] border shadow-lg ${booking.paymentStatus === 'Paid' ? 'border-emerald-500/20 text-emerald-400 bg-emerald-500/5' : booking.paymentStatus === 'Advance Paid' ? 'border-amber-500/20 text-amber-500 bg-amber-500/5' : 'border-red-500/20 text-red-500 bg-red-500/5'}`}>
-                                                                {booking.paymentStatus || 'Pending Recon'}
-                                                            </span>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className={`w-1.5 h-1.5 rounded-full ${booking.status === 'Confirmed' ? 'bg-indigo-500' : booking.status === 'CheckedIn' ? 'bg-emerald-500' : 'bg-white/10'}`}></div>
-                                                                <span className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-black italic">PROTOCOL: {booking.status}</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-8 text-center">
-                                                        <button
-                                                            onClick={() => setViewingBooking(booking)}
-                                                            className="px-6 py-3 bg-navy-950/80 text-gold-400 border border-gold-500/10 hover:border-gold-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-[0.3em] transition-all shadow-xl active:scale-95 group/btn"
-                                                        >
-                                                            <span className="group-hover/btn:tracking-[0.5em] transition-all italic">Inspect Details</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 );

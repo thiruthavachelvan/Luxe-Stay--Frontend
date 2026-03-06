@@ -86,24 +86,42 @@ const AmenitiesPage = () => {
             <section className="relative pt-40 pb-24 overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.05),transparent_50%)]" />
                 <div className="container mx-auto px-6 relative z-10">
-                    <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Sanctuary Facilities</span>
-                    </div>
+                    <div className="grid lg:grid-cols-2 gap-20 items-center">
+                        <div className="max-w-xl">
+                            <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
+                                <div className="w-1.5 h-1.5 rounded-full bg-gold-400 shadow-[0_0_8px_rgba(212,175,55,0.6)]" />
+                                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Sanctuary Facilities</span>
+                            </div>
 
-                    <h1 className="text-6xl md:text-8xl font-serif italic text-white mb-8 tracking-tight leading-[0.9] animate-in fade-in slide-in-from-top-8 duration-1000">
-                        Every luxury, <br />
-                        <span className="text-gold-400">perfectly curated.</span>
-                    </h1>
+                            <h1 className="text-5xl md:text-7xl font-serif italic text-white mb-8 tracking-tight leading-[0.95] animate-in fade-in slide-in-from-top-8 duration-1000">
+                                Every luxury, <br />
+                                <span className="text-gold-400 block mt-1">perfectly curated.</span>
+                            </h1>
 
-                    <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-                        From state-of-the-art wellness centers to digital-first convenience, explore the comprehensive ecosystem of LuxeStay excellence.
-                    </p>
+                            <p className="text-lg text-white/40 font-light leading-relaxed mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                                From state-of-the-art wellness centers to digital-first convenience, explore the comprehensive ecosystem of LuxeStay excellence.
+                            </p>
 
-                    <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
-                        <span className="hover:text-gold-400 transition-colors cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Archive</span>
-                        <ChevronRight className="w-3 h-3" />
-                        <span className="text-gold-400">Amenities</span>
+                            <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
+                                <span className="hover:text-gold-400 transition-colors cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Archive</span>
+                                <ChevronRight className="w-3 h-3" />
+                                <span className="text-gold-400">Amenities</span>
+                            </div>
+                        </div>
+
+                        {/* Decorative Visual - Sanctuary Ornament */}
+                        <div className="hidden lg:block relative group">
+                            <div className="absolute inset-0 bg-gold-400/5 blur-[80px] group-hover:bg-gold-400/10 transition-all duration-1000" />
+                            <div className="relative border border-white/5 aspect-[4/5] max-w-[400px] ml-auto rounded-sm overflow-hidden shadow-2xl">
+                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 transition-all duration-1000 scale-105 group-hover:scale-100" />
+                                <div className="absolute inset-0 bg-gradient-to-tr from-navy-950/90 via-transparent to-transparent" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-24 h-24 rounded-full border border-white/5 flex items-center justify-center group-hover:border-gold-400/20 transition-colors duration-700">
+                                        <Sparkles className="w-8 h-8 text-white/10 group-hover:text-gold-400/40 transition-colors duration-700" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

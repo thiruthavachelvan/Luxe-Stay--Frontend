@@ -33,7 +33,7 @@ import {
     Crown,
     ShieldCheck,
     CreditCard,
-    Headphones,
+    Headset,
     Compass,
     History,
     AlertCircle,
@@ -49,8 +49,14 @@ import {
     CheckCircle,
     Clock,
     ChevronRight,
+    Circle,
+    Wine,
+    Users,
+    Gem,
+    Diamond,
+    Headphones,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import TableReservationForm from '../components/TableReservationForm';
 
 const UserDashboard = () => {
@@ -2438,7 +2444,7 @@ const UserDashboard = () => {
                     {/* Sidebar Decoration */}
                     <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-gold-400/20 to-transparent" />
 
-                    <div className="p-8 relative">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-8 relative">
                         <div className="flex items-center justify-between mb-12">
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
@@ -2497,7 +2503,7 @@ const UserDashboard = () => {
                         </nav>
                     </div>
 
-                    <div className="mt-auto p-8 border-t border-white/5 space-y-8 relative">
+                    <div className="p-8 border-t border-white/5 space-y-8 relative flex-shrink-0">
                         {/* Membership Badge */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

@@ -7,8 +7,9 @@ import {
     Eye, Wifi, Coffee, Tv, Wind, Loader2, Calendar,
     MapPin, X, Filter, ChevronDown, BedDouble, Layers,
     Hash, Waves, UtensilsCrossed, Dumbbell, Car, Flower2,
-    ChevronRight, Building2
+    ChevronRight, Building2, Home, Sparkles
 } from 'lucide-react';
+import { calculateMemberPrice, getTierDiscount, TIER_BENEFITS } from '../utils/membership';
 
 // ── Helpers
 const AMENITY_ICONS = {
@@ -266,6 +267,12 @@ const ExploreRoomsPage = () => {
                             <Hotel className="w-5 h-5 text-navy-950" />
                         </div>
                         <span className="font-serif text-white text-xl tracking-tight hidden sm:block">LuxeStay <span className="italic text-gold-400">Reimagined</span></span>
+                    </button>
+
+                    <button onClick={() => navigate('/')}
+                        className="hidden lg:flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-gold-400 transition-colors">
+                        <Home className="w-3.5 h-3.5" />
+                        <span>Home</span>
                     </button>
 
                     <div className="relative flex-1 max-w-sm ml-4">
@@ -609,8 +616,20 @@ const ExploreRoomsPage = () => {
                                             <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-navy-950/80 to-transparent">
                                                 <div className="flex items-end justify-between">
                                                     <div>
-                                                        <span className="text-[9px] text-white/40 uppercase tracking-widest block mb-1">Nightly Rate</span>
-                                                        <span className="text-2xl font-serif text-white">₹{room.price?.toLocaleString('en-IN')}</span>
+                                                        <span className="text-[9px] text-white/40 uppercase tracking-widest block mb-1">
+                                                            {user?.membershipTier && user.membershipTier !== 'None' ? `${user.membershipTier} Member Rate` : 'Nightly Rate'}
+                                                        </span>
+                                                        <span className="text-2xl font-serif text-white">
+                                                            ₹{user?.membershipTier && user.membershipTier !== 'None'
+                                                                ? calculateMemberPrice(room.price, user.membershipTier).toLocaleString('en-IN')
+                                                                : room.price?.toLocaleString('en-IN')}
+                                                        </span>
+                                                        {user?.membershipTier && user.membershipTier !== 'None' && (
+                                                            <span className="text-[9px] text-gold-400 block mt-1 font-bold uppercase tracking-widest">
+                                                                You save {getTierDiscount(user.membershipTier)}%
+                                                                <span className="line-through text-white/20 ml-2">₹{room.price?.toLocaleString('en-IN')}</span>
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-sm">
                                                         <Star className="w-2.5 h-2.5 text-gold-400 fill-gold-400" />
@@ -630,6 +649,17 @@ const ExploreRoomsPage = () => {
                                                     <span className="flex items-center gap-1.5"><Users className="w-3 h-3 text-gold-400/40" />{getRoomCategory(room)}</span>
                                                     <span className="flex items-center gap-1.5"><Eye className="w-3 h-3 text-gold-400/40" />{room.viewType || 'Scenic'}</span>
                                                 </div>
+
+                                                {user?.membershipTier && user.membershipTier !== 'None' && TIER_BENEFITS[user.membershipTier] && (
+                                                    <div className="mt-4 flex flex-wrap gap-1.5">
+                                                        {TIER_BENEFITS[user.membershipTier].slice(1, 4).map((benefit, bi) => (
+                                                            <div key={bi} className="flex items-center gap-1 px-2 py-0.5 bg-gold-400/10 border border-gold-400/20 rounded-sm">
+                                                                <Sparkles className="w-2 h-2 text-gold-400" />
+                                                                <span className="text-[7px] font-black uppercase text-gold-400/80">{benefit}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="flex flex-wrap gap-2 mb-8">

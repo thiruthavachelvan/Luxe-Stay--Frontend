@@ -37,21 +37,37 @@ const GalleryPage = () => {
             <main className="pt-40 pb-24 px-6 container mx-auto relative overflow-hidden">
                 <div className="absolute top-20 right-[-10%] w-[500px] h-[500px] bg-gold-400/5 rounded-full blur-[120px] pointer-events-none" />
 
-                {/* Hero / Intro */}
-                <div className="max-w-4xl mb-24 relative z-10">
-                    <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">The Visual Registry</span>
+                {/* Hero Section */}
+                <div className="grid lg:grid-cols-2 gap-20 items-center mb-24 relative z-10">
+                    <div className="max-w-xl">
+                        <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gold-400 shadow-[0_0_8px_rgba(212,175,55,0.6)]" />
+                            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">The Visual Registry</span>
+                        </div>
+
+                        <h1 className="text-5xl md:text-7xl font-serif italic text-white mb-8 tracking-tight leading-[0.95] animate-in fade-in slide-in-from-top-8 duration-1000">
+                            A study in <br />
+                            <span className="text-gold-400 block mt-1">excellence.</span>
+                        </h1>
+
+                        <p className="text-lg text-white/40 font-light leading-relaxed mb-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                            Explore the meticulous architecture and curated atmospheres that define our global sanctuaries. Each frame a testament to the art of luxury.
+                        </p>
                     </div>
 
-                    <h1 className="text-6xl md:text-8xl font-serif italic text-white mb-8 tracking-tight leading-[0.9] animate-in fade-in slide-in-from-top-8 duration-1000">
-                        A study in <br />
-                        <span className="text-gold-400">excellence.</span>
-                    </h1>
-
-                    <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-                        Explore the meticulous architecture and curated atmospheres that define our global sanctuaries. Each frame a testament to the art of luxury.
-                    </p>
+                    {/* Decorative Visual - Minimalist Frame */}
+                    <div className="hidden lg:block relative group">
+                        <div className="absolute inset-0 bg-gold-400/5 blur-[80px] group-hover:bg-gold-400/10 transition-all duration-1000" />
+                        <div className="relative border border-white/5 aspect-[16/9] rounded-sm overflow-hidden shadow-2xl">
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 transition-all duration-1000 scale-105 group-hover:scale-100" />
+                            <div className="absolute inset-0 bg-gradient-to-tr from-navy-950/90 via-transparent to-transparent" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-20 h-20 rounded-full border border-white/5 flex items-center justify-center group-hover:border-gold-400/20 transition-colors duration-700">
+                                    <ImageIcon className="w-6 h-6 text-white/10 group-hover:text-gold-400/40 transition-colors duration-700" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Filters - Glassmorphism Pills */}

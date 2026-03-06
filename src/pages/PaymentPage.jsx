@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, MapPin, CreditCard, Wallet, Bitcoin, AlertTriangle, Lock, ChevronRight, CheckCircle2, Tag, X } from 'lucide-react';
+import { ShieldCheck, MapPin, CreditCard, Wallet, Bitcoin, AlertTriangle, Lock, ChevronRight, CheckCircle2, Tag, X, Sparkles, Info } from 'lucide-react';
+import { TIER_BENEFITS } from '../utils/membership';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -299,8 +300,31 @@ const PaymentPage = () => {
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center">
                                         <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Base Rate ({bookingDetails.nights} nights)</span>
-                                        <span className="text-xs font-mono text-white/60">₹{subtotal.toLocaleString()}</span>
+                                        <span className="text-xs font-mono text-white/60">₹{(bookingDetails.originalSubtotal || subtotal).toLocaleString()}</span>
                                     </div>
+                                    {bookingDetails.membershipDiscount > 0 && (
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center text-emerald-400">
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Exclusive Benefit ({bookingDetails.membershipTier})</span>
+                                                <span className="text-sm font-mono">−₹{bookingDetails.membershipDiscount.toLocaleString()}</span>
+                                            </div>
+
+                                            {/* Tier specific perks */}
+                                            {TIER_BENEFITS[bookingDetails.membershipTier] && (
+                                                <div className="p-3 bg-white/5 border border-white/5 rounded-sm space-y-2">
+                                                    <p className="text-[7px] font-black text-white/20 uppercase tracking-widest border-b border-white/5 pb-1">Included Sanctuary Privileges</p>
+                                                    <div className="space-y-1.5">
+                                                        {TIER_BENEFITS[bookingDetails.membershipTier].map((perk, pi) => (
+                                                            <div key={pi} className="flex items-center gap-1.5">
+                                                                <Sparkles className="w-2 h-2 text-gold-400" />
+                                                                <span className="text-[7px] font-bold text-white/40 uppercase tracking-tight">{perk}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                     {(addOns && addOns.length > 0) && addOns.map((a, i) => (
                                         <div key={i} className="flex justify-between items-center">
                                             <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{a.name}</span>

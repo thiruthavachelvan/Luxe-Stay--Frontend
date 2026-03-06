@@ -5,10 +5,11 @@ import {
     MapPin, Star, Bed, Users, Eye, Maximize2, ChevronRight,
     Wifi, Coffee, Tv, Wind, CheckCircle2, X, ChevronLeft,
     ChevronRight as ChevRight, Shield, Calendar, Minus, Plus,
-    Loader2, Building, ShieldAlert, Sparkles, Navigation
+    Loader2, Building, ShieldAlert, Sparkles, Navigation, Tag
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { calculateMemberPrice, getTierDiscount, TIER_BENEFITS } from '../utils/membership';
 
 /* ─── Amenity icon mapping ─── */
 const amenityIcons = {
@@ -77,6 +78,7 @@ const RoomDetailPage = () => {
 
     /* Room data */
     const [room, setRoom] = useState(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -107,6 +109,14 @@ const RoomDetailPage = () => {
     const descRef = useRef(null);
     const amenRef = useRef(null);
     const reviewRef = useRef(null);
+
+    /* ── Load User ── */
+    useEffect(() => {
+        const loadUser = () => setUser(JSON.parse(sessionStorage.getItem('userData') || 'null'));
+        loadUser();
+        window.addEventListener('focus', loadUser);
+        return () => window.removeEventListener('focus', loadUser);
+    }, []);
 
     /* ── Fetch room ── */
     useEffect(() => {
@@ -171,7 +181,13 @@ const RoomDetailPage = () => {
 
     /* ── Pricing calc ── */
     const nights = Math.max(1, Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000));
-    const pricePerNight = room?.price || 0;
+
+    // Membership Discount Logic
+    const hasMembership = user?.membershipTier && user.membershipTier !== 'None';
+    const basePrice = room?.price || 0;
+    const memberPrice = hasMembership ? calculateMemberPrice(basePrice, user.membershipTier) : basePrice;
+    const pricePerNight = memberPrice;
+
     const subtotal = pricePerNight * nights;
     const serviceFee = Math.round(subtotal * 0.015);
     const occupancyTax = Math.round(subtotal * 0.005);
@@ -216,12 +232,15 @@ const RoomDetailPage = () => {
                 nights,
                 adults,
                 children,
+                originalSubtotal: basePrice * nights,
+                membershipDiscount: (basePrice - memberPrice) * nights,
                 subtotal,
                 serviceFee,
                 occupancyTax,
                 addOns: addOnsDetails,
                 total,
-                offerCode
+                offerCode,
+                membershipTier: user?.membershipTier
             }
         });
     };
@@ -340,8 +359,14 @@ const RoomDetailPage = () => {
                             </h1>
                             <div className="flex items-center gap-8 text-white/60">
                                 <div className="flex flex-col">
-                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gold-400/60 mb-1">Starting From</span>
-                                    <span className="text-3xl font-serif text-white">₹{pricePerNight.toLocaleString()} <span className="text-sm font-sans opacity-40">/ night</span></span>
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gold-400/60 mb-1">
+                                        {hasMembership ? `${user.membershipTier} Member Rate` : 'Starting From'}
+                                    </span>
+                                    <span className="text-3xl font-serif text-white">
+                                        ₹{pricePerNight.toLocaleString()}
+                                        {hasMembership && <span className="text-xs text-gold-400 ml-2 italic">(-{getTierDiscount(user.membershipTier)}%)</span>}
+                                        <span className="text-sm font-sans opacity-40"> / night</span>
+                                    </span>
                                 </div>
                                 <div className="h-12 w-px bg-white/10" />
                                 <button
@@ -562,53 +587,106 @@ const RoomDetailPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Guests */}
-                                <div className="space-y-4">
-                                    <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] block">Residence Count</label>
-                                    <div className="flex items-center justify-between py-2 border-b border-white/5">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Adults</span>
-                                        <div className="flex items-center gap-6">
-                                            <button onClick={() => setAdults(v => Math.max(1, v - 1))} className="text-white/20 hover:text-gold-400 transition-colors disabled:opacity-0" disabled={adults <= 1}><Minus className="w-4 h-4" /></button>
-                                            <span className="text-sm font-serif italic text-white w-4 text-center">{adults}</span>
-                                            <button onClick={() => setAdults(v => Math.min(room.capacity?.adults || 4, v + 1))} className="text-white/20 hover:text-gold-400 transition-colors"><Plus className="w-4 h-4" /></button>
-                                        </div>
+                                <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Adults</span>
+                                    <div className="flex items-center gap-6">
+                                        <button onClick={() => setAdults(v => Math.max(1, v - 1))} className="text-white/20 hover:text-gold-400 transition-colors disabled:opacity-0" disabled={adults <= 1}><Minus className="w-4 h-4" /></button>
+                                        <span className="text-sm font-serif italic text-white w-4 text-center">{adults}</span>
+                                        <button onClick={() => setAdults(v => Math.min(room.capacity?.adults || 4, v + 1))} className="text-white/20 hover:text-gold-400 transition-colors"><Plus className="w-4 h-4" /></button>
                                     </div>
                                 </div>
-
-                                {/* Summary */}
-                                <div className="space-y-4 pt-10 border-t border-white/5">
-                                    <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
-                                        <span className="text-white/40">{nights} Nights Residency</span>
-                                        <span className="text-white">₹{subtotal.toLocaleString()}</span>
-                                    </div>
-                                    {addOnTotal > 0 && (
-                                        <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-gold-400">
-                                            <span>Curated Add-ons</span>
-                                            <span>+₹{addOnTotal.toLocaleString()}</span>
-                                        </div>
-                                    )}
-                                    <div className="flex justify-between items-end pt-4">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">Final Valuation</span>
-                                        <span className="text-4xl font-serif text-gold-400 italic">₹{total.toLocaleString()}</span>
-                                    </div>
-                                </div>
-
-                                {/* CTA */}
-                                <button
-                                    onClick={handleBookNow}
-                                    disabled={!isAvailable || checkingAvailability}
-                                    className={`w-full py-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.4em] transition-all shadow-2xl relative overflow-hidden group ${isAvailable && !checkingAvailability
-                                        ? 'bg-gold-400 text-navy-950 hover:bg-white hover:shadow-gold-400/20'
-                                        : 'bg-white/5 text-white/10 cursor-not-allowed'}`}
-                                >
-                                    <span className="relative z-10">{checkingAvailability ? 'Verifying Sanctuary...' : isAvailable ? 'Confirm Reservation' : 'Selection Occupied'}</span>
-                                </button>
-
-                                <p className="text-[9px] text-white/20 uppercase tracking-widest text-center leading-relaxed">
-                                    Secure your stay with a 50% luxury deposit. <br />
-                                    Terms & conditions of residency apply.
-                                </p>
                             </div>
+
+                            {/* Bespoke Add-ons */}
+                            <div className="space-y-4">
+                                <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] block">Bespoke Enhancements</label>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {ADDON_CATALOG.slice(0, 5).map((addon) => (
+                                        <button
+                                            key={addon.id}
+                                            onClick={() => {
+                                                setSelectedAddOns(prev =>
+                                                    prev.includes(addon.id) ? prev.filter(id => id !== addon.id) : [...prev, addon.id]
+                                                );
+                                            }}
+                                            className={`flex items-center justify-between p-3 rounded-sm border transition-all ${selectedAddOns.includes(addon.id)
+                                                ? 'bg-gold-400/10 border-gold-400 text-gold-400'
+                                                : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10'
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-lg">{addon.icon}</span>
+                                                <div className="text-left">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest">{addon.label}</p>
+                                                    <p className="text-[8px] opacity-60">₹{addon.price.toLocaleString()} / {addon.per}</p>
+                                                </div>
+                                            </div>
+                                            <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedAddOns.includes(addon.id) ? 'bg-gold-400 border-gold-400' : 'border-white/20'
+                                                }`}>
+                                                {selectedAddOns.includes(addon.id) && <CheckCircle2 className="w-2 h-2 text-navy-950" />}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Summary */}
+                            <div className="space-y-4 pt-10 border-t border-white/5">
+                                {hasMembership && TIER_BENEFITS[user.membershipTier] && (
+                                    <div className="mb-6 space-y-3">
+                                        <p className="text-[9px] font-black text-gold-400 uppercase tracking-widest">Your Exclusive {user.membershipTier} Perks</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {TIER_BENEFITS[user.membershipTier].map((perk, i) => (
+                                                <div key={i} className="flex items-center gap-1.5 px-2 py-1 bg-gold-400/5 border border-gold-400/10 rounded-sm">
+                                                    <Sparkles className="w-2 h-2 text-gold-400" />
+                                                    <span className="text-[8px] font-bold text-white/60 uppercase tracking-tight">{perk}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                    <span className="text-white/40">{nights} Nights Residency {hasMembership && `(${user.membershipTier} Rate)`}</span>
+                                    <div className="text-right">
+                                        <span className="text-white">₹{subtotal.toLocaleString()}</span>
+                                        {hasMembership && (
+                                            <p className="text-[8px] text-white/20 line-through">₹{(basePrice * nights).toLocaleString()}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                {addOnTotal > 0 && (
+                                    <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-gold-400">
+                                        <span>Curated Add-ons</span>
+                                        <span>+₹{addOnTotal.toLocaleString()}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between items-end pt-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">Final Valuation</span>
+                                    <span className="text-4xl font-serif text-gold-400 italic">₹{total.toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* CTA */}
+                            <button
+                                onClick={handleBookNow}
+                                disabled={!isAvailable || checkingAvailability}
+                                className={`w-full py-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.4em] transition-all shadow-2xl relative overflow-hidden group ${isAvailable && !checkingAvailability
+                                    ? 'bg-gold-400 text-navy-950 hover:bg-white hover:shadow-gold-400/20'
+                                    : 'bg-white/5 text-white/10 cursor-not-allowed'}`}
+                            >
+                                <span className="relative z-10">{checkingAvailability ? 'Verifying Sanctuary...' : isAvailable ? 'Confirm Reservation' : 'Selection Occupied'}</span>
+                            </button>
+
+                            <p className="text-[9px] text-white/20 uppercase tracking-widest text-center leading-relaxed">
+                                {hasMembership ? (
+                                    <span className="text-gold-400 font-bold block mb-2 animate-pulse">
+                                        Exclusive {user.membershipTier} Benefit Applied
+                                    </span>
+                                ) : null}
+                                Secure your stay with a 50% luxury deposit. <br />
+                                Terms & conditions of residency apply.
+                            </p>
                         </motion.div>
                     </div>
                 </div>
@@ -620,8 +698,3 @@ const RoomDetailPage = () => {
 };
 
 export default RoomDetailPage;
-
-
-
-
-
