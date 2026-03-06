@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ChevronRight, User, Utensils, Award, Clock, Flame, Star } from 'lucide-react';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const RestaurantPage = () => {
@@ -32,84 +33,42 @@ const RestaurantPage = () => {
     const user = JSON.parse(sessionStorage.getItem('userData'));
 
     return (
-        <div className="min-h-screen bg-[#0F1626] font-sans text-white">
-            {/* Nav Header */}
-            <header className="fixed top-0 w-full z-50 bg-[#0F1626]/90 backdrop-blur-md border-b border-white/5">
-                <div className="container mx-auto px-8 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-12">
-                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-                            <div className="w-8 h-8 bg-[#2D5BFF] rounded-lg flex items-center justify-center">
-                                <Utensils className="w-5 h-5 text-white" />
-                            </div>
-                            <span className="font-bold text-xl tracking-wide">
-                                LuxeStay<span className="font-serif italic text-[#2D5BFF] ml-1 font-normal">Dining</span>
-                            </span>
-                        </div>
-                        <nav className="hidden lg:flex gap-8">
-                            <button className="text-white font-bold text-sm">Dining</button>
-                            <button onClick={() => navigate('/rooms')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Rooms</button>
-                            <button onClick={() => navigate('/spa')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Spa</button>
-                            <button onClick={() => navigate('/gallery')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Gallery</button>
-                        </nav>
-                    </div>
+        <div className="min-h-screen bg-navy-950 text-white font-sans selection:bg-gold-400 selection:text-navy-950">
+            <Navbar />
 
-                    <div className="flex items-center gap-6">
-                        <button
-                            onClick={() => {
-                                if (user) {
-                                    navigate('/dashboard?section=dining');
-                                } else {
-                                    navigate('/login');
-                                }
-                            }}
-                            className="px-6 py-2 bg-[#2D5BFF] text-white text-sm font-bold rounded-full hover:bg-luxury-gold transition-colors"
-                        >
-                            Reserve a Table
-                        </button>
-                        {user ? (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#D4AF37] to-yellow-200 border-2 border-[#0F1626] flex items-center justify-center font-bold text-[#0F1626] cursor-pointer" onClick={() => navigate('/dashboard')}>
-                                {(user.name || 'G')[0].toUpperCase()}
-                            </div>
-                        ) : (
-                            <button onClick={() => navigate('/login')} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/20 transition-all">
-                                <User className="w-5 h-5" />
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </header>
-
-            <main className="pt-28 pb-24 px-8 max-w-7xl mx-auto">
-                <div className="h-[260px] w-full rounded-3xl overflow-hidden relative mb-12 shadow-2xl">
+            <main className="pt-40 pb-24 px-6 container mx-auto">
+                {/* Hero Section - Cinematic Culinary */}
+                <div className="relative h-[400px] w-full rounded-[40px] overflow-hidden mb-20 shadow-2xl glass-panel border-white/5 animate-in fade-in zoom-in-95 duration-1000">
                     <img
                         src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80"
                         alt="The Grand Brasserie"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover opacity-60"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F1626] via-[#0F1626]/40 to-transparent"></div>
-                    <div className="absolute bottom-16 left-16 max-w-2xl">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="px-3 py-1 bg-[#2D5BFF] text-white text-[10px] font-bold uppercase tracking-widest rounded-full">Award-Winning</span>
-                            <div className="flex gap-1 text-[#D4AF37]">
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-transparent"></div>
+                    <div className="absolute bottom-16 left-16 max-w-2xl space-y-6">
+                        <div className="flex items-center gap-4">
+                            <span className="px-4 py-1.5 bg-gold-400 text-navy-950 text-[9px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl shadow-gold-400/20">The Michelin Registry</span>
+                            <div className="flex gap-1 text-gold-400">
                                 <Award className="w-4 h-4 fill-current" />
                             </div>
                         </div>
-                        <h1 className="text-6xl font-bold font-serif italic text-white mb-6">The Grand Brasserie</h1>
-                        <p className="text-lg text-gray-300 font-medium">
-                            Experience culinary excellence crafted by Michelin-starred chefs in an atmosphere of timeless sophistication.
+                        <h1 className="text-5xl md:text-7xl font-serif italic text-white tracking-tight">The Grand Brasserie</h1>
+                        <p className="text-lg text-white/40 font-light leading-relaxed max-w-xl">
+                            Experience culinary excellence engineered by Michelin-starred stewards in an atmosphere of profound sophistication.
                         </p>
                     </div>
                 </div>
 
-                <div className="border-b border-white/10 mb-16">
-                    <div className="flex gap-12 overflow-x-auto no-scrollbar">
+                {/* Navigation / Filters - Elevated Tabs */}
+                <div className="flex justify-center mb-24">
+                    <div className="glass-panel p-2 flex gap-2 overflow-x-auto scrollbar-hide border-white/5 bg-navy-950/40 backdrop-blur-2xl">
                         {tabs.map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`pb-4 text-sm font-bold transition-all whitespace-nowrap border-b-2 ${activeTab === tab
-                                    ? 'border-[#2D5BFF] text-white'
-                                    : 'border-transparent text-gray-400 hover:text-white'
+                                className={`flex-shrink-0 px-8 py-4 rounded-[20px] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeTab === tab
+                                    ? 'bg-gold-400 text-navy-950 shadow-2xl shadow-gold-400/20'
+                                    : 'text-white/40 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {tab}
@@ -119,69 +78,61 @@ const RestaurantPage = () => {
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-20 text-gray-400">
-                        <div className="w-10 h-10 border-4 border-[#2D5BFF]/30 border-t-[#2D5BFF] rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-xs font-bold uppercase tracking-widest">Curating the menu...</p>
+                    <div className="flex flex-col items-center justify-center py-32 space-y-6">
+                        <div className="w-12 h-12 border-2 border-gold-400/20 border-t-gold-400 rounded-full animate-spin"></div>
+                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">Defining the palette...</p>
                     </div>
                 ) : (
-                    <div className="space-y-12 animate-in fade-in duration-500">
+                    <div className="space-y-24 animate-in fade-in duration-1000">
 
-                        {/* Resident Exclusive / Complimentary Section */}
+                        {/* Resident Exclusive Section - Cinematic Card */}
                         {activeTab === 'Resident Exclusive' && (
-                            <div className="bg-[#1A2235] border border-white/5 rounded-3xl p-8 lg:p-12 shadow-2xl">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <Star className="w-4 h-4 text-[#2D5BFF] fill-current" />
-                                    <span className="text-[10px] font-bold text-[#2D5BFF] uppercase tracking-widest">Resident Benefits</span>
+                            <div className="glass-panel p-12 lg:p-20 relative overflow-hidden group border-white/5 bg-white/[0.01]">
+                                <div className="absolute top-0 right-0 p-20 text-gold-400/5 group-hover:text-gold-400/10 transition-colors duration-1000">
+                                    <Star className="w-48 h-48 fill-current" />
                                 </div>
-                                <div className="flex items-end justify-between mb-10">
-                                    <div>
-                                        <h2 className="text-3xl font-bold font-serif italic text-white mb-3">Complimentary Breakfast Items</h2>
-                                        <p className="text-sm text-gray-400 max-w-lg">Exclusive for our residents. Enjoy a curated selection of our morning favorites as part of your stay.</p>
+                                <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+                                    <div className="space-y-8">
+                                        <div className="space-y-4">
+                                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">The Resident Registry</span>
+                                            <h2 className="text-4xl md:text-5xl font-serif italic text-white leading-tight">Morning rituals, <br />complimentary.</h2>
+                                        </div>
+                                        <p className="text-white/40 text-lg font-light leading-relaxed max-w-md">
+                                            Exclusive for our residents. A curated selection of morning favorites engineered as the definitive start to your day.
+                                        </p>
                                     </div>
-                                    <button className="hidden md:flex items-center gap-2 text-sm font-bold text-[#2D5BFF] hover:text-white transition-colors group">
-                                        View Full Stay Details
-                                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </button>
-                                </div>
 
-                                {menuItems.filter(item => item.isComplimentary).length === 0 ? (
-                                    <div className="py-12 text-center border border-white/10 border-dashed rounded-2xl">
-                                        <p className="text-gray-400 text-sm">No complimentary items available at the moment.</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {menuItems.filter(item => item.isComplimentary).slice(0, 3).map(item => (
-                                            <div key={item._id} className="bg-[#0F1626] border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:border-white/10 transition-colors cursor-pointer">
-                                                <img src={item.image || "https://images.unsplash.com/photo-1509627259045-84dc24ebba1b?auto=format&fit=crop&q=80&w=200"} alt={item.name} className="w-16 h-16 rounded-xl object-cover" />
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                                        <span className="text-[8px] font-bold text-green-500 uppercase tracking-widest">Free</span>
-                                                    </div>
-                                                    <h4 className="text-sm font-bold text-white mb-1">{item.name}</h4>
-                                                    <p className="text-[10px] text-gray-500 line-clamp-1">{item.description}</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {menuItems.filter(item => item.isComplimentary).slice(0, 4).map((item, i) => (
+                                            <div key={item._id} className="glass-panel p-6 flex items-center gap-6 hover:bg-white/[0.03] transition-all duration-500 group animate-in fade-in slide-in-from-right-8" style={{ animationDelay: `${i * 100}ms` }}>
+                                                <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-2xl">
+                                                    <img src={item.image || "https://images.unsplash.com/photo-1509627259045-84dc24ebba1b?auto=format&fit=crop&q=80&w=200"} alt={item.name} className="w-full h-full object-cover" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em]">Sanctuary Benefit</span>
+                                                    <h4 className="text-sm font-bold text-white uppercase tracking-tighter">{item.name}</h4>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                )}
+                                </div>
                             </div>
                         )}
 
-                        {/* Standard Category Layouts */}
+                        {/* Standard Menu Grids */}
                         {activeTab !== 'Resident Exclusive' && (
-                            <div>
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-1.5 h-8 bg-[#2D5BFF] rounded-r-full"></div>
-                                    <h2 className="text-3xl font-bold font-serif italic text-white">{activeTab}</h2>
+                            <div className="space-y-16">
+                                <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+                                    <div className="space-y-4">
+                                        <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">The Collection</span>
+                                        <h2 className="text-5xl font-serif italic text-white">{activeTab}</h2>
+                                    </div>
+                                    <div className="h-0.5 w-32 bg-gold-400/20" />
                                 </div>
 
-                                {/* Dynamic Grid based on Category */}
                                 <div className={`grid gap-8 ${(activeTab === 'Signature Breakfast' || activeTab === 'Weekend Buffet')
                                     ? 'grid-cols-1 lg:grid-cols-2'
-                                    : activeTab === 'Beverages & Bar'
-                                        ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-[#1A2235] p-8 rounded-3xl border border-white/5'
-                                        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                                    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
                                     }`}>
 
                                     {menuItems.filter(item => {
@@ -190,80 +141,43 @@ const RestaurantPage = () => {
                                         if (activeTab === 'Beverages & Bar') return ['Beverages', 'Bar Menu'].includes(item.category);
                                         if (activeTab === 'Weekend Buffet') return item.category === 'Weekend Buffet';
                                         return false;
-                                    }).map(item => (
-
-                                        // Layout 1: Horizontal Cards (Signature Breakfast / Weekend Buffet)
-                                        (activeTab === 'Signature Breakfast' || activeTab === 'Weekend Buffet') ? (
-                                            <div key={item._id} className="bg-[#1A2235] rounded-3xl border border-white/5 overflow-hidden flex flex-col sm:flex-row hover:border-[#2D5BFF]/50 transition-colors group h-full">
-                                                <div className="w-full sm:w-2/5 h-48 sm:h-full relative overflow-hidden">
-                                                    <img src={item.image || "https://images.unsplash.com/photo-1593006526979-4f8fb84aaad1?auto=format&fit=crop&q=80"} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    }).map((item, i) => (
+                                        <div key={item._id} className="glass-panel group flex flex-col h-full bg-navy-950/40 border-white/5 hover:border-gold-400/30 transition-all duration-700 overflow-hidden animate-in fade-in slide-in-from-bottom-8" style={{ animationDelay: `${i * 100}ms` }}>
+                                            <div className="h-64 overflow-hidden relative">
+                                                <img src={item.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80"} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                                                <div className="absolute top-6 right-6 flex flex-col gap-2">
+                                                    {item.dietaryType === 'Non-Veg' ? (
+                                                        <span className="px-3 py-1 bg-red-400/20 text-red-400 border border-red-400/20 rounded-full text-[8px] font-black uppercase tracking-widest backdrop-blur-md">Non-Veg</span>
+                                                    ) : (
+                                                        <span className="px-3 py-1 bg-emerald-400/20 text-emerald-400 border border-emerald-400/20 rounded-full text-[8px] font-black uppercase tracking-widest backdrop-blur-md">Vegetarian</span>
+                                                    )}
                                                 </div>
-                                                <div className="p-6 flex-1 flex flex-col justify-between">
-                                                    <div>
-                                                        <div className="flex items-start justify-between mb-2">
-                                                            <h3 className="text-lg font-bold text-white font-serif line-clamp-1 group-hover:text-[#2D5BFF] transition-colors pr-4">{item.name}</h3>
-                                                            {item.dietaryType === 'Non-Veg' ? (
-                                                                <span className="px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded text-[8px] font-bold uppercase whitespace-nowrap">Non-Veg</span>
-                                                            ) : (
-                                                                <span className="px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 rounded text-[8px] font-bold uppercase whitespace-nowrap">Veg</span>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-xs text-gray-400 line-clamp-3 mb-4 leading-relaxed">{item.description}</p>
+                                            </div>
+
+                                            <div className="p-10 flex-1 flex flex-col">
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <h3 className="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-gold-400 transition-colors">{item.name}</h3>
+                                                    <span className="text-xl font-bold text-gold-400">₹{item.price}</span>
+                                                </div>
+
+                                                <p className="text-xs text-white/30 font-medium leading-[1.8] uppercase tracking-wider mb-8 flex-1">
+                                                    {item.description}
+                                                </p>
+
+                                                <div className="flex items-center gap-6 pt-8 border-t border-white/5 text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="w-3.5 h-3.5" />
+                                                        {item.preparationTime || '25m'}
                                                     </div>
-                                                    <div className="flex items-center justify-end border-t border-white/5 pt-4">
-                                                        <span className="text-xl font-bold text-[#2D5BFF]">₹{item.price}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <Flame className="w-3.5 h-3.5" />
+                                                        {item.calories || '650 kcal'}
                                                     </div>
                                                 </div>
                                             </div>
-                                        ) :
-
-                                            // Layout 2: Vertical Large Cards (Chef's Specials)
-                                            activeTab === "Chef's Specials" ? (
-                                                <div key={item._id} className="bg-[#1A2235] rounded-3xl border border-white/5 overflow-hidden hover:border-[#2D5BFF]/50 transition-colors group flex flex-col h-full">
-                                                    <div className="w-full h-64 relative overflow-hidden bg-white">
-                                                        {/* Many of these have white backgrounds in the mockup so we pad them and mix-blend if possible, or just cover */}
-                                                        <img src={item.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80"} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                                                    </div>
-                                                    <div className="p-8 flex-1 flex flex-col">
-                                                        <div className="flex items-center gap-2 mb-4">
-                                                            <span className="text-[8px] font-bold text-[#2D5BFF] uppercase tracking-widest">{item.category}</span>
-                                                        </div>
-                                                        <div className="flex items-start justify-between mb-4">
-                                                            <h3 className="text-xl font-bold text-white font-serif line-clamp-1 group-hover:text-[#2D5BFF] transition-colors">{item.name}</h3>
-                                                            <span className="text-2xl font-bold text-[#2D5BFF]">₹{item.price}</span>
-                                                        </div>
-                                                        <p className="text-sm text-gray-400 line-clamp-3 mb-6 flex-1 leading-relaxed">{item.description}</p>
-
-                                                        <div className="flex items-center justify-between border-t border-white/5 pt-6 mt-auto">
-                                                            <div className="flex gap-4">
-                                                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                                                    <Clock className="w-3.5 h-3.5" />
-                                                                    {item.preparationTime || '25m'}
-                                                                </div>
-                                                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                                                    <Flame className="w-3.5 h-3.5" />
-                                                                    {item.calories || '650 kcal'}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) :
-
-                                                // Layout 3: List view (Beverages & Bar)
-                                                (
-                                                    <div key={item._id} className="border-b border-white/5 pb-4 last:border-0 hover:bg-white/5 p-4 rounded-xl transition-colors cursor-pointer group">
-                                                        <div className="flex justify-between items-start mb-1">
-                                                            <h4 className="text-sm font-bold text-white group-hover:text-[#2D5BFF] transition-colors">{item.name}</h4>
-                                                            <span className="text-sm font-bold text-[#2D5BFF]">₹{item.price}</span>
-                                                        </div>
-                                                        <p className="text-[10px] text-gray-500 line-clamp-1">{item.description}</p>
-                                                    </div>
-                                                )
-
+                                        </div>
                                     ))}
 
-                                    {/* Empty state fallback for any category */}
                                     {menuItems.filter(item => {
                                         if (activeTab === 'Signature Breakfast') return item.category === 'Breakfast' && !item.isComplimentary;
                                         if (activeTab === "Chef's Specials") return item.category === "Chef's Specials";
@@ -271,11 +185,11 @@ const RestaurantPage = () => {
                                         if (activeTab === 'Weekend Buffet') return item.category === 'Weekend Buffet';
                                         return false;
                                     }).length === 0 && (
-                                            <div className="col-span-full py-12 text-center text-gray-500 border border-dashed border-white/10 rounded-2xl">
-                                                No {activeTab.toLowerCase()} items currently available.
+                                            <div className="col-span-full py-24 glass-panel flex flex-col items-center justify-center gap-6 border-dashed border-white/10">
+                                                <Utensils className="w-12 h-12 text-white/10" />
+                                                <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">The culinary registry is expanding</p>
                                             </div>
                                         )}
-
                                 </div>
                             </div>
                         )}
@@ -284,7 +198,7 @@ const RestaurantPage = () => {
             </main>
 
             <Footer />
-        </div >
+        </div>
     );
 };
 

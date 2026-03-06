@@ -30,7 +30,12 @@ const LocationsPage = () => {
 
     const indiaLocations = locations.filter(loc => loc.category === 'India' && loc.status === 'Active');
     const internationalLocations = locations.filter(loc => loc.category === 'International' && loc.status === 'Active');
-    const comingSoonLocations = locations.filter(loc => loc.status === 'Coming Soon');
+    const comingSoonLocations = locations
+        .filter(loc => loc.status === 'Coming Soon' && ['Paris', 'Tokyo'].includes(loc.city))
+        .sort((a, b) => {
+            const order = { 'Paris': 1, 'Tokyo': 2 };
+            return order[a.city] - order[b.city];
+        });
 
     if (loading) {
         return (
@@ -183,10 +188,10 @@ const LocationsPage = () => {
                             <p className="text-white/40 text-sm font-light">Eagerly anticipated sanctuaries currently in development.</p>
                         </div>
 
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                            {coming_soon_placeholders.map((location, index) => (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+                            {comingSoonLocations.map((location, index) => (
                                 <motion.div
-                                    key={index}
+                                    key={location._id}
                                     initial={{ opacity: 0 }}
                                     whileInView={{ opacity: 1 }}
                                     viewport={{ once: true }}
@@ -196,7 +201,7 @@ const LocationsPage = () => {
                                     <div className="relative aspect-square rounded-full overflow-hidden mb-6 border border-white/5 p-2 transition-all duration-700 hover:border-gold-400/30">
                                         <div className="w-full h-full rounded-full overflow-hidden blur-[2px] group-hover:blur-0 transition-all duration-700">
                                             <img
-                                                src={location.image}
+                                                src={getLocationImage(location.city)}
                                                 alt={location.city}
                                                 className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0"
                                             />
@@ -220,12 +225,6 @@ const LocationsPage = () => {
     );
 };
 
-const coming_soon_placeholders = [
-    { city: 'Amalfi Coast', image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80' },
-    { city: 'Kyoto', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80' },
-    { city: 'Santorini', image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&q=80' },
-    { city: 'Swiss Alps', image: 'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?auto=format&fit=crop&q=80' },
-];
 
 export default LocationsPage;
 

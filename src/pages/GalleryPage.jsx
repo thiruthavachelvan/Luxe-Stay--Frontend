@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Filter, X, Image as ImageIcon } from 'lucide-react';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const GalleryPage = () => {
@@ -30,66 +31,38 @@ const GalleryPage = () => {
         : galleryItems.filter(item => item.category === selectedCategory);
 
     return (
-        <div className="min-h-screen bg-[#0F1626] font-sans text-white">
-            {/* Nav Header */}
-            <header className="fixed top-0 w-full z-50 bg-[#0F1626]/90 backdrop-blur-md border-b border-white/5 transition-all duration-300">
-                <div className="container mx-auto px-8 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-12">
-                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-                            <div className="w-8 h-8 rounded-lg border border-white/20 flex items-center justify-center bg-white/5">
-                                <ImageIcon className="w-4 h-4 text-white" />
-                            </div>
-                            <span className="font-bold text-xl tracking-wider">
-                                LuxeStay<span className="font-serif italic text-white/70 ml-1 font-normal">Gallery</span>
-                            </span>
-                        </div>
-                        <nav className="hidden lg:flex gap-8">
-                            <button onClick={() => navigate('/restaurant')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Dining</button>
-                            <button onClick={() => navigate('/rooms')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Rooms</button>
-                            <button onClick={() => navigate('/spa')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Spa</button>
-                            <button className="text-white font-bold text-sm">Gallery</button>
-                        </nav>
-                    </div>
+        <div className="min-h-screen bg-navy-950 text-white font-sans selection:bg-gold-400 selection:text-navy-950">
+            <Navbar />
 
-                    <div className="flex items-center gap-6">
-                        {user ? (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#D4AF37] to-yellow-200 border-2 border-[#0F1626] flex items-center justify-center font-bold text-[#0F1626] cursor-pointer" onClick={() => navigate('/dashboard')}>
-                                {(user.name || 'G')[0].toUpperCase()}
-                            </div>
-                        ) : (
-                            <button onClick={() => navigate('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-white text-[#0F1626] rounded-full font-bold text-sm hover:bg-gray-200 transition-colors">
-                                <User className="w-4 h-4" />
-                                Sign In
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </header>
+            <main className="pt-40 pb-24 px-6 container mx-auto relative overflow-hidden">
+                <div className="absolute top-20 right-[-10%] w-[500px] h-[500px] bg-gold-400/5 rounded-full blur-[120px] pointer-events-none" />
 
-            <main className="pt-32 pb-24 px-8 max-w-7xl mx-auto">
                 {/* Hero / Intro */}
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h1 className="text-5xl md:text-6xl font-bold font-serif italic text-white mb-6">
-                        Visual Journey
+                <div className="max-w-4xl mb-24 relative z-10">
+                    <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">The Visual Registry</span>
+                    </div>
+
+                    <h1 className="text-6xl md:text-8xl font-serif italic text-white mb-8 tracking-tight leading-[0.9] animate-in fade-in slide-in-from-top-8 duration-1000">
+                        A study in <br />
+                        <span className="text-gold-400">excellence.</span>
                     </h1>
-                    <p className="text-gray-400 text-lg leading-relaxed">
-                        Explore the meticulous design, elegant atmospheres, and breathtaking views that define the LuxeStay experience.
+
+                    <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                        Explore the meticulous architecture and curated atmospheres that define our global sanctuaries. Each frame a testament to the art of luxury.
                     </p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-                    <div className="flex items-center gap-2 mr-4 text-gray-500">
-                        <Filter className="w-4 h-4" />
-                        <span className="text-sm font-bold uppercase tracking-widest">Filter by:</span>
-                    </div>
+                {/* Filters - Glassmorphism Pills */}
+                <div className="flex flex-wrap items-center gap-4 mb-20 relative z-10">
                     {categories.map(category => (
                         <button
                             key={category}
                             onClick={() => setSelectedCategory(category)}
-                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${selectedCategory === category
-                                    ? 'bg-white text-[#0F1626] shadow-lg shadow-white/10'
-                                    : 'bg-[#1A2235] text-gray-400 hover:text-white hover:bg-white/10'
+                            className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 border ${selectedCategory === category
+                                ? 'bg-gold-400 border-gold-400 text-navy-950 shadow-2xl shadow-gold-400/20'
+                                : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-white/20'
                                 }`}
                         >
                             {category}
@@ -97,28 +70,35 @@ const GalleryPage = () => {
                     ))}
                 </div>
 
-                {/* Masonry-style Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:auto-rows-[250px]">
+                {/* Cinematic Masonry Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:auto-rows-[300px] relative z-10">
                     {filteredGallery.length === 0 ? (
-                        <div className="col-span-full py-20 text-center text-gray-500 border border-white/10 border-dashed rounded-3xl">
-                            No images available in this category yet.
+                        <div className="col-span-full py-32 glass-panel flex flex-col items-center justify-center gap-6 border-dashed border-white/10">
+                            <ImageIcon className="w-12 h-12 text-white/10" />
+                            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Registry entries coming soon</p>
                         </div>
                     ) : (
-                        filteredGallery.map((item) => (
+                        filteredGallery.map((item, i) => (
                             <div
                                 key={item.id}
                                 onClick={() => setSelectedImage(item)}
-                                className={`group relative rounded-2xl overflow-hidden cursor-pointer bg-[#1A2235] border border-white/5 ${selectedCategory === 'All' ? item.span : 'col-span-1 row-span-1'
+                                className={`group relative rounded-[32px] overflow-hidden cursor-pointer glass-panel border-white/10 animate-in fade-in zoom-in-95 duration-700 ${selectedCategory === 'All' ? item.span : 'col-span-1 row-span-1'
                                     }`}
+                                style={{ animationDelay: `${i * 100}ms` }}
                             >
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0F1626]/90 via-[#0F1626]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                    <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest mb-1">{item.category}</span>
-                                    <h3 className="text-lg font-bold text-white font-serif">{item.title}</h3>
+                                <div className="absolute inset-0 bg-navy-950/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-10 translate-y-4 group-hover:translate-y-0">
+                                    <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.3em] mb-4 block translate-y-4 group-hover:translate-y-0 transition-transform duration-700 delay-100">{item.category}</span>
+                                    <h3 className="text-2xl font-serif italic text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-700 delay-200">{item.title}</h3>
+
+                                    <div className="mt-8 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-white/40 translate-y-4 group-hover:translate-y-0 transition-transform duration-700 delay-300">
+                                        <span>Full Preview</span>
+                                        <div className="h-px w-8 bg-gold-400/30" />
+                                    </div>
                                 </div>
                             </div>
                         ))
@@ -126,25 +106,41 @@ const GalleryPage = () => {
                 </div>
             </main>
 
-            {/* Lightbox Modal */}
+            {/* Lightbox Modal - Immersive Cinema Mode */}
             {selectedImage && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0F1626]/95 backdrop-blur-xl animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/95 backdrop-blur-3xl animate-in fade-in duration-500">
                     <button
                         onClick={() => setSelectedImage(null)}
-                        className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-50"
+                        className="absolute top-10 right-10 w-16 h-16 rounded-full glass-panel flex items-center justify-center text-white/40 hover:text-white transition-all z-50 group hover:border-gold-400/50"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-8 h-8 group-hover:scale-110 transition-transform" />
                     </button>
 
-                    <div className="max-w-6xl w-full px-8 flex flex-col items-center">
-                        <img
-                            src={selectedImage.image}
-                            alt={selectedImage.title}
-                            className="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl mb-6"
-                        />
-                        <div className="text-center">
-                            <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.3em] mb-2 block">{selectedImage.category}</span>
-                            <h2 className="text-3xl font-bold font-serif italic text-white">{selectedImage.title}</h2>
+                    <div className="container max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-16 animate-in zoom-in-95 duration-700">
+                        <div className="w-full md:w-2/3 glass-panel p-2 rotate-1 group hover:rotate-0 transition-transform duration-1000">
+                            <img
+                                src={selectedImage.image}
+                                alt={selectedImage.title}
+                                className="w-full h-auto object-contain rounded-[24px] shadow-[0_0_100px_rgba(212,175,55,0.1)]"
+                            />
+                        </div>
+
+                        <div className="w-full md:w-1/3 space-y-8">
+                            <div className="space-y-4">
+                                <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">{selectedImage.category}</span>
+                                <h2 className="text-5xl font-serif italic text-white leading-tight">{selectedImage.title}</h2>
+                            </div>
+
+                            <div className="h-px w-24 bg-gold-400/20" />
+
+                            <p className="text-white/40 font-light leading-relaxed">
+                                Experience the pinnacle of cinematic living. Our {selectedImage.category.toLowerCase()} are engineered to provide an atmosphere of profound tranquility and absolute luxury.
+                            </p>
+
+                            <button onClick={() => setSelectedImage(null)} className="text-[10px] font-black uppercase tracking-[0.3em] text-gold-400 hover:text-white transition-colors flex items-center gap-4 group">
+                                <div className="w-12 h-px bg-gold-400/30 group-hover:w-16 transition-all" />
+                                Return to Archive
+                            </button>
                         </div>
                     </div>
                 </div>

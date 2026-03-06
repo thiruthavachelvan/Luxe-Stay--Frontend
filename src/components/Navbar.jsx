@@ -15,6 +15,7 @@ export default function Navbar() {
 
     const navLinks = [
         { name: "Home", href: "/" },
+        { name: "About Us", href: "/about" },
         { name: "Locations", href: "/locations" },
         { name: "Rooms", href: "/rooms" },
         { name: "Dining", href: "/restaurant" },
@@ -27,8 +28,8 @@ export default function Navbar() {
     return (
         <motion.nav
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${isScrolled
-                    ? "bg-navy-950/80 backdrop-blur-md border-white/5 py-4"
-                    : "bg-transparent border-transparent py-6"
+                ? "bg-navy-950/80 backdrop-blur-md border-white/5 py-4"
+                : "bg-transparent border-transparent py-6"
                 }`}
             initial={{ y: -100 }}
             animate={{ y: 0 }}

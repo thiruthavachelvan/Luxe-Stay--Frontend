@@ -56,7 +56,6 @@ const GuestDetailsPage = () => {
         newDetails[index][field] = value;
         setGuestDetails(newDetails);
 
-        // Clear error for this field
         if (errors[`${index}-${field}`]) {
             setErrors(prev => ({ ...prev, [`${index}-${field}`]: null }));
         }
@@ -81,7 +80,7 @@ const GuestDetailsPage = () => {
 
     const handleContinue = (e) => {
         e.preventDefault();
-        window.scrollTo(0, 0); // Scroll to top for validation errors if any
+        window.scrollTo(0, 0);
         if (validateForm()) {
             navigate('/payment', {
                 state: {
@@ -96,133 +95,153 @@ const GuestDetailsPage = () => {
     const { room, checkIn, checkOut, nights, total } = bookingDetails;
 
     return (
-        <div className="min-h-screen bg-luxury-dark flex flex-col font-sans">
+        <div className="min-h-screen bg-navy-950 flex flex-col font-sans">
             <Navbar />
 
-            <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-24 sm:py-32 space-y-8 animate-in fade-in duration-500">
+            <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-32 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                 {/* ── Breadcrumbs ── */}
-                <div className="flex items-center gap-2 text-xs text-luxury-muted mb-4">
-                    <span className="hover:text-luxury-blue cursor-pointer">Search</span>
+                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4">
+                    <span className="hover:text-gold-400 transition-colors cursor-pointer">Archive</span>
                     <ChevronRight className="w-3 h-3" />
-                    <span className="hover:text-luxury-blue cursor-pointer" onClick={() => navigate(-1)}>Room Selection</span>
+                    <span className="hover:text-gold-400 transition-colors cursor-pointer" onClick={() => navigate(-1)}>Selection</span>
                     <ChevronRight className="w-3 h-3" />
-                    <span className="text-luxury-blue font-bold">Guest Details</span>
+                    <span className="text-gold-400">Patrons</span>
                     <ChevronRight className="w-3 h-3" />
-                    <span className="text-luxury-muted">Secure Payment</span>
+                    <span className="">Secured Payment</span>
                 </div>
 
                 {/* ── Header ── */}
-                <div>
-                    <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 font-serif italic tracking-tight">Who's checking in?</h1>
-                    <p className="text-sm text-luxury-muted tracking-wide">Please provide the details of all guests staying with us.</p>
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Patron Registration</span>
+                    </div>
+                    <h1 className="text-5xl md:text-6xl font-serif italic text-white tracking-tight leading-tight">Who's checking in?</h1>
+                    <p className="text-xs text-white/30 uppercase tracking-widest font-medium max-w-xl">Please formalize the credentials of all guests accompanying you on this journey.</p>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-10 items-start">
+                <div className="grid lg:grid-cols-3 gap-16 items-start">
                     {/* ── Left Column: Forms ── */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-10">
                         {guestDetails.map((guest, index) => (
-                            <div key={index} className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-luxury-blue"></div>
+                            <div key={index} className="glass-panel p-10 relative group overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1.5 h-full bg-gold-400/20 group-hover:bg-gold-400 transition-colors duration-700" />
 
-                                <h3 className="text-lg font-bold text-white font-serif italic mb-5 flex items-center gap-2">
-                                    {guest.type === 'adult' ? <User className="w-5 h-5 text-luxury-blue" /> : <Users className="w-5 h-5 text-luxury-blue" />}
-                                    {guest.type === 'adult' ? `Adult ${index + 1}` : `Child ${index + 1 - bookingDetails.adults}`}
-                                    {index === 0 && <span className="ml-2 text-[10px] bg-luxury-blue/20 text-luxury-blue px-2 py-0.5 rounded-full uppercase tracking-wider not-italic font-sans">Primary Guest</span>}
-                                </h3>
+                                <div className="flex items-center justify-between mb-10">
+                                    <h3 className="text-xl font-serif italic text-white flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 text-white/40 group-hover:text-gold-400 transition-colors">
+                                            {guest.type === 'adult' ? <User className="w-5 h-5" /> : <Users className="w-5 h-5" />}
+                                        </div>
+                                        {guest.type === 'adult' ? `Adult ${index + 1}` : `Child ${index + 1 - bookingDetails.adults}`}
+                                    </h3>
+                                    {index === 0 && (
+                                        <span className="text-[9px] font-black text-gold-400 uppercase tracking-[0.3em] px-4 py-1.5 bg-gold-400/10 border border-gold-400/20 rounded-full">
+                                            Primary Patron
+                                        </span>
+                                    )}
+                                </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div className="space-y-1.5 md:col-span-2">
-                                        <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">Full Name</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-3 md:col-span-2">
+                                        <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Full Legal Name</label>
                                         <input
                                             type="text"
                                             value={guest.name}
                                             onChange={(e) => handleGuestChange(index, 'name', e.target.value)}
-                                            placeholder="As per official ID"
-                                            className={`w-full bg-luxury-dark border ${errors[`${index}-name`] ? 'border-red-500 focus:ring-red-500/20' : 'border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20'} rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 transition-all placeholder:text-luxury-muted/40`}
+                                            placeholder="As per official documentation"
+                                            className={`w-full bg-white/5 border ${errors[`${index}-name`] ? 'border-rose-500/50' : 'border-white/10 hover:border-gold-400/30'} rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all font-medium placeholder:text-white/10`}
                                         />
-                                        {errors[`${index}-name`] && <p className="text-red-500 text-xs pl-1">{errors[`${index}-name`]}</p>}
+                                        {errors[`${index}-name`] && <p className="text-rose-400 text-[10px] font-black uppercase tracking-widest mt-2 ml-1">{errors[`${index}-name`]}</p>}
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">Age</label>
+                                    <div className="space-y-3">
+                                        <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Age</label>
                                         <input
                                             type="number"
                                             value={guest.age}
                                             onChange={(e) => handleGuestChange(index, 'age', e.target.value)}
                                             placeholder="e.g. 35"
-                                            className={`w-full bg-luxury-dark border ${errors[`${index}-age`] ? 'border-red-500 focus:ring-red-500/20' : 'border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20'} rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 transition-all placeholder:text-luxury-muted/40`}
+                                            className={`w-full bg-white/5 border ${errors[`${index}-age`] ? 'border-rose-500/50' : 'border-white/10 hover:border-gold-400/30'} rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all font-medium placeholder:text-white/10`}
                                         />
-                                        {errors[`${index}-age`] && <p className="text-red-500 text-xs pl-1">{errors[`${index}-age`]}</p>}
+                                        {errors[`${index}-age`] && <p className="text-rose-400 text-[10px] font-black uppercase tracking-widest mt-2 ml-1">{errors[`${index}-age`]}</p>}
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">Gender</label>
-                                        <select
-                                            value={guest.gender}
-                                            onChange={(e) => handleGuestChange(index, 'gender', e.target.value)}
-                                            className={`w-full bg-luxury-dark border ${errors[`${index}-gender`] ? 'border-red-500 focus:ring-red-500/20' : 'border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20'} rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer [color-scheme:dark]`}
-                                        >
-                                            <option value="" disabled>Select Gender</option>
-                                            {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
-                                        </select>
-                                        {errors[`${index}-gender`] && <p className="text-red-500 text-xs pl-1">{errors[`${index}-gender`]}</p>}
+                                    <div className="space-y-3">
+                                        <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Gender</label>
+                                        <div className="relative">
+                                            <select
+                                                value={guest.gender}
+                                                onChange={(e) => handleGuestChange(index, 'gender', e.target.value)}
+                                                className={`w-full bg-white/5 border ${errors[`${index}-gender`] ? 'border-rose-500/50' : 'border-white/10 hover:border-gold-400/30'} rounded-2xl px-6 py-4 text-sm text-white/80 focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all appearance-none cursor-pointer font-bold`}
+                                            >
+                                                <option value="" disabled className="bg-navy-950">Select Orientation</option>
+                                                {GENDERS.map(g => <option key={g} value={g} className="bg-navy-950">{g.toUpperCase()}</option>)}
+                                            </select>
+                                            <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 pointer-events-none rotate-90" />
+                                        </div>
+                                        {errors[`${index}-gender`] && <p className="text-rose-400 text-[10px] font-black uppercase tracking-widest mt-2 ml-1">{errors[`${index}-gender`]}</p>}
                                     </div>
 
                                     {guest.type === 'adult' && (
                                         <>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">Phone Number</label>
+                                            <div className="space-y-3">
+                                                <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Direct Link (Phone)</label>
                                                 <input
                                                     type="tel"
                                                     value={guest.phone}
                                                     onChange={(e) => handleGuestChange(index, 'phone', e.target.value)}
                                                     placeholder="+91"
-                                                    className={`w-full bg-luxury-dark border ${errors[`${index}-phone`] ? 'border-red-500 focus:ring-red-500/20' : 'border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20'} rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:ring-1 transition-all placeholder:text-luxury-muted/40`}
+                                                    className={`w-full bg-white/5 border ${errors[`${index}-phone`] ? 'border-rose-500/50' : 'border-white/10 hover:border-gold-400/30'} rounded-2xl px-6 py-4 text-sm text-white font-mono focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all placeholder:text-white/10`}
                                                 />
-                                                {errors[`${index}-phone`] && <p className="text-red-500 text-xs pl-1">{errors[`${index}-phone`]}</p>}
+                                                {errors[`${index}-phone`] && <p className="text-rose-400 text-[10px] font-black uppercase tracking-widest mt-2 ml-1">{errors[`${index}-phone`]}</p>}
                                             </div>
 
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">Email (Optional)</label>
+                                            <div className="space-y-3">
+                                                <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Secure Email (Optional)</label>
                                                 <input
                                                     type="email"
                                                     value={guest.email}
                                                     onChange={(e) => handleGuestChange(index, 'email', e.target.value)}
-                                                    placeholder="guest@example.com"
-                                                    className={`w-full bg-luxury-dark border border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 transition-all placeholder:text-luxury-muted/40`}
+                                                    placeholder="guest@sanctuary.com"
+                                                    className={`w-full bg-white/5 border border-white/10 hover:border-gold-400/30 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all placeholder:text-white/10`}
                                                 />
                                             </div>
 
-                                            <div className="space-y-1.5 border-t border-luxury-border/20 md:col-span-2 pt-4 mt-2">
-                                                <div className="flex items-center gap-1.5 mb-1 bg-blue-500/10 text-blue-400 w-max px-2 py-1 rounded border border-blue-500/20">
-                                                    <Info className="w-3 h-3" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider">Govt ID Proof Required at Check-in</span>
+                                            <div className="md:col-span-2 pt-6">
+                                                <div className="p-4 bg-gold-400/5 border border-gold-400/10 rounded-2xl flex items-center gap-4">
+                                                    <div className="w-8 h-8 rounded-lg bg-gold-400/10 flex items-center justify-center">
+                                                        <Info className="w-4 h-4 text-gold-400" />
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-gold-400/80 uppercase tracking-widest leading-relaxed">Official Government Verification is mandatory at the time of arrival.</span>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">ID Type</label>
-                                                <select
-                                                    value={guest.idType}
-                                                    onChange={(e) => handleGuestChange(index, 'idType', e.target.value)}
-                                                    className={`w-full bg-luxury-dark border ${errors[`${index}-idType`] ? 'border-red-500 focus:ring-red-500/20' : 'border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20'} rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer [color-scheme:dark]`}
-                                                >
-                                                    <option value="" disabled>Select ID</option>
-                                                    {ID_TYPES.map(id => <option key={id} value={id}>{id}</option>)}
-                                                </select>
-                                                {errors[`${index}-idType`] && <p className="text-red-500 text-xs pl-1">{errors[`${index}-idType`]}</p>}
+                                            <div className="space-y-3">
+                                                <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Credential Type</label>
+                                                <div className="relative">
+                                                    <select
+                                                        value={guest.idType}
+                                                        onChange={(e) => handleGuestChange(index, 'idType', e.target.value)}
+                                                        className={`w-full bg-white/5 border ${errors[`${index}-idType`] ? 'border-rose-500/50' : 'border-white/10 hover:border-gold-400/30'} rounded-2xl px-6 py-4 text-sm text-white/80 focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all appearance-none cursor-pointer font-bold`}
+                                                    >
+                                                        <option value="" disabled className="bg-navy-950">SELECT CREDENTIAL</option>
+                                                        {ID_TYPES.map(id => <option key={id} value={id} className="bg-navy-950">{id.toUpperCase()}</option>)}
+                                                    </select>
+                                                    <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 pointer-events-none rotate-90" />
+                                                </div>
+                                                {errors[`${index}-idType`] && <p className="text-rose-400 text-[10px] font-black uppercase tracking-widest mt-2 ml-1">{errors[`${index}-idType`]}</p>}
                                             </div>
 
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1">ID Number</label>
+                                            <div className="space-y-3">
+                                                <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-1">Credential Identifier</label>
                                                 <input
                                                     type="text"
                                                     value={guest.idNumber}
                                                     onChange={(e) => handleGuestChange(index, 'idNumber', e.target.value)}
-                                                    placeholder={`Enter ${guest.idType || 'ID'} number`}
-                                                    className={`w-full bg-luxury-dark border ${errors[`${index}-idNumber`] ? 'border-red-500 focus:ring-red-500/20' : 'border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20'} rounded-xl px-4 py-3 text-sm text-white font-mono uppercase focus:outline-none focus:ring-1 transition-all placeholder:text-luxury-muted/40`}
+                                                    placeholder={`Enter ${guest.idType || 'ID'} code`}
+                                                    className={`w-full bg-white/5 border ${errors[`${index}-idNumber`] ? 'border-rose-500/50' : 'border-white/10 hover:border-gold-400/30'} rounded-2xl px-6 py-4 text-sm text-white font-mono uppercase focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all placeholder:text-white/10`}
                                                 />
-                                                {errors[`${index}-idNumber`] && <p className="text-red-500 text-xs pl-1">{errors[`${index}-idNumber`]}</p>}
+                                                {errors[`${index}-idNumber`] && <p className="text-rose-400 text-[10px] font-black uppercase tracking-widest mt-2 ml-1">{errors[`${index}-idNumber`]}</p>}
                                             </div>
                                         </>
                                     )}
@@ -230,61 +249,87 @@ const GuestDetailsPage = () => {
                             </div>
                         ))}
 
-                        <div className="bg-luxury-card border border-luxury-border/30 rounded-2xl p-6 shadow-xl">
-                            <h3 className="text-lg font-bold text-white font-serif italic mb-4">Special Requests</h3>
-                            <p className="text-xs text-luxury-muted mb-4">Let us know if you have any dietary requirements, need an extra bed, or have a special occasion.</p>
+                        <div className="glass-panel p-10 space-y-8 relative overflow-hidden">
+                            <h3 className="text-xl font-serif italic text-white flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 text-white/40">
+                                    <Sparkles className="w-5 h-5" />
+                                </div>
+                                Bespoke Requirements
+                            </h3>
+                            <p className="text-[10px] text-white/30 uppercase tracking-widest leading-relaxed">Kindly detail any nuances—dietary protocols, anniversary commemorations, or sanctuary preferences—to personalize your stay.</p>
                             <textarea
                                 value={specialRequests}
                                 onChange={(e) => setSpecialRequests(e.target.value)}
-                                placeholder="E.g., Twin beds preferred, ground floor, celebrating anniversary..."
-                                className="w-full bg-luxury-dark border border-luxury-border/30 focus:border-luxury-blue focus:ring-luxury-blue/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 transition-all placeholder:text-luxury-muted/40 min-h-[120px] resize-y"
+                                placeholder="Describe your expectations..."
+                                className="w-full bg-white/5 border border-white/10 hover:border-gold-400/30 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-gold-400/40 focus:bg-white/10 transition-all placeholder:text-white/10 min-h-[160px] resize-none font-medium"
                             ></textarea>
-                            <p className="text-[10px] text-luxury-muted/70 mt-2">* Special requests are subject to availability and cannot be guaranteed.</p>
+                            <p className="text-[9px] text-gold-400/40 font-black uppercase tracking-[0.2em] italic">* Manifestation of special requests is subject to sanctuary availability.</p>
                         </div>
                     </div>
 
                     {/* ── Right Column: Summary & CTA ── */}
-                    <div className="lg:sticky lg:top-28">
-                        <div className="bg-luxury-card border border-luxury-border/30 rounded-[2.5rem] p-7 shadow-2xl space-y-6">
-                            <h2 className="text-lg font-bold text-white font-serif italic mb-2">Booking Summary</h2>
+                    <div className="lg:sticky lg:top-32">
+                        <div className="glass-panel p-10 space-y-10 border-gold-400/20 relative overflow-hidden group">
+                            {/* Animated glow */}
+                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-gold-400/5 blur-[80px] rounded-full group-hover:bg-gold-400/10 transition-all duration-[2000ms]" />
 
-                            <div className="space-y-4">
-                                <div className="pb-4 border-b border-luxury-border/20">
-                                    <h3 className="text-white font-bold">{room.type}</h3>
-                                    <p className="text-xs text-luxury-muted">{room.location?.city}</p>
+                            <div className="relative z-10">
+                                <h2 className="text-2xl font-serif italic text-white mb-2">Folio Summary</h2>
+                                <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.3em]">Review your itinerary</p>
+                            </div>
+
+                            <div className="relative z-10 space-y-8">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
+                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">{room.location?.city} Hotel</p>
+                                    </div>
+                                    <h3 className="text-2xl font-serif italic text-white leading-tight">{room.type}</h3>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 pb-4 border-b border-luxury-border/20">
-                                    <div>
-                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1 mb-1">Check-in</p>
-                                        <p className="text-sm text-white font-medium">{new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                <div className="grid grid-cols-2 gap-8 py-8 border-y border-white/5">
+                                    <div className="space-y-2">
+                                        <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Arrive</p>
+                                        <p className="text-xs font-bold text-white uppercase tracking-tighter">{new Date(checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1 mb-1">Check-out</p>
-                                        <p className="text-sm text-white font-medium">{new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                    <div className="space-y-2 text-right">
+                                        <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Depart</p>
+                                        <p className="text-xs font-bold text-white uppercase tracking-tighter">{new Date(checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                     </div>
-                                    <div className="col-span-2">
-                                        <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1 mb-1">Stay Duration</p>
-                                        <p className="text-sm text-white font-medium">{nights} Night{nights > 1 ? 's' : ''}</p>
+                                    <div className="space-y-2">
+                                        <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Tenure</p>
+                                        <p className="text-xs font-bold text-white uppercase tracking-tighter">{nights} Night{nights > 1 ? 's' : ''}</p>
+                                    </div>
+                                    <div className="space-y-2 text-right">
+                                        <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Portfolio</p>
+                                        <p className="text-xs font-bold text-gold-400/60 font-mono">#{Math.random().toString(36).slice(2, 8).toUpperCase()}</p>
                                     </div>
                                 </div>
 
-                                <div className="pb-4 border-b border-luxury-border/20">
-                                    <p className="text-[10px] font-bold text-luxury-muted uppercase tracking-widest pl-1 mb-1">Total Amount</p>
-                                    <p className="text-2xl font-bold text-luxury-blue font-serif italic">₹{total.toLocaleString()}</p>
-                                    {bookingDetails.offerCode && <p className="text-xs text-yellow-500 mt-1">Pre-tax estimate. Coupon will be applied at payment.</p>}
+                                <div className="space-y-4">
+                                    <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Total Consideration</p>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-sm font-serif italic text-gold-400/60 uppercase racking-widest">INR</span>
+                                        <p className="text-5xl font-serif italic text-gold-400 tracking-tight">₹{total.toLocaleString()}</p>
+                                    </div>
+                                    {bookingDetails.offerCode && (
+                                        <div className="flex items-center gap-2 px-3 py-1.5 bg-gold-400/10 border border-gold-400/20 rounded-lg w-max">
+                                            <Tag className="w-3 h-3 text-gold-400" />
+                                            <span className="text-[8px] font-black text-gold-400 uppercase tracking-widest">{bookingDetails.offerCode} Applied</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleContinue}
-                                className="w-full py-4 bg-luxury-blue text-white rounded-2xl font-bold text-sm sm:text-base shadow-xl shadow-luxury-blue/20 hover:bg-luxury-blue-hover transition-all flex items-center justify-center gap-2 group mt-2"
+                                className="relative z-10 w-full py-5 bg-gold-400 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-gold-400/10 hover:bg-white transition-all transform active:scale-[0.98] flex items-center justify-center gap-4 group"
                             >
                                 Continue to Payment
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                             </button>
 
-                            <p className="text-center text-[10px] text-luxury-muted">You won't be charged yet.</p>
+                            <p className="text-center text-[8px] font-bold text-white/10 uppercase tracking-[0.4em]">Integrity secured by LuxeStay</p>
                         </div>
                     </div>
                 </div>

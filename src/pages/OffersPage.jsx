@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
     Crown, Medal, Star, Gem, CreditCard, Tag, Check, ChevronRight,
     Sparkles, Zap, Gift, BadgePercent, Calendar, ArrowRight
@@ -138,10 +139,10 @@ const DEFAULT_SEASONAL_OFFERS = [
 
 // Reusable gold label with flanking lines
 const GoldLabel = ({ children, center }) => (
-    <div className={`flex items-center gap-3 mb-4 ${center ? 'justify-center' : ''}`}>
-        <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#D4AF37]/60" />
-        <span className="text-[#D4AF37] uppercase tracking-[0.3em] text-xs font-bold">{children}</span>
-        <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#D4AF37]/60" />
+    <div className={`flex items-center gap-4 mb-6 ${center ? 'justify-center' : ''}`}>
+        <div className="h-[1px] w-12 bg-gold-500/30" />
+        <span className="text-[10px] font-black text-gold-500 uppercase tracking-[0.5em] italic">{children}</span>
+        <div className="h-[1px] w-12 bg-gold-500/30" />
     </div>
 );
 
@@ -161,7 +162,7 @@ const OffersPage = () => {
                         description: c.featuredDescription || c.description,
                         discount: c.discountType === 'percent' ? `${c.discountValue}% OFF` : `₹${Number(c.discountValue).toLocaleString('en-IN')} OFF`,
                         tag: c.featuredTag || 'Special Offer',
-                        color: c.featuredColor || 'from-blue-900/60 to-[#0F1626]',
+                        color: c.featuredColor || 'from-blue-900/60 to-navy-950',
                         image: c.featuredImage || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
                         code: c.code,
                         roomTypeFilter: ''
@@ -187,49 +188,64 @@ const OffersPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0F1626] text-white font-sans">
+        <div className="min-h-screen bg-navy-950 text-white font-sans selection:bg-gold-400 selection:text-navy-950">
             <Navbar />
 
             {/* ── Hero Banner ── */}
-            <section className="relative pt-32 pb-24 overflow-hidden">
+            <section className="relative pt-48 pb-32 overflow-hidden">
                 <div className="absolute inset-0">
                     <img
                         src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=1920"
                         alt="Luxury"
-                        className="w-full h-full object-cover opacity-20"
+                        className="w-full h-full object-cover opacity-20 scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#0F1626]/80 via-[#0F1626]/60 to-[#0F1626]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-950/40 to-navy-950" />
                 </div>
-                <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-[#D4AF37]/8 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-luxury-gold/8 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="container mx-auto px-6 text-center relative z-10">
-                    <GoldLabel center>Exclusive Benefits</GoldLabel>
-                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 leading-tight">
-                        Offers & <span className="font-serif italic text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-yellow-200 to-[#D4AF37]">Memberships</span>
-                    </h1>
-                    <p className="text-white/50 max-w-2xl mx-auto text-sm md:text-base font-light mt-4">
-                        Unlock a world of privilege. From seasonal deals to lifetime memberships — we reward the discerning traveller.
-                    </p>
-                    <div className="flex items-center justify-center gap-6 mt-8 text-xs text-white/40">
-                        <div className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Instant Activation</div>
-                        <div className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Valid at All Properties</div>
-                        <div className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> 12 Month Validity</div>
-                    </div>
+                {/* Decorative Elements */}
+                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gold-400/5 rounded-full blur-[120px] animate-pulse pointer-events-none" />
+                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gold-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+                <div className="container mx-auto px-6 text-center relative z-10 space-y-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <GoldLabel center>Exclusive Benefits</GoldLabel>
+                        <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter">
+                            Offers & <br />
+                            <span className="font-serif italic text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-yellow-200 to-gold-500 underline decoration-gold-500/10 underline-offset-[20px]">Memberships</span>
+                        </h1>
+                        <p className="text-white/40 max-w-2xl mx-auto text-lg font-serif italic leading-relaxed">
+                            Unlock a world of privilege. From seasonal deals to lifetime memberships — we reward the discerning traveller with unparalleled sophistication.
+                        </p>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5, duration: 1 }}
+                        className="flex flex-wrap items-center justify-center gap-10 pt-12 text-[10px] font-black text-gold-500/40 uppercase tracking-[0.4em] italic"
+                    >
+                        <div className="flex items-center gap-3"><Check className="w-4 h-4 text-gold-400" /> Instant Activation</div>
+                        <div className="flex items-center gap-3"><Check className="w-4 h-4 text-gold-400" /> Valid at All Properties</div>
+                        <div className="flex items-center gap-3"><Check className="w-4 h-4 text-gold-400" /> 12 Month Validity</div>
+                    </motion.div>
                 </div>
             </section>
 
             {/* ── Membership Tiers ── */}
-            <section className="py-20 relative overflow-hidden">
+            <section className="py-32 relative overflow-hidden bg-navy-900/20">
                 <div className="container mx-auto px-6">
-                    <div className="text-center mb-16">
+                    <div className="text-center mb-24">
                         <GoldLabel center>Membership Tiers</GoldLabel>
-                        <h2 className="text-3xl md:text-5xl font-bold text-white">
-                            Choose Your{' '}
-                            <span className="font-serif italic text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-yellow-200 to-[#D4AF37]">Privilege</span>
+                        <h2 className="text-4xl md:text-6xl font-bold text-white font-serif italic tracking-tight">
+                            Choose Your Privilege
                         </h2>
-                        <p className="text-white/40 text-sm mt-3 max-w-xl mx-auto">
-                            All memberships include exclusive coupon codes sent to your inbox monthly.
+                        <div className="w-24 h-[1px] bg-gold-500/20 mx-auto mt-8 mb-6"></div>
+                        <p className="text-gold-500/40 text-sm font-serif italic tracking-widest max-w-xl mx-auto uppercase">
+                            Exclusive monthly rewards transmitted directly to your registry.
                         </p>
                     </div>
 

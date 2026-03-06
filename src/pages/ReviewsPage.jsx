@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Star, Filter, ChevronRight, ThumbsUp, MapPin, Calendar } from 'lucide-react';
 import Navbar from '../components/Navbar';

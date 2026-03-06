@@ -236,304 +236,258 @@ const PaymentPage = () => {
     const { room, checkIn, checkOut, subtotal, serviceFee, occupancyTax, addOns, guestDetails } = bookingDetails;
 
     return (
-        <div className="min-h-screen bg-luxury-dark flex flex-col font-sans">
+        <div className="min-h-screen bg-navy-950 flex flex-col font-sans">
             <Navbar />
 
-            <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-24 sm:py-32 space-y-8 animate-in fade-in duration-500">
+            <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-32 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                 {/* ── Breadcrumbs ── */}
-                <div className="flex items-center gap-2 text-xs text-luxury-muted mb-4">
-                    <span className="hover:text-luxury-blue cursor-pointer">Search</span>
+                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4">
+                    <span className="hover:text-gold-400 transition-colors cursor-pointer" onClick={() => navigate('/rooms')}>Archive</span>
                     <ChevronRight className="w-3 h-3" />
-                    <span className="hover:text-luxury-blue cursor-pointer" onClick={() => navigate(-1)}>Room Selection</span>
+                    <span className="hover:text-gold-400 transition-colors cursor-pointer" onClick={() => navigate(-1)}>Patrons</span>
                     <ChevronRight className="w-3 h-3" />
-                    <span className="text-luxury-blue font-bold">Secure Payment</span>
+                    <span className="text-gold-400">Secured Payment</span>
                 </div>
 
                 {/* ── Header ── */}
-                <div>
-                    <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 font-serif italic tracking-tight">Complete Your Booking</h1>
-                    <p className="text-sm text-luxury-muted tracking-wide">Verify your stay details and choose a payment method below.</p>
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Financial Settlement</span>
+                    </div>
+                    <h1 className="text-5xl md:text-6xl font-serif italic text-white tracking-tight leading-tight">Finalize your sanctuary.</h1>
+                    <p className="text-xs text-white/30 uppercase tracking-widest font-medium max-w-xl">A final validation of your itinerary followed by a secure transfer of consideration.</p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-10">
-                    {/* ── Left Column: Booking Summary ── */}
-                    <div className="space-y-6">
-                        <div className="bg-luxury-card border border-luxury-border/30 rounded-[2rem] overflow-hidden shadow-2xl p-6 lg:p-8">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-lg font-bold text-white font-serif italic">Booking Summary</h2>
-                                <span className="bg-luxury-blue/10 text-luxury-blue text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-luxury-blue/30">Reserved</span>
+                <div className="grid lg:grid-cols-2 gap-16">
+                    {/* ── Left Column: Folio Summary ── */}
+                    <div className="space-y-10">
+                        <div className="glass-panel p-10 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/5 blur-[60px] rounded-full group-hover:bg-gold-400/10 transition-all duration-1000" />
+
+                            <div className="flex justify-between items-center mb-10 relative z-10">
+                                <h2 className="text-2xl font-serif italic text-white">Folio Summary</h2>
+                                <div className="px-4 py-1 bg-gold-400/10 border border-gold-400/20 rounded-full">
+                                    <span className="text-[9px] font-black text-gold-400 uppercase tracking-widest leading-relaxed">Itinerary Reserved</span>
+                                </div>
                             </div>
 
-                            <div className="w-full h-48 sm:h-64 rounded-2xl overflow-hidden shadow-lg border border-luxury-border/20 mb-8 relative">
-                                <img src={room.images?.[0] || "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80"} className="w-full h-full object-cover" alt="Room" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                            <div className="aspect-[16/9] rounded-2xl overflow-hidden mb-10 relative border border-white/10 group-hover:border-gold-400/20 transition-colors duration-700">
+                                <img src={room.images?.[0] || "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]" alt="Room" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-transparent to-transparent" />
+                                <div className="absolute bottom-6 left-6">
+                                    <h3 className="text-2xl font-serif italic text-white mb-1">{room.type}</h3>
+                                    <div className="flex items-center gap-2 text-white/40">
+                                        <MapPin className="w-3 h-3 text-gold-400" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{room.location?.city} Sanctuary</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <span className="text-[10px] font-bold text-luxury-blue uppercase tracking-widest block mb-1">Stay Details</span>
-                                    <h3 className="text-2xl font-bold text-white font-serif italic mb-1">{room.type || 'Luxury Suite'}</h3>
-                                    <p className="text-xs text-luxury-muted flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{room.location?.city || room.location?.name || 'LuxeStay Property'}</p>
+                            <div className="grid grid-cols-2 gap-10 py-10 border-y border-white/5 relative z-10">
+                                <div className="space-y-2">
+                                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Arrival</p>
+                                    <p className="text-xs font-bold text-white uppercase tracking-tighter">{new Date(checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                 </div>
-
-                                <div className="grid grid-cols-2 gap-6 pt-6 border-t border-luxury-border/30">
-                                    <div>
-                                        <span className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest block mb-1">Check-in</span>
-                                        <p className="text-sm text-white font-bold">{new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest block mb-1">Check-out</span>
-                                        <p className="text-sm text-white font-bold">{new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                    </div>
+                                <div className="space-y-2 text-right">
+                                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Departure</p>
+                                    <p className="text-xs font-bold text-white uppercase tracking-tighter">{new Date(checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                 </div>
+                            </div>
 
-                                {guestDetails && guestDetails.length > 0 && (
-                                    <div className="pt-6 border-t border-luxury-border/30">
-                                        <span className="text-[10px] font-bold text-luxury-blue uppercase tracking-widest block mb-2">Guests</span>
-                                        <div className="space-y-2 text-sm text-luxury-muted">
-                                            {guestDetails.map((g, i) => (
-                                                <div key={i} className="flex justify-between">
-                                                    <span>{g.name} <span className="text-[10px] uppercase text-luxury-muted/50 ml-1">({g.type})</span></span>
-                                                    <span>{g.age} yrs</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="space-y-3 pt-6 border-t border-luxury-border/30 text-sm">
-                                    <div className="flex justify-between text-luxury-muted">
-                                        <span>Room Rate ({bookingDetails.nights} nights)</span>
-                                        <span className="text-white">₹{subtotal.toLocaleString()}</span>
+                            <div className="space-y-6 pt-10 relative z-10">
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Base Rate ({bookingDetails.nights} nights)</span>
+                                        <span className="text-xs font-mono text-white/60">₹{subtotal.toLocaleString()}</span>
                                     </div>
                                     {(addOns && addOns.length > 0) && addOns.map((a, i) => (
-                                        <div key={i} className="flex justify-between text-luxury-muted text-xs">
-                                            <span>{a.name}</span>
-                                            <span className="text-white">₹{a.price.toLocaleString()}</span>
+                                        <div key={i} className="flex justify-between items-center">
+                                            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{a.name}</span>
+                                            <span className="text-xs font-mono text-white/60">₹{a.price.toLocaleString()}</span>
                                         </div>
                                     ))}
-                                    <div className="flex justify-between text-luxury-muted">
-                                        <span>Service Fee & Taxes</span>
-                                        <span className="text-white">₹{(serviceFee + occupancyTax).toLocaleString()}</span>
+                                    <div className="flex justify-between items-center pb-6">
+                                        <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Regulatory Fees & Dues</span>
+                                        <span className="text-xs font-mono text-white/60">₹{(serviceFee + occupancyTax).toLocaleString()}</span>
                                     </div>
+
                                     {couponDiscount > 0 && (
-                                        <div className="flex justify-between text-green-400 text-sm">
-                                            <span className="flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" />Coupon ({couponCode})</span>
-                                            <span>−₹{couponDiscount.toLocaleString()}</span>
+                                        <div className="flex justify-between items-center p-4 bg-emerald-400/5 border border-emerald-400/10 rounded-xl">
+                                            <div className="flex items-center gap-2">
+                                                <Tag className="w-3.5 h-3.5 text-emerald-400" />
+                                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Patron Benefit ({couponCode})</span>
+                                            </div>
+                                            <span className="text-sm font-mono text-emerald-400">−₹{couponDiscount.toLocaleString()}</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                                        <span className="font-bold text-white tracking-widest uppercase text-xs">Total Amount</span>
-                                        <span className="font-bold text-luxury-blue text-xl font-serif italic">₹{(total - couponDiscount).toLocaleString()}</span>
+
+                                    <div className="flex justify-between items-center pt-8 border-t border-white/10">
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-widest">Grand Consideration</span>
+                                            <p className="text-[8px] text-white/20 italic">inclusive of all sanctuary dues</p>
+                                        </div>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-xs font-serif italic text-gold-400/60 uppercase tracking-widest pr-1">INR</span>
+                                            <span className="text-4xl font-serif italic text-gold-400 tracking-tighter">₹{(total - couponDiscount).toLocaleString()}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Coupon Code */}
-                        <div className={`bg-luxury-card/50 border rounded-2xl p-5 transition-all ${paymentSchedule === 'advance' ? 'border-white/5 opacity-60' : 'border-luxury-border/30'}`}>
-                            <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-4">
-                                <Tag className="w-4 h-4 text-[#D4AF37]" />
-                                Have a Coupon Code?
-                                {paymentSchedule === 'advance' && (
-                                    <span className="ml-auto text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                                        <Lock className="w-2.5 h-2.5" /> Full payment only
-                                    </span>
-                                )}
+                        {/* ── Coupon Logic Section ── */}
+                        <div className={`glass-panel p-8 transition-all relative overflow-hidden group ${paymentSchedule === 'advance' ? 'opacity-40 grayscale pointer-events-none' : 'hover:border-gold-400/20'}`}>
+                            {paymentSchedule === 'advance' && (
+                                <div className="absolute inset-0 bg-navy-950/40 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center space-y-3">
+                                    <Lock className="w-6 h-6 text-gold-400" />
+                                    <p className="text-[9px] font-black text-gold-400 uppercase tracking-[0.3em]">Full Settlement Required</p>
+                                </div>
+                            )}
+
+                            <h3 className="text-sm font-serif italic text-white flex items-center gap-3 mb-6 relative z-10">
+                                <div className="w-8 h-8 rounded-lg bg-gold-400/10 flex items-center justify-center">
+                                    <Tag className="w-4 h-4 text-gold-400" />
+                                </div>
+                                Privilege Voucher
                             </h3>
 
-                            {paymentSchedule === 'advance' ? (
-                                <div className="text-center py-4 text-luxury-muted text-xs">
-                                    <Lock className="w-5 h-5 mx-auto mb-2 text-amber-500/50" />
-                                    Coupon codes are available for full payment bookings only.
-                                </div>
-                            ) : couponStatus === 'valid' ? (
-                                <div className="flex items-center justify-between bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
-                                    <div>
-                                        <p className="text-green-400 text-sm font-bold">{couponCode} applied!</p>
-                                        <p className="text-green-400/70 text-xs mt-0.5">{couponMessage}</p>
-                                    </div>
-                                    <button onClick={handleRemoveCoupon} className="text-white/40 hover:text-white transition-colors ml-4">
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={couponInput}
-                                            onChange={e => setCouponInput(e.target.value.toUpperCase())}
-                                            onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
-                                            placeholder="Enter code e.g. WELCOME10"
-                                            className="flex-1 bg-luxury-dark border border-luxury-border/30 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 outline-none transition-all placeholder:text-luxury-muted/40 uppercase"
-                                        />
-                                        <button
-                                            onClick={handleApplyCoupon}
-                                            disabled={isValidatingCoupon || !couponInput.trim()}
-                                            className="px-5 py-3 bg-[#D4AF37] text-[#0F1626] rounded-xl font-bold text-sm hover:bg-yellow-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                                        >
-                                            {isValidatingCoupon ? '...' : 'Apply'}
+                            <div className="relative z-10">
+                                {couponStatus === 'valid' ? (
+                                    <div className="flex items-center justify-between p-4 bg-emerald-400/5 border border-emerald-400/20 rounded-2xl group/btn">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">{couponCode} Validated</p>
+                                            <p className="text-[9px] text-emerald-400/60 font-medium italic">{couponMessage}</p>
+                                        </div>
+                                        <button onClick={handleRemoveCoupon} className="p-2 hover:bg-rose-500/10 rounded-lg text-white/20 hover:text-rose-400 transition-all">
+                                            <X className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    {couponStatus === 'invalid' && (
-                                        <p className="text-red-400 text-xs mt-2 flex items-center gap-1.5">
-                                            <AlertTriangle className="w-3.5 h-3.5" /> {couponMessage}
-                                        </p>
-                                    )}
-                                </>
-                            )}
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="flex gap-3">
+                                            <div className="relative flex-1">
+                                                <input
+                                                    type="text"
+                                                    value={couponInput}
+                                                    onChange={e => setCouponInput(e.target.value.toUpperCase())}
+                                                    onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
+                                                    placeholder="ENTER VOUCHER CODE"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs text-white font-mono uppercase tracking-widest focus:outline-none focus:border-gold-400/30 focus:bg-white/10 transition-all placeholder:text-white/10"
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleApplyCoupon}
+                                                disabled={isValidatingCoupon || !couponInput.trim()}
+                                                className="px-8 bg-gold-400 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all disabled:opacity-20 active:scale-95"
+                                            >
+                                                {isValidatingCoupon ? 'Validating...' : 'Apply'}
+                                            </button>
+                                        </div>
+                                        {couponStatus === 'invalid' && (
+                                            <div className="flex items-center gap-2 px-4 py-2 bg-rose-500/5 border border-rose-500/20 rounded-xl">
+                                                <AlertTriangle className="w-3 h-3 text-rose-400" />
+                                                <p className="text-rose-400 text-[9px] font-black uppercase tracking-widest">{couponMessage}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        {/* Security Banner */}
-                        <div className="bg-luxury-card/50 border border-luxury-border/30 rounded-2xl p-5 flex items-center gap-5">
-                            <div className="w-12 h-12 bg-luxury-blue/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                <ShieldCheck className="w-6 h-6 text-luxury-blue" />
+                        {/* ── Security Trust ── */}
+                        <div className="flex items-center gap-6 p-8 glass-panel border-white/5 bg-white/[0.02]">
+                            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10">
+                                <ShieldCheck className="w-8 h-8 text-white/20" />
                             </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-white">100% Secure Transaction</h4>
-                                <p className="text-[10px] sm:text-xs text-luxury-muted mt-0.5">Your information is encrypted with industry-leading SSL standards.</p>
+                            <div className="space-y-1">
+                                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">End-to-End Encryption</h4>
+                                <p className="text-[9px] text-white/20 font-medium leading-relaxed">Your financial credentials are processed through an isolated, PCI-DSS compliant vault. Integrity is non-negotiable.</p>
                             </div>
                         </div>
                     </div>
 
                     {/* ── Right Column: Payment Details ── */}
-                    <div className="space-y-6">
-                        {/* Payment Schedule */}
-                        <div className="bg-luxury-card border border-luxury-border/30 rounded-[2rem] p-6 lg:p-8 space-y-6 shadow-xl relative overflow-hidden">
-                            <h2 className="text-lg font-bold text-white font-serif italic relative z-10">Payment Schedule</h2>
+                    <div className="space-y-10 lg:sticky lg:top-32 h-max">
+                        {/* ── Payment Schedule ── */}
+                        <div className="glass-panel p-10 space-y-10 relative overflow-hidden group">
+                            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-gold-400/5 blur-[80px] rounded-full group-hover:bg-gold-400/10 transition-all duration-[2000ms]" />
 
-                            <div className="bg-luxury-dark rounded-xl p-1 flex relative z-10">
+                            <div className="relative z-10">
+                                <h2 className="text-2xl font-serif italic text-white mb-2">Settlement Protocol</h2>
+                                <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.3em]">Choose your preference</p>
+                            </div>
+
+                            <div className="p-1 bg-white/5 border border-white/10 rounded-[24px] flex relative z-10">
                                 <button
                                     onClick={() => setPaymentSchedule('full')}
-                                    className={`flex-1 py-3 text-xs sm:text-sm font-bold rounded-lg transition-all ${paymentSchedule === 'full' ? 'bg-luxury-card text-white shadow-lg border border-luxury-border/20' : 'text-luxury-muted hover:text-white'}`}
+                                    className={`flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-[20px] transition-all duration-500 ${paymentSchedule === 'full' ? 'bg-gold-400 text-navy-950 shadow-2xl' : 'text-white/40 hover:text-white'}`}
                                 >
-                                    Full Payment
+                                    Full Consideration
                                 </button>
                                 <button
                                     onClick={() => {
                                         setPaymentSchedule('advance');
-                                        // Coupons not allowed on advance payment — clear any applied
                                         handleRemoveCoupon();
                                     }}
-                                    className={`flex-1 py-3 text-xs sm:text-sm font-bold rounded-lg transition-all ${paymentSchedule === 'advance' ? 'bg-luxury-card text-white shadow-lg border border-luxury-border/20' : 'text-luxury-muted hover:text-white'}`}
+                                    className={`flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-[20px] transition-all duration-500 ${paymentSchedule === 'advance' ? 'bg-gold-400 text-navy-950 shadow-2xl' : 'text-white/40 hover:text-white'}`}
                                 >
-                                    25% Advance
+                                    25% Earnest Money
                                 </button>
                             </div>
 
-                            <p className="text-[10px] text-luxury-muted italic relative z-10">
-                                {paymentSchedule === 'full'
-                                    ? '✓ Full payment unlocks coupon codes, free breakfast & late checkout.'
-                                    : 'Advance deposit secures your room. Coupon codes are not applicable on advance payments.'}
+                            <div className="p-5 bg-gold-400/5 border border-gold-400/10 rounded-2xl relative z-10">
+                                <div className="flex items-start gap-4">
+                                    <Info className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
+                                    <p className="text-[9px] font-bold text-gold-400 uppercase tracking-widest leading-relaxed">
+                                        {paymentSchedule === 'full'
+                                            ? 'Unlocks exclusive sanctuary benefits: complimentary buffet access, expedited lounge check-in, and late departure privileges.'
+                                            : 'Advance deposit secures the itinerary. The residual consideration of 75% plus applicable dues shall be payable upon arrival.'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── Razorpay Secure Warning ── */}
+                        <div className="p-8 bg-emerald-400/5 border border-emerald-400/10 rounded-[32px] space-y-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-8 text-emerald-400/5 group-hover:text-emerald-400/10 transition-colors">
+                                <Lock className="w-24 h-24 rotate-12" />
+                            </div>
+
+                            <div className="flex items-center gap-4 relative z-10">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-400/10 flex items-center justify-center">
+                                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                                </div>
+                                <h4 className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em]">Secured Checkout Channel</h4>
+                            </div>
+                            <p className="text-[10px] text-emerald-400/60 font-medium leading-relaxed relative z-10">
+                                Upon confirmation, you will be redirected to our secure payment gateway (Razorpay). Multi-factor authentication is enforced for all significant transfers.
                             </p>
                         </div>
 
-                        {/* Payment Method */}
-                        <div className="bg-luxury-card border border-luxury-border/30 rounded-[2rem] p-6 lg:p-8 shadow-xl">
-                            <h2 className="text-lg font-bold text-white font-serif italic mb-6">Select Payment Method</h2>
+                        {/* ── CTA ── */}
+                        <div className="space-y-6">
+                            <button
+                                onClick={handleConfirmPayment}
+                                disabled={isLoading}
+                                className="w-full py-7 bg-gold-400 text-navy-950 rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl shadow-gold-400/20 hover:bg-white transition-all transform active:scale-[0.98] flex items-center justify-center gap-4 group disabled:opacity-50 disabled:grayscale"
+                            >
+                                {isLoading ? (
+                                    <div className="w-6 h-6 border-4 border-navy-950/20 border-t-navy-950 rounded-full animate-spin" />
+                                ) : (
+                                    <>
+                                        Authorize Transfer INR {finalAmount.toLocaleString()}
+                                    </>
+                                )}
+                            </button>
 
-                            <div className="space-y-3">
-                                {/* Card Option */}
-                                <div className={`border rounded-2xl transition-all ${paymentMethod === 'card' ? 'border-luxury-blue bg-luxury-blue/5' : 'border-luxury-border/30 bg-luxury-dark/50 hover:border-luxury-border/60'}`}>
-                                    <label className="flex items-center justify-between p-4 cursor-pointer" onClick={() => setPaymentMethod('card')}>
-                                        <div className="flex items-center gap-3">
-                                            <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-luxury-blue' : 'text-luxury-muted'}`} />
-                                            <div>
-                                                <h4 className="text-sm font-bold text-white">Credit / Debit Card</h4>
-                                                <p className="text-[10px] text-luxury-muted mt-0.5">Visa, Mastercard, Amex</p>
-                                            </div>
-                                        </div>
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'card' ? 'border-luxury-blue' : 'border-luxury-muted'}`}>
-                                            {paymentMethod === 'card' && <div className="w-2.5 h-2.5 rounded-full bg-luxury-blue"></div>}
-                                        </div>
-                                    </label>
-
-                                    {paymentMethod === 'card' && (
-                                        <div className="p-5 border-t border-luxury-border/20 space-y-4 animate-in fade-in slide-in-from-top-2">
-                                            <div>
-                                                <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest mb-1.5 block">Cardholder Name</label>
-                                                <input type="text" value={cardName} onChange={e => setCardName(e.target.value)} className="w-full bg-luxury-dark border border-luxury-border/30 rounded-xl px-4 py-3 text-sm text-white focus:border-luxury-blue focus:ring-1 focus:ring-luxury-blue outline-none transition-all placeholder:text-luxury-muted/30" placeholder="John Doe" />
-                                            </div>
-                                            <div>
-                                                <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest mb-1.5 block">Card Number</label>
-                                                <input type="text" value={cardNumber} onChange={e => setCardNumber(e.target.value)} className="w-full bg-luxury-dark border border-luxury-border/30 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-luxury-blue focus:ring-1 focus:ring-luxury-blue outline-none transition-all placeholder:text-luxury-muted/30" placeholder="**** **** **** 1234" />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest mb-1.5 block">Expiry Date</label>
-                                                    <input type="text" value={expiry} onChange={e => setExpiry(e.target.value)} className="w-full bg-luxury-dark border border-luxury-border/30 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-luxury-blue focus:ring-1 focus:ring-luxury-blue outline-none transition-all placeholder:text-luxury-muted/30" placeholder="MM/YY" />
-                                                </div>
-                                                <div>
-                                                    <label className="text-[9px] font-bold text-luxury-muted uppercase tracking-widest mb-1.5 block">CVV</label>
-                                                    <input type="password" value={cvv} onChange={e => setCvv(e.target.value)} className="w-full bg-luxury-dark border border-luxury-border/30 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-luxury-blue focus:ring-1 focus:ring-luxury-blue outline-none transition-all placeholder:text-luxury-muted/30" placeholder="***" maxLength="4" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Live Verification Active</span>
                                 </div>
-
-                                {/* UPI Option */}
-                                <div className={`border rounded-2xl transition-all ${paymentMethod === 'upi' ? 'border-luxury-blue bg-luxury-blue/5' : 'border-luxury-border/30 bg-luxury-dark/50 hover:border-luxury-border/60'}`}>
-                                    <label className="flex items-center justify-between p-4 cursor-pointer" onClick={() => setPaymentMethod('upi')}>
-                                        <div className="flex items-center gap-3">
-                                            <Wallet className={`w-5 h-5 ${paymentMethod === 'upi' ? 'text-luxury-blue' : 'text-luxury-muted'}`} />
-                                            <div>
-                                                <h4 className="text-sm font-bold text-white">UPI / Instant Transfer</h4>
-                                                <p className="text-[10px] text-luxury-muted mt-0.5">Pay using Google Pay, PhonePe, or BHIM</p>
-                                            </div>
-                                        </div>
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'upi' ? 'border-luxury-blue' : 'border-luxury-muted'}`}>
-                                            {paymentMethod === 'upi' && <div className="w-2.5 h-2.5 rounded-full bg-luxury-blue"></div>}
-                                        </div>
-                                    </label>
-                                </div>
-
-                                {/* Crypto Option */}
-                                <div className={`border rounded-2xl transition-all ${paymentMethod === 'crypto' ? 'border-luxury-blue bg-luxury-blue/5' : 'border-luxury-border/30 bg-luxury-dark/50 hover:border-luxury-border/60'}`}>
-                                    <label className="flex items-center justify-between p-4 cursor-pointer" onClick={() => setPaymentMethod('crypto')}>
-                                        <div className="flex items-center gap-3">
-                                            <Bitcoin className={`w-5 h-5 ${paymentMethod === 'crypto' ? 'text-luxury-blue' : 'text-luxury-muted'}`} />
-                                            <div>
-                                                <h4 className="text-sm font-bold text-white">Cryptocurrency</h4>
-                                                <p className="text-[10px] text-luxury-muted mt-0.5">Pay with BTC, ETH, or USDC via Coinbase</p>
-                                            </div>
-                                        </div>
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'crypto' ? 'border-luxury-blue' : 'border-luxury-muted'}`}>
-                                            {paymentMethod === 'crypto' && <div className="w-2.5 h-2.5 rounded-full bg-luxury-blue"></div>}
-                                        </div>
-                                    </label>
-                                </div>
+                                <span onClick={() => navigate(-1)} className="text-[10px] font-black text-white/10 uppercase tracking-[0.2em] hover:text-gold-400 transition-colors cursor-pointer border-b border-white/5 hover:border-gold-400 pb-1">Revise Itinerary</span>
                             </div>
-                        </div>
-
-                        {/* Razorpay Secured Warning */}
-                        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 flex gap-4">
-                            <ShieldCheck className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <h4 className="text-sm font-bold text-green-500">Secured Checkout via Razorpay</h4>
-                                <p className="text-[10px] text-green-400/80 mt-1">Your payment is processed securely by Razorpay. A popup will appear to collect payment details once you click Confirm.</p>
-                            </div>
-                        </div>
-
-                        {/* CTA */}
-                        <button
-                            onClick={handleConfirmPayment}
-                            disabled={isLoading}
-                            className="w-full py-4 bg-luxury-blue text-white rounded-2xl font-bold text-sm sm:text-base shadow-xl shadow-luxury-blue/20 hover:bg-luxury-blue-hover transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                            {isLoading ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                                <>
-                                    <Lock className="w-4 h-4" />
-                                    Confirm & Pay ₹{finalAmount.toLocaleString()}
-                                </>
-                            )}
-                        </button>
-
-                        <div className="text-center pt-2">
-                            <span onClick={() => navigate(-1)} className="text-xs text-luxury-muted hover:text-white cursor-pointer transition-colors border-b border-transparent hover:border-white pb-0.5">Return to Room Details</span>
                         </div>
                     </div>
                 </div>

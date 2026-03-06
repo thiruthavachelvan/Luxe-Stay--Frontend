@@ -79,42 +79,46 @@ const AmenitiesPage = () => {
     const active = categories.find(c => c.id === activeTab);
 
     return (
-        <div className="min-h-screen bg-luxury-dark text-luxury-text">
+        <div className="min-h-screen bg-navy-950 text-white font-sans selection:bg-gold-400 selection:text-navy-950">
             <Navbar />
 
-            {/* Hero */}
-            <section className="relative pt-32 pb-20 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/10 via-transparent to-luxury-blue/10 pointer-events-none" />
-                <div className="container mx-auto px-6 relative">
-                    <span className="text-luxury-blue text-xs font-bold tracking-[0.2em] uppercase mb-4 block">
-                        World-Class Facilities
-                    </span>
-                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                        Every Convenience, <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-luxury-blue to-emerald-400">
-                            Perfectly Curated
-                        </span>
+            {/* Hero Section */}
+            <section className="relative pt-40 pb-24 overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.05),transparent_50%)]" />
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Sanctuary Facilities</span>
+                    </div>
+
+                    <h1 className="text-6xl md:text-8xl font-serif italic text-white mb-8 tracking-tight leading-[0.9] animate-in fade-in slide-in-from-top-8 duration-1000">
+                        Every luxury, <br />
+                        <span className="text-gold-400">perfectly curated.</span>
                     </h1>
-                    <p className="text-luxury-muted text-lg max-w-2xl leading-relaxed mb-6">
-                        From the moment you arrive, every amenity is designed to elevate your stay. Explore our comprehensive facilities across all LuxeStay properties.
+
+                    <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                        From state-of-the-art wellness centers to digital-first convenience, explore the comprehensive ecosystem of LuxeStay excellence.
                     </p>
-                    <div className="flex items-center gap-2 text-luxury-muted text-sm">
-                        <span>Home</span><ChevronRight className="w-4 h-4" /><span className="text-luxury-blue">Amenities</span>
+
+                    <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
+                        <span className="hover:text-gold-400 transition-colors cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Archive</span>
+                        <ChevronRight className="w-3 h-3" />
+                        <span className="text-gold-400">Amenities</span>
                     </div>
                 </div>
             </section>
 
-            {/* Tabs */}
-            <section className="sticky top-16 z-30 bg-luxury-dark/95 backdrop-blur-md border-b border-luxury-border">
+            {/* Elevated Sticky Tabs */}
+            <section className="sticky top-20 z-40 py-6">
                 <div className="container mx-auto px-6">
-                    <div className="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
+                    <div className="glass-panel p-2 flex gap-2 overflow-x-auto scrollbar-hide border-white/5 bg-navy-950/40 backdrop-blur-2xl">
                         {categories.map((cat) => (
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveTab(cat.id)}
-                                className={`flex-shrink-0 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === cat.id
-                                        ? `${cat.activeBg} text-white shadow-lg`
-                                        : 'text-luxury-muted hover:text-white hover:bg-white/5'
+                                className={`flex-shrink-0 px-8 py-4 rounded-[20px] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeTab === cat.id
+                                    ? `bg-gold-400 text-navy-950 shadow-2xl shadow-gold-400/20`
+                                    : 'text-white/40 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {cat.label}
@@ -124,46 +128,60 @@ const AmenitiesPage = () => {
                 </div>
             </section>
 
-            {/* Items Grid */}
-            <section className="py-20">
-                <div className="container mx-auto px-6">
-                    <div className="mb-12">
-                        <h2 className={`text-2xl font-bold text-white mb-2 ${active.color}`}>{active.label}</h2>
-                        <div className={`w-12 h-0.5 ${active.activeBg}`} />
+            {/* Items Grid with Glassmorphism */}
+            <section className="py-24 relative">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 blur-[120px] rounded-full pointer-events-none" />
+
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20">
+                        <div className="space-y-4">
+                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">Registry of Service</span>
+                            <h2 className="text-4xl md:text-5xl font-serif italic text-white leading-tight">{active.label}</h2>
+                        </div>
+                        <div className="h-0.5 w-32 bg-gold-400/20" />
                     </div>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {active.items.map((item) => (
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {active.items.map((item, i) => (
                             <div
                                 key={item.name}
-                                className={`bg-[#1A2235] border ${active.border} rounded-2xl p-6 group hover:-translate-y-1 hover:shadow-xl transition-all duration-300`}
+                                className="glass-panel p-10 group hover:border-gold-400/20 transition-all duration-700 hover:bg-white/[0.03] animate-in fade-in slide-in-from-bottom-8"
+                                style={{ animationDelay: `${i * 100}ms` }}
                             >
-                                <div className={`w-12 h-12 rounded-xl ${active.bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                                    <item.icon className={`w-6 h-6 ${active.color}`} />
+                                <div className="w-14 h-14 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center mb-10 group-hover:bg-gold-400 group-hover:border-gold-400 transition-all duration-700">
+                                    <item.icon className="w-6 h-6 text-white/20 group-hover:text-navy-950 transition-colors" />
                                 </div>
-                                <h3 className="text-white font-semibold mb-2">{item.name}</h3>
-                                <p className="text-luxury-muted text-sm leading-relaxed">{item.desc}</p>
+                                <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-tighter group-hover:text-gold-400 transition-colors">{item.name}</h3>
+                                <p className="text-xs text-white/40 font-medium leading-relaxed group-hover:text-white/60 transition-colors uppercase tracking-widest">{item.desc}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* All Categories Overview */}
-            <section className="bg-[#1A2235] border-t border-luxury-border py-20">
+            {/* Complete Registry Overview */}
+            <section className="bg-white/[0.02] border-y border-white/5 py-32">
                 <div className="container mx-auto px-6">
-                    <div className="text-center mb-12">
-                        <span className="text-luxury-blue text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Complete Overview</span>
-                        <h2 className="text-3xl font-bold text-white">Everything In One Place</h2>
+                    <div className="text-center space-y-4 mb-20">
+                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">Overview</span>
+                        <h2 className="text-4xl font-serif italic text-white">The Full Collection</h2>
                     </div>
+
                     <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
                         {categories.map((cat) => (
                             <button
                                 key={cat.id}
-                                onClick={() => { setActiveTab(cat.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                                className={`${cat.bg} border ${cat.border} rounded-2xl p-6 text-left group hover:-translate-y-1 transition-all duration-300`}
+                                onClick={() => { setActiveTab(cat.id); window.scrollTo({ top: 300, behavior: 'smooth' }); }}
+                                className="glass-panel p-8 text-left group hover:bg-white/5 transition-all duration-500 overflow-hidden relative"
                             >
-                                <p className={`font-semibold ${cat.color} mb-2`}>{cat.label}</p>
-                                <p className="text-luxury-muted text-sm">{cat.items.length} amenities</p>
+                                <div className="relative z-10 space-y-4">
+                                    <p className="text-[10px] font-black text-gold-400 uppercase tracking-widest">{cat.label}</p>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">{cat.items.length} Amenities</p>
+                                        <ChevronRight className="w-4 h-4 text-white/10 group-hover:text-gold-400 transition-colors transform group-hover:translate-x-1" />
+                                    </div>
+                                </div>
+                                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold-400/[0.02] rounded-full group-hover:scale-150 transition-transform duration-1000" />
                             </button>
                         ))}
                     </div>
