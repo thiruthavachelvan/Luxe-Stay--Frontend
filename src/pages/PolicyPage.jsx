@@ -263,15 +263,15 @@ const PolicyPage = () => {
                 {/* Main Content Area */}
                 <main className="flex-1 min-w-0 bg-[#020617]">
                     {/* Mobile Navigation */}
-                    <div className="lg:hidden border-b border-white/10 bg-navy-950/80 backdrop-blur-md sticky top-20 z-20 overflow-x-auto no-scrollbar">
-                        <div className="flex gap-2 p-4">
+                    <div className="lg:hidden border-b border-white/10 bg-navy-950/80 backdrop-blur-md sticky top-20 z-20">
+                        <div className="flex flex-wrap justify-center gap-2 p-4">
                             {sections.map((sec) => (
                                 <button
                                     key={sec.id}
                                     onClick={() => handleNav(sec.id)}
-                                    className={`flex-shrink-0 px-5 py-2.5 rounded-full text-xs font-medium transition-all ${activeId === sec.id
-                                        ? 'bg-gold-500 text-navy-950'
-                                        : 'bg-white/5 text-gray-400 border border-white/10'
+                                    className={`flex-shrink-0 px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeId === sec.id
+                                        ? 'bg-gold-500 text-navy-950 shadow-lg shadow-gold-500/20'
+                                        : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
                                         }`}
                                 >
                                     {sec.label}
@@ -288,9 +288,9 @@ const PolicyPage = () => {
                         className="p-8 md:p-16 max-w-4xl"
                     >
                         {/* Header Section */}
-                        <div className="mb-16">
-                            <div className="flex items-center gap-3 text-gold-500/60 text-[10px] uppercase tracking-[0.4em] mb-8">
-                                <span>Architecture</span>
+                        <div className="mb-16 text-center md:text-left">
+                            <div className="flex items-center justify-center md:justify-start gap-3 text-gold-500/60 text-[10px] uppercase tracking-[0.4em] mb-8">
+                                <span className="italic">Architecture</span>
                                 <ChevronRight className="w-3 h-3" />
                                 <span className="text-gold-500 font-bold">{active.label}</span>
                             </div>
@@ -300,22 +300,22 @@ const PolicyPage = () => {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="flex items-center gap-2 mb-6"
+                                    className="flex items-center justify-center md:justify-start gap-2 mb-6"
                                 >
                                     <div className="flex gap-1">
                                         {[1, 2, 3].map(i => (
                                             <div key={i} className="w-1 h-1 rounded-full bg-gold-500/40 animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />
                                         ))}
                                     </div>
-                                    <span className="text-gold-500/70 text-[10px] uppercase tracking-widest font-medium">Revision: {active.lastUpdated}</span>
+                                    <span className="text-gold-500/70 text-[10px] uppercase tracking-widest font-medium italic">Revision: {active.lastUpdated}</span>
                                 </motion.div>
                             )}
 
-                            <h1 className="text-4xl md:text-6xl font-serif italic text-white mb-6 leading-tight">
+                            <h1 className="text-4xl md:text-7xl font-serif italic text-white mb-6 leading-tight">
                                 {active.label}
                             </h1>
 
-                            <p className="text-gray-400 text-lg font-light leading-relaxed max-w-2xl">
+                            <p className="text-gray-400 text-lg font-light leading-relaxed max-w-2xl mx-auto md:mx-0">
                                 {active.description}
                             </p>
                         </div>

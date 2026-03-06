@@ -257,13 +257,13 @@ const AboutPage = () => {
             {/* Properties Registry */}
             <section className="bg-navy-900/50 py-32 border-y border-white/5">
                 <div className="container mx-auto px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 mb-20 text-center md:text-left">
                         <div className="space-y-4">
-                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">Global Portfolio</span>
-                            <h2 className="text-5xl font-serif italic text-white">The Registry</h2>
+                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] block italic">Global Portfolio</span>
+                            <h2 className="text-4xl md:text-6xl font-serif italic text-white leading-tight">The Registry</h2>
                         </div>
-                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] max-w-xs text-right leading-relaxed">
-                            {locations.length} architectural landmarks <br /> defined by service.
+                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] max-w-xs md:text-right leading-relaxed italic">
+                            {locations.length} architectural landmarks <br className="hidden md:block" /> defined by service.
                         </p>
                     </div>
 
@@ -299,20 +299,20 @@ const AboutPage = () => {
             <section className="py-40">
                 <div className="container mx-auto px-6">
                     <div className="text-center space-y-4 mb-24">
-                        <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">Stewards</span>
-                        <h2 className="text-5xl font-serif italic text-white">The Conserge Board</h2>
+                        <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] block italic">Stewards</span>
+                        <h2 className="text-4xl md:text-6xl font-serif italic text-white leading-tight">The Conserge Board</h2>
                     </div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-10">
                         {leadership.map((l) => (
                             <div key={l.name} className="group relative">
-                                <div className="glass-panel p-10 flex items-center gap-8 hover:bg-white/[0.03] transition-all duration-500 overflow-hidden">
-                                    <div className={`w-20 h-20 rounded-full ${l.color} flex items-center justify-center text-white text-2xl font-serif italic border-4 border-navy-950 shadow-2xl group-hover:scale-110 transition-transform duration-500`}>
+                                <div className="glass-panel p-8 md:p-10 flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-6 sm:gap-8 hover:bg-white/[0.03] transition-all duration-500 overflow-hidden text-center sm:text-left h-full">
+                                    <div className={`w-20 h-20 rounded-full ${l.color} flex-shrink-0 flex items-center justify-center text-white text-2xl font-serif italic border-4 border-navy-950 shadow-2xl group-hover:scale-110 transition-transform duration-500 relative z-10`}>
                                         {l.initials}
                                     </div>
-                                    <div className="space-y-1">
-                                        <h4 className="text-lg font-bold text-white uppercase tracking-tighter">{l.name}</h4>
-                                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">{l.title}</p>
+                                    <div className="space-y-2 relative z-10">
+                                        <h4 className="text-xl md:text-lg font-bold text-white uppercase tracking-tighter leading-tight">{l.name}</h4>
+                                        <p className="text-[10px] font-black text-gold-400/40 uppercase tracking-[0.2em]">{l.title}</p>
                                     </div>
                                     <div className="absolute right-[-20px] bottom-[-20px] w-24 h-24 bg-white/[0.02] rounded-full group-hover:scale-150 transition-transform duration-1000" />
                                 </div>

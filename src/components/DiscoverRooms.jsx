@@ -34,13 +34,13 @@ export default function DiscoverRooms() {
     return (
         <section className="py-32 relative bg-navy-950" id="rooms">
             <div className="container mx-auto px-6">
-                <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+                <div className="flex flex-col md:flex-row items-center md:items-end justify-between mb-16 gap-6 text-center md:text-left">
                     <div>
                         <motion.span
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="text-gold-400 uppercase tracking-widest text-xs font-semibold mb-4 block"
+                            className="text-gold-400 uppercase tracking-[0.4em] text-[10px] font-black mb-4 block italic"
                         >
                             Accommodations
                         </motion.span>
@@ -48,13 +48,13 @@ export default function DiscoverRooms() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="text-4xl md:text-5xl font-serif text-white"
+                            className="text-4xl md:text-6xl font-serif text-white leading-tight"
                         >
                             Featured <span className="italic text-gold-400">Suites</span>
                         </motion.h2>
                     </div>
                     <Link to="/rooms">
-                        <Button variant="outline" className="hidden md:flex">
+                        <Button variant="outline" className="flex">
                             View All Rooms
                         </Button>
                     </Link>
@@ -68,7 +68,7 @@ export default function DiscoverRooms() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.2 }}
-                            className="group relative h-[600px] w-full overflow-hidden rounded-sm cursor-pointer"
+                            className="group relative h-[450px] md:h-[600px] w-full overflow-hidden rounded-sm cursor-pointer"
                         >
                             <Link to={`/rooms/${room._id}`}>
                                 <div className="absolute inset-0 bg-navy-950">
@@ -81,7 +81,7 @@ export default function DiscoverRooms() {
 
                                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-transparent opacity-90" />
 
-                                <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 md:translate-y-0 group-hover:translate-y-0 transition-transform duration-500">
                                     <div className="flex items-center gap-2 mb-3">
                                         <MapPin className="w-3 h-3 text-gold-400" />
                                         <span className="text-white/70 text-xs uppercase tracking-widest">
@@ -89,8 +89,8 @@ export default function DiscoverRooms() {
                                         </span>
                                     </div>
 
-                                    <h3 className="text-3xl font-serif text-white mb-2">{room.type} - {room.roomNumber}</h3>
-                                    <p className="text-white/50 text-sm mb-6">{room.viewType || room.bedType || 'Premium Suite'}</p>
+                                    <h3 className="text-2xl md:text-3xl font-serif text-white mb-2">{room.type} - {room.roomNumber}</h3>
+                                    <p className="text-white/50 text-xs md:text-sm mb-6">{room.viewType || room.bedType || 'Premium Suite'}</p>
 
                                     <div className="flex items-center justify-between border-t border-white/10 pt-6">
                                         <div>

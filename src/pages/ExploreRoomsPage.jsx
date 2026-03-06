@@ -47,7 +47,8 @@ const useDropdown = () => {
     useEffect(() => {
         const handler = (e) => {
             const inTrigger = Object.values(refs.current).some(el => el?.contains(e.target));
-            if (!inTrigger) setOpenId(null);
+            const inPortal = e.target.closest('.dropdown-portal');
+            if (!inTrigger && !inPortal) setOpenId(null);
         };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
@@ -56,7 +57,17 @@ const useDropdown = () => {
     const open = (id, el) => {
         if (!el) return;
         const r = el.getBoundingClientRect();
-        setPos({ top: r.bottom + 6, left: r.left, width: Math.max(r.width, 200) });
+        const width = Math.max(r.width, 240);
+        let left = r.left;
+
+        // Viewport constraint: Ensure portal doesn't overflow right
+        if (left + width > window.innerWidth - 16) {
+            left = window.innerWidth - width - 12;
+        }
+        // Ensure portal doesn't overflow left
+        if (left < 12) left = 12;
+
+        setPos({ top: r.bottom + 6, left, width });
         setOpenId(prev => prev === id ? null : id);
     };
 
@@ -64,8 +75,8 @@ const useDropdown = () => {
 
     const Portal = ({ id, children }) =>
         openId !== id ? null : createPortal(
-            <div style={{ position: 'fixed', top: pos.top, left: pos.left, minWidth: pos.width, zIndex: 99999 }}
-                className="bg-navy-950/95 backdrop-blur-2xl border border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] p-4 overflow-hidden rounded-sm">
+            <div style={{ position: 'fixed', top: pos.top, left: pos.left, width: pos.width, maxWidth: 'calc(100vw - 24px)', zIndex: 99999 }}
+                className="dropdown-portal bg-navy-950/95 backdrop-blur-2xl border border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] p-4 overflow-hidden rounded-sm">
                 {children}
             </div>,
             document.body
@@ -130,6 +141,8 @@ const ExploreRoomsPage = () => {
         price: useRef(null),
         guests: useRef(null),
         sort: useRef(null),
+        locationMobile: useRef(null),
+        floorMobile: useRef(null),
     };
 
     // Filter states
@@ -305,7 +318,55 @@ const ExploreRoomsPage = () => {
 
 
                 {/* ── Filter strip ─────────────────────────────── */}
-                <div className="flex items-center justify-center gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar">
+                <div className="flex flex-wrap items-center justify-center gap-2 px-4 pb-3">
+
+                    {/* Mobile Only: Hubs & Sections */}
+                    <div className="flex lg:hidden gap-2">
+                        <FilterBtn
+                            triggerRef={el => { if (el) btnRefs.locationMobile.current = el; }}
+                            label={selectedLocation || 'Hub'}
+                            icon={Globe}
+                            active={openId === 'locationMobile'}
+                            count={0}
+                            onClick={() => open('locationMobile', btnRefs.locationMobile.current)}
+                        />
+                        <Portal id="locationMobile">
+                            <p className="text-[9px] font-bold text-gold-400 uppercase tracking-widest mb-3 opacity-60">Global Hubs</p>
+                            {allLocations.map(loc => (
+                                <button key={loc._id}
+                                    onMouseDown={() => { setSelectedLocation(loc.city); setSelectedFloor('All Floors'); close(); }}
+                                    className={`w-full text-left px-4 py-2.5 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all ${selectedLocation === loc.city ? 'bg-gold-400 text-navy-950' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                                    {loc.city}
+                                </button>
+                            ))}
+                        </Portal>
+
+                        <FilterBtn
+                            triggerRef={el => { if (el) btnRefs.floorMobile.current = el; }}
+                            label={selectedFloor === 'All Floors' ? 'Section' : selectedFloor}
+                            icon={Layers}
+                            active={openId === 'floorMobile'}
+                            count={selectedFloor !== 'All Floors' ? 1 : 0}
+                            onClick={() => open('floorMobile', btnRefs.floorMobile.current)}
+                        />
+                        <Portal id="floorMobile">
+                            <p className="text-[9px] font-bold text-gold-400 uppercase tracking-widest mb-3 opacity-60">Architectural Sections</p>
+                            {FLOORS.map(fl => {
+                                const cnt = fl === 'All Floors' ? locationRooms.length : locationRooms.filter(r => r.floor === fl).length;
+                                if (fl !== 'All Floors' && cnt === 0) return null;
+                                return (
+                                    <button key={fl} onMouseDown={() => { setSelectedFloor(fl); close(); }}
+                                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all ${selectedFloor === fl ? 'bg-gold-400 text-navy-950' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                                        <span>{fl}</span>
+                                        <span className="text-[9px] opacity-40">{cnt}</span>
+                                    </button>
+                                );
+                            })}
+                        </Portal>
+                    </div>
+
+                    <div className="hidden lg:block w-px h-5 bg-luxury-border/30 shrink-0" />
+                    <div className="lg:hidden w-full h-px bg-white/5 mt-1 mb-2" />
 
                     {/* Room Type dropdown */}
                     <FilterBtn
@@ -411,7 +472,7 @@ const ExploreRoomsPage = () => {
                             <span>₹0</span><span>₹{maxPrice.toLocaleString('en-IN')}</span>
                         </div>
                         <input type="range" min="0" max={priceSliderMax}
-                            step={Math.ceil(priceSliderMax / 100) * 10}
+                            step={500}
                             value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))}
                             className="w-full accent-luxury-blue h-1.5 rounded-lg" />
                         <div className="flex justify-between text-[9px] text-luxury-muted mt-1">
@@ -528,15 +589,15 @@ const ExploreRoomsPage = () => {
                 <main className="flex-1 min-w-0 px-10 py-12">
 
                     {/* Heading */}
-                    <div className="flex items-center justify-between mb-16 flex-wrap gap-8">
-                        <div>
-                            <div className="flex items-center gap-2 text-[10px] text-white/20 font-bold uppercase tracking-[0.3em] mb-4">
+                    <div className="flex flex-col items-center md:items-start md:flex-row md:justify-between mb-16 gap-8 text-center md:text-left">
+                        <div className="w-full md:w-auto">
+                            <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] text-white/20 font-bold uppercase tracking-[0.3em] mb-4">
                                 <Globe className="w-3 h-3 text-gold-400" />
                                 <span>{selectedLocation}</span>
                                 {selectedFloor !== 'All Floors' && <><ChevronRight className="w-3 h-3" /><span>{selectedFloor}</span></>}
                                 {selectedRoomType !== 'All Rooms' && <><ChevronRight className="w-3 h-3" /><span>{selectedRoomType}</span></>}
                             </div>
-                            <h1 className="text-4xl font-serif text-white flex items-center gap-4 flex-wrap mb-4">
+                            <h1 className="text-4xl md:text-6xl font-serif text-white flex items-center justify-center md:justify-start gap-4 flex-wrap mb-4">
                                 <span className="italic text-gold-400">{selectedLocation}</span> Collection
                                 {selectedFloor === 'Location Special' && (
                                     <span className="text-[9px] bg-gold-400/10 text-gold-400 px-3 py-1 rounded-full border border-gold-400/20 uppercase tracking-widest font-black">Heritage</span>

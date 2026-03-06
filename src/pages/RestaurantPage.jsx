@@ -45,15 +45,15 @@ const RestaurantPage = () => {
                         className="w-full h-full object-cover opacity-60"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-transparent"></div>
-                    <div className="absolute bottom-16 left-16 max-w-2xl space-y-6">
-                        <div className="flex items-center gap-4">
+                    <div className="absolute inset-x-0 bottom-10 md:bottom-16 px-6 md:px-16 text-center md:text-left space-y-4 md:space-y-6">
+                        <div className="flex flex-col md:flex-row items-center gap-4">
                             <span className="px-4 py-1.5 bg-gold-400 text-navy-950 text-[9px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl shadow-gold-400/20">The Michelin Registry</span>
                             <div className="flex gap-1 text-gold-400">
                                 <Award className="w-4 h-4 fill-current" />
                             </div>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-serif italic text-white tracking-tight">The Grand Brasserie</h1>
-                        <p className="text-lg text-white/40 font-light leading-relaxed max-w-xl">
+                        <h1 className="text-4xl md:text-7xl font-serif italic text-white tracking-tight leading-tight">The Grand Brasserie</h1>
+                        <p className="text-sm md:text-lg text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0">
                             Experience culinary excellence engineered by Michelin-starred stewards in an atmosphere of profound sophistication.
                         </p>
                     </div>
@@ -61,7 +61,7 @@ const RestaurantPage = () => {
 
                 {/* Navigation / Filters - Elevated Tabs */}
                 <div className="flex justify-center mb-24">
-                    <div className="glass-panel p-2 flex gap-2 overflow-x-auto scrollbar-hide border-white/5 bg-navy-950/40 backdrop-blur-2xl">
+                    <div className="glass-panel p-2 flex flex-wrap justify-center gap-2 border-white/5 bg-navy-950/40 backdrop-blur-2xl">
                         {tabs.map(tab => (
                             <button
                                 key={tab}
@@ -93,9 +93,9 @@ const RestaurantPage = () => {
                                 </div>
                                 <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
                                     <div className="space-y-8">
-                                        <div className="space-y-4">
-                                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">The Resident Registry</span>
-                                            <h2 className="text-4xl md:text-5xl font-serif italic text-white leading-tight">Morning rituals, <br />complimentary.</h2>
+                                        <div className="space-y-4 text-center lg:text-left">
+                                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] block italic">The Resident Registry</span>
+                                            <h2 className="text-4xl md:text-6xl font-serif italic text-white leading-tight">Morning rituals, <br className="hidden md:block" />complimentary.</h2>
                                         </div>
                                         <p className="text-white/40 text-lg font-light leading-relaxed max-w-md">
                                             Exclusive for our residents. A curated selection of morning favorites engineered as the definitive start to your day.
@@ -122,10 +122,10 @@ const RestaurantPage = () => {
                         {/* Standard Menu Grids */}
                         {activeTab !== 'Resident Exclusive' && (
                             <div className="space-y-16">
-                                <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+                                <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 text-center md:text-left">
                                     <div className="space-y-4">
-                                        <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">The Collection</span>
-                                        <h2 className="text-5xl font-serif italic text-white">{activeTab}</h2>
+                                        <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] block italic">The Collection</span>
+                                        <h2 className="text-4xl md:text-6xl font-serif italic text-white leading-tight">{activeTab}</h2>
                                     </div>
                                     <div className="h-0.5 w-32 bg-gold-400/20" />
                                 </div>

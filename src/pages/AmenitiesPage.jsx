@@ -129,7 +129,7 @@ const AmenitiesPage = () => {
             {/* Elevated Sticky Tabs */}
             <section className="sticky top-20 z-40 py-6">
                 <div className="container mx-auto px-6">
-                    <div className="glass-panel p-2 flex gap-2 overflow-x-auto scrollbar-hide border-white/5 bg-navy-950/40 backdrop-blur-2xl">
+                    <div className="glass-panel p-2 flex flex-wrap justify-center gap-2 border-white/5 bg-navy-950/40 backdrop-blur-2xl">
                         {categories.map((cat) => (
                             <button
                                 key={cat.id}
@@ -151,10 +151,10 @@ const AmenitiesPage = () => {
                 <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 blur-[120px] rounded-full pointer-events-none" />
 
                 <div className="container mx-auto px-6 relative z-10">
-                    <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 mb-20 text-center md:text-left">
                         <div className="space-y-4">
-                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">Registry of Service</span>
-                            <h2 className="text-4xl md:text-5xl font-serif italic text-white leading-tight">{active.label}</h2>
+                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] block italic">Registry of Service</span>
+                            <h2 className="text-4xl md:text-6xl font-serif italic text-white leading-tight">{active.label}</h2>
                         </div>
                         <div className="h-0.5 w-32 bg-gold-400/20" />
                     </div>

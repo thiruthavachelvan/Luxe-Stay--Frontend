@@ -357,7 +357,7 @@ const RoomDetailPage = () => {
                                     </span>
                                 ))}
                             </h1>
-                            <div className="flex items-center gap-8 text-white/60">
+                            <div className="flex flex-col md:flex-row md:items-center gap-8 text-white/60">
                                 <div className="flex flex-col">
                                     <span className="text-[9px] font-bold uppercase tracking-widest text-gold-400/60 mb-1">
                                         {hasMembership ? `${user.membershipTier} Member Rate` : 'Starting From'}
@@ -368,21 +368,23 @@ const RoomDetailPage = () => {
                                         <span className="text-sm font-sans opacity-40"> / night</span>
                                     </span>
                                 </div>
-                                <div className="h-12 w-px bg-white/10" />
-                                <button
-                                    onClick={() => openLightbox(0)}
-                                    className="group flex items-center gap-4 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-sm hover:bg-white/10 transition-all"
-                                >
-                                    <Maximize2 className="w-5 h-5 text-gold-400" />
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">View Gallery</span>
-                                </button>
+                                <div className="hidden md:block h-12 w-px bg-white/10" />
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => openLightbox(0)}
+                                        className="group flex items-center gap-4 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-sm hover:bg-white/10 transition-all whitespace-nowrap"
+                                    >
+                                        <Maximize2 className="w-5 h-5 text-gold-400" />
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">View Gallery</span>
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
                 </div>
 
-                {/* Thumbnail Navigation */}
-                <div className="absolute right-8 bottom-20 flex flex-col gap-4">
+                {/* Thumbnail Navigation - Adjusted for mobile */}
+                <div className="absolute right-4 md:right-8 bottom-4 md:bottom-20 flex flex-row md:flex-col gap-3 md:gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide max-w-[calc(100vw-32px)]">
                     {images.map((img, i) => (
                         <button
                             key={i}
@@ -668,15 +670,17 @@ const RoomDetailPage = () => {
                             </div>
 
                             {/* CTA */}
-                            <button
-                                onClick={handleBookNow}
-                                disabled={!isAvailable || checkingAvailability}
-                                className={`w-full py-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.4em] transition-all shadow-2xl relative overflow-hidden group ${isAvailable && !checkingAvailability
-                                    ? 'bg-gold-400 text-navy-950 hover:bg-white hover:shadow-gold-400/20'
-                                    : 'bg-white/5 text-white/10 cursor-not-allowed'}`}
-                            >
-                                <span className="relative z-10">{checkingAvailability ? 'Verifying Sanctuary...' : isAvailable ? 'Confirm Reservation' : 'Selection Occupied'}</span>
-                            </button>
+                            <div className="mt-12">
+                                <button
+                                    onClick={handleBookNow}
+                                    disabled={!isAvailable || checkingAvailability}
+                                    className={`w-full py-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.4em] transition-all shadow-2xl relative overflow-hidden group ${isAvailable && !checkingAvailability
+                                        ? 'bg-gold-400 text-navy-950 hover:bg-white hover:shadow-gold-400/20'
+                                        : 'bg-white/5 text-white/10 cursor-not-allowed'}`}
+                                >
+                                    <span className="relative z-10">{checkingAvailability ? 'Verifying Sanctuary...' : isAvailable ? 'Confirm Reservation' : 'Selection Occupied'}</span>
+                                </button>
+                            </div>
 
                             <p className="text-[9px] text-white/20 uppercase tracking-widest text-center leading-relaxed">
                                 {hasMembership ? (
