@@ -30,7 +30,31 @@ const RestaurantPage = () => {
         fetchMenu();
     }, []);
 
-    const user = JSON.parse(sessionStorage.getItem('userData'));
+    const [user, setUser] = useState(() => {
+        const stored = sessionStorage.getItem('userData');
+        return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    });
+
+    useEffect(() => {
+        const syncUser = () => {
+            const stored = sessionStorage.getItem('userData');
+            setUser((stored && stored !== 'undefined') ? JSON.parse(stored) : null);
+        };
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+        window.addEventListener('focus', syncUser);
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => {
+            window.removeEventListener('focus', syncUser);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
+    }, []);
 
     return (
         <div className="min-h-screen bg-navy-950 text-white font-sans selection:bg-gold-400 selection:text-navy-950">

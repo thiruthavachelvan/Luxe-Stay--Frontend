@@ -173,6 +173,26 @@ const OffersPage = () => {
             .catch(() => { }); // Silently fall back to defaults on error
     }, []);
 
+    useEffect(() => {
+        const syncUser = () => {
+            const stored = sessionStorage.getItem('userData');
+            setUser((stored && stored !== 'undefined') ? JSON.parse(stored) : null);
+        };
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+            }
+        };
+        window.addEventListener('focus', syncUser);
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => {
+            window.removeEventListener('focus', syncUser);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
+    }, []);
+
     const handleBuyMembership = (tier) => {
         const userData = sessionStorage.getItem('userData');
         if (!userData) {

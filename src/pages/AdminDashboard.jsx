@@ -54,7 +54,10 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const AdminDashboard = () => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const stored = sessionStorage.getItem('userData');
+        return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    });
     const [activeSection, setActiveSection] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [staffMembers, setStaffMembers] = useState([]);
@@ -296,13 +299,30 @@ const AdminDashboard = () => {
     const [occupancyStatusFilter, setOccupancyStatusFilter] = useState('CheckedIn');
     const [roomsViewDate, setRoomsViewDate] = useState(new Date().toISOString().split('T')[0]);
 
+
     useEffect(() => {
-        const userData = sessionStorage.getItem('userData');
-        if (!userData || JSON.parse(userData).role !== 'admin') {
+        const userDataStr = sessionStorage.getItem('userData');
+        const userData = (userDataStr && userDataStr !== 'undefined') ? JSON.parse(userDataStr) : null;
+
+        if (!userData || userData.role?.toLowerCase() !== 'admin') {
             navigate('/login');
         } else {
-            setUser(JSON.parse(userData));
+            setUser(userData);
         }
+
+        const handleStorageChange = (event) => {
+            if (event.key === 'luxe-stay-logout') {
+                sessionStorage.clear();
+                setUser(null);
+                navigate('/login');
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, [navigate]);
 
     const fetchStaff = async (locationId = 'all') => {
@@ -768,12 +788,28 @@ const AdminDashboard = () => {
             fetchStats(revenueRange);
         }
 
-        return () => clearInterval(notificationInterval);
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+
+        window.addEventListener('storage', handleGlobalLogout);
+
+        return () => {
+            clearInterval(notificationInterval);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
     }, [activeSection, staffFilter, selectedRoomLocation, selectedFloor, selectedMenuCategory, revenueRange]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('userToken');
         sessionStorage.removeItem('userData');
+        localStorage.setItem('luxe-stay-logout', Date.now().toString());
+        setUser(null);
         navigate('/');
     };
 

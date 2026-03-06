@@ -16,7 +16,6 @@ import Footer from '../components/Footer';
 
 const SpaPage = () => {
     const navigate = useNavigate();
-    const user = JSON.parse(sessionStorage.getItem('userData'));
 
     const services = [
         {
@@ -53,13 +52,38 @@ const SpaPage = () => {
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [user, setUser] = useState(() => {
+        const stored = sessionStorage.getItem('userData');
+        return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    });
+
+    useEffect(() => {
+        const syncUser = () => {
+            const stored = sessionStorage.getItem('userData');
+            setUser((stored && stored !== 'undefined') ? JSON.parse(stored) : null);
+        };
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+        window.addEventListener('focus', syncUser);
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => {
+            window.removeEventListener('focus', syncUser);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
+    }, []);
 
     useEffect(() => {
         window.scrollTo(0, 0);
         if (user) {
             fetchBookings();
         }
-    }, []);
+    }, [user]); // Added user to dependency array to refetch bookings if user state changes
 
     const fetchBookings = async () => {
         try {
@@ -186,7 +210,7 @@ const SpaPage = () => {
                         setIsProcessing(false);
                     }
                 },
-                prefill: { name: user.name || user.fullName || 'Guest', email: user.email || '' },
+                prefill: { name: user.fullName || 'Guest', email: user.email || '' },
                 theme: { color: '#D4AF37' }
             };
             const rzp = new window.Razorpay(options);
@@ -227,7 +251,7 @@ const SpaPage = () => {
                     <div className="flex items-center gap-6">
                         {user ? (
                             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#D4AF37] to-yellow-200 border-2 border-[#0F1626] flex items-center justify-center font-bold text-[#0F1626] cursor-pointer" onClick={() => navigate('/dashboard')}>
-                                {(user.name || 'G')[0].toUpperCase()}
+                                {(user.fullName || 'G')[0].toUpperCase()}
                             </div>
                         ) : (
                             <button onClick={() => navigate('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-white text-[#0F1626] rounded-full font-bold text-sm hover:bg-gray-200 transition-colors">

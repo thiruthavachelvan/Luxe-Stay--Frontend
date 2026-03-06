@@ -6,7 +6,31 @@ import Footer from '../components/Footer';
 
 const GalleryPage = () => {
     const navigate = useNavigate();
-    const user = JSON.parse(sessionStorage.getItem('userData'));
+    const [user, setUser] = useState(() => {
+        const stored = sessionStorage.getItem('userData');
+        return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    });
+
+    useEffect(() => {
+        const syncUser = () => {
+            const stored = sessionStorage.getItem('userData');
+            setUser((stored && stored !== 'undefined') ? JSON.parse(stored) : null);
+        };
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+        window.addEventListener('focus', syncUser);
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => {
+            window.removeEventListener('focus', syncUser);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
+    }, []);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedImage, setSelectedImage] = useState(null);
 

@@ -31,16 +31,31 @@ const LoginPage = () => {
                 throw new Error(data.message || 'Something went wrong');
             }
 
-            // Save user data/token
-            sessionStorage.setItem('userToken', data.token);
-            sessionStorage.setItem('userData', JSON.stringify(data));
+            // Clear any existing stale data
+            sessionStorage.clear();
 
-            const role = data.role || 'resident';
+            // Save user data/token
+            const userToken = data.token || data.user?.token;
+            if (!userToken) {
+                throw new Error('Authentication failed: No access token received.');
+            }
+
+            // Backend may return user fields at top level OR nested under 'user'
+            // We merge them to be safe, prioritizing the nested user object if it exists
+            const rawUserData = data.user || data;
+            const { token: _t, user: _u, ...baseData } = data;
+            const userData = { ...baseData, ...(data.user || {}) };
+            delete userData.token;
+
+            sessionStorage.setItem('userToken', userToken);
+            sessionStorage.setItem('userData', JSON.stringify(userData));
+
+            // Use the merged role
+            const role = (userData.role || 'resident').toLowerCase();
 
             if (role === 'admin') {
                 navigate('/admin');
             } else {
-                // Check for a redirect URL preserved in search params
                 const params = new URLSearchParams(window.location.search);
                 const redirectTo = params.get('redirect');
                 if (redirectTo) {

@@ -41,9 +41,13 @@ const StaffDashboard = () => {
             return;
         }
 
-        const parsed = JSON.parse(userData);
+        const parsed = (userData && userData !== 'undefined') ? JSON.parse(userData) : null;
+        if (!parsed) {
+            navigate('/login');
+            return;
+        }
         const staffRoles = ['cook', 'room-service', 'cleaner', 'driver', 'plumber', 'admin'];
-        if (!staffRoles.includes(parsed.role)) {
+        if (!staffRoles.includes(parsed.role?.toLowerCase())) {
             navigate('/dashboard');
             return;
         }
@@ -51,6 +55,18 @@ const StaffDashboard = () => {
         setUser(parsed);
         // Cooks default to food orders tab
         if (parsed.role === 'cook') setActiveTab('food');
+
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => window.removeEventListener('storage', handleGlobalLogout);
     }, [navigate]);
 
     const fetchOrders = useCallback(async () => {
@@ -228,6 +244,7 @@ const StaffDashboard = () => {
     const handleLogout = () => {
         sessionStorage.removeItem('userToken');
         sessionStorage.removeItem('userData');
+        localStorage.setItem('luxe-stay-logout', Date.now().toString());
         navigate('/');
     };
 

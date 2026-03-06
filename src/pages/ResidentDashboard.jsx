@@ -9,17 +9,33 @@ const ResidentDashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const userData = sessionStorage.getItem('userData');
-        if (!userData || JSON.parse(userData).role !== 'resident') {
+        const userDataStr = sessionStorage.getItem('userData');
+        const userData = (userDataStr && userDataStr !== 'undefined') ? JSON.parse(userDataStr) : null;
+
+        if (!userData || userData.role?.toLowerCase() !== 'resident') {
             navigate('/login');
         } else {
-            setUser(JSON.parse(userData));
+            setUser(userData);
         }
+
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => window.removeEventListener('storage', handleGlobalLogout);
     }, [navigate]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('userToken');
         sessionStorage.removeItem('userData');
+        localStorage.setItem('luxe-stay-logout', Date.now().toString());
+        setUser(null);
         navigate('/');
     };
 

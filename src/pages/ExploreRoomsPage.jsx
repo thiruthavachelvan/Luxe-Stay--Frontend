@@ -127,7 +127,31 @@ const ExploreRoomsPage = () => {
     const [allLocations, setAllLocations] = useState([]);
     const [roomRatings, setRoomRatings] = useState({});
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const stored = sessionStorage.getItem('userData');
+        return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    });
+
+    useEffect(() => {
+        const syncUser = () => {
+            const stored = sessionStorage.getItem('userData');
+            setUser((stored && stored !== 'undefined') ? JSON.parse(stored) : null);
+        };
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+        window.addEventListener('focus', syncUser);
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => {
+            window.removeEventListener('focus', syncUser);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
+    }, []);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { openId, open, close, refs: dropRefs, Portal } = useDropdown();
@@ -161,10 +185,6 @@ const ExploreRoomsPage = () => {
     const [checkIn] = useState(() => searchParams.get('checkIn') || new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
-        const loadUser = () => setUser(JSON.parse(sessionStorage.getItem('userData') || 'null'));
-        loadUser();
-        window.addEventListener('focus', loadUser);
-
         fetch(`${__API_BASE__}/api/public/locations`)
             .then(r => r.json())
             .then(data => {
@@ -179,8 +199,6 @@ const ExploreRoomsPage = () => {
         const urlRoomType = searchParams.get('roomType');
         if (urlOffer) setActiveOffer({ code: urlOffer, roomType: urlRoomType });
         else if (urlRoomType) setSelectedRoomType(urlRoomType);
-
-        return () => window.removeEventListener('focus', loadUser);
     }, [searchParams]);
 
     useEffect(() => {

@@ -78,7 +78,10 @@ const RoomDetailPage = () => {
 
     /* Room data */
     const [room, setRoom] = useState(null);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const stored = sessionStorage.getItem('userData');
+        return (stored && stored !== 'undefined') ? JSON.parse(stored) : null;
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -112,10 +115,25 @@ const RoomDetailPage = () => {
 
     /* ── Load User ── */
     useEffect(() => {
-        const loadUser = () => setUser(JSON.parse(sessionStorage.getItem('userData') || 'null'));
-        loadUser();
-        window.addEventListener('focus', loadUser);
-        return () => window.removeEventListener('focus', loadUser);
+        const syncUser = () => {
+            const stored = sessionStorage.getItem('userData');
+            setUser((stored && stored !== 'undefined') ? JSON.parse(stored) : null);
+        };
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('userData');
+                setUser(null);
+                navigate('/');
+            }
+        };
+        syncUser();
+        window.addEventListener('focus', syncUser);
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => {
+            window.removeEventListener('focus', syncUser);
+            window.removeEventListener('storage', handleGlobalLogout);
+        };
     }, []);
 
     /* ── Fetch room ── */

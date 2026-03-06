@@ -136,20 +136,37 @@ const UserDashboard = () => {
     };
 
     useEffect(() => {
-        const storedUser = JSON.parse(sessionStorage.getItem('userData'));
-        if (!storedUser) {
+        const stored = sessionStorage.getItem('userData');
+        if (!stored || stored === 'undefined') {
             navigate('/login');
-        } else {
-            setUser(storedUser);
-            fetchAllData();
-
-            // Check URL for section routing
-            const params = new URLSearchParams(window.location.search);
-            const section = params.get('section');
-            if (section && ['dashboard', 'bookings', 'dining', 'reviews', 'profile', 'payment', 'support', 'membership'].includes(section)) {
-                setActiveSection(section);
-            }
+            return;
         }
+
+        const userData = JSON.parse(stored);
+        setUser(userData);
+        setProfileFormData(userData);
+        fetchAllData().catch(err => {
+            console.error('Initial fetch failed:', err);
+            setLoading(false);
+        });
+
+        // Check URL for section routing
+        const params = new URLSearchParams(window.location.search);
+        const section = params.get('section');
+        if (section && ['dashboard', 'bookings', 'dining', 'reviews', 'profile', 'payment', 'support', 'membership'].includes(section)) {
+            setActiveSection(section);
+        }
+
+        const handleGlobalLogout = (e) => {
+            if (e.key === 'luxe-stay-logout') {
+                sessionStorage.clear();
+                setUser(null);
+                navigate('/');
+            }
+        };
+
+        window.addEventListener('storage', handleGlobalLogout);
+        return () => window.removeEventListener('storage', handleGlobalLogout);
     }, [navigate, window.location.search]);
 
     const fetchAllData = async () => {
@@ -160,7 +177,14 @@ const UserDashboard = () => {
         try {
             // Fetch Profile
             const profileRes = await fetch(`${__API_BASE__}/api/auth/profile`, { headers });
-            if (profileRes.ok) setProfile(await profileRes.json());
+            if (profileRes.ok) {
+                setProfile(await profileRes.json());
+            } else if (profileRes.status === 401) {
+                // If token is invalid/expired, redirect to login
+                sessionStorage.clear();
+                navigate('/login');
+                return;
+            }
 
             // Fetch Bookings
             const bookingsRes = await fetch(`${__API_BASE__}/api/auth/my-bookings`, { headers });
@@ -200,7 +224,7 @@ const UserDashboard = () => {
         }
     };
 
-    if (loading && !profile?.fullName) {
+    if (loading && !profile) {
         return (
             <div className="min-h-screen bg-navy-950 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070')] bg-cover bg-center opacity-20" />
@@ -431,8 +455,8 @@ const UserDashboard = () => {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('userData');
-        sessionStorage.removeItem('userToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('userToken');
         navigate('/');
     };
 
