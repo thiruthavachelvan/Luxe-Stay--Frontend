@@ -390,7 +390,7 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                             </h4>
                             <p className="text-sm text-gray-400 mb-6">Select items from our menu to have them prepared for your arrival.</p>
 
-                            <div className="space-y-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="space-y-12">
                                 {Object.entries(
                                     menuItems.reduce((acc, item) => {
                                         const cat = item.category || 'Other';
@@ -399,41 +399,47 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                                         return acc;
                                     }, {})
                                 ).map(([category, items]) => (
-                                    <div key={category} className="space-y-4">
-                                        <h5 className="text-[10px] font-bold text-luxury-muted uppercase tracking-[0.2em] border-b border-white/5 pb-2">{category}</h5>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div key={category} className="space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            <h5 className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] italic whitespace-nowrap">{category}</h5>
+                                            <div className="h-px w-full bg-gold-400/20"></div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
                                             {items.map(item => (
-                                                <div key={item._id} className="bg-[#0F1626] p-4 rounded-xl border border-white/5 flex items-center justify-between group hover:border-white/20 transition-colors relative">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <h5 className="text-white font-medium">{item.name}</h5>
+                                                <div key={item._id} className="bg-white/5 p-5 rounded-2xl border border-white/5 flex flex-wrap items-center justify-between gap-4 group hover:border-gold-400/30 transition-all duration-500 relative overflow-hidden">
+                                                    <div className="flex-1 min-w-[140px]">
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <h5 className="text-sm font-bold text-white uppercase tracking-tighter group-hover:text-gold-400 transition-colors">{item.name}</h5>
                                                             {item.isSpecial && (
-                                                                <span className="px-2 py-0.5 bg-[#D4AF37]/20 text-[#D4AF37] text-[8px] font-bold uppercase tracking-wider rounded">Signature</span>
+                                                                <span className="px-2 py-0.5 bg-gold-400/20 text-gold-400 text-[8px] font-black uppercase tracking-widest rounded-lg border border-gold-400/20 italic">Signature</span>
                                                             )}
                                                         </div>
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-[#D4AF37] text-sm font-bold">₹{item.price}</span>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-gold-400 text-sm font-bold flex items-baseline gap-1">
+                                                                <span className="text-[9px] opacity-40">INR</span>
+                                                                {item.price}
+                                                            </span>
                                                             {item.isComplimentary && (
-                                                                <span className="text-[9px] text-green-400 font-bold uppercase tracking-widest">Complimentary</span>
+                                                                <span className="text-[9px] text-emerald-400 font-black uppercase tracking-widest italic animate-pulse">Benefit</span>
                                                             )}
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-3 bg-[#1A2235] rounded-lg p-1">
+                                                    <div className="flex items-center gap-2 bg-navy-950/40 rounded-xl p-1 border border-white/5 shadow-inner">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleMealSelection(item._id, -1)}
-                                                            className="w-8 h-8 rounded-md bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors"
+                                                            className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all active:scale-95 text-xl font-light"
                                                         >
                                                             -
                                                         </button>
-                                                        <span className="w-4 text-center text-white text-sm font-medium">
+                                                        <span className="w-6 text-center text-white text-xs font-black tracking-tighter">
                                                             {selectedMeals[item._id] || 0}
                                                         </span>
                                                         <button
                                                             type="button"
                                                             onClick={() => handleMealSelection(item._id, 1)}
-                                                            className="w-8 h-8 rounded-md bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center transition-colors"
+                                                            className="w-10 h-10 rounded-lg bg-gold-400/10 hover:bg-gold-400/20 text-gold-400 flex items-center justify-center transition-all active:scale-95 text-xl font-light"
                                                         >
                                                             +
                                                         </button>

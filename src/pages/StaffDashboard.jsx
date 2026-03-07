@@ -1,11 +1,11 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     User, LogOut, Clock, CheckCircle2,
     ClipboardList, Car, ConciergeBell, Pipette, Eraser,
     Utensils, RefreshCw, Package, ChefHat,
-    Wind, Flower2, BellRing, Play
+    Wind, Flower2, BellRing, Play, Menu, X
 } from 'lucide-react';
 
 const STATUS_COLORS = {
@@ -30,6 +30,8 @@ const StaffDashboard = () => {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const contentRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -155,6 +157,14 @@ const StaffDashboard = () => {
         }
     }, [user, fetchOrders, fetchServiceRequests, fetchNotifications, fetchUserProfile]);
 
+    useEffect(() => {
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [activeTab]);
+
     const handleCompleteOrder = async (orderId) => {
         setCompletingId(orderId);
         try {
@@ -279,10 +289,18 @@ const StaffDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-navy-950 text-white font-sans flex selection:bg-gold-500/30">
+        <div className="min-h-screen bg-navy-950 text-white font-sans flex selection:bg-gold-500/30 overflow-x-hidden">
+            {/* Sidebar / Mobile Drawer Overlay */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-navy-950/60 backdrop-blur-sm z-[55] lg:hidden"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="fixed inset-y-0 left-0 w-72 bg-navy-900/50 backdrop-blur-2xl border-r border-white/10 z-[60] hidden lg:flex flex-col">
-                <div className="p-8 border-b border-white/10 bg-navy-950/20">
+            <aside className={`fixed inset-y-0 left-0 w-72 bg-navy-900/95 lg:bg-navy-900/50 backdrop-blur-2xl border-r border-white/10 z-[60] transition-transform duration-500 lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
+                <div className="p-8 border-b border-white/10 bg-navy-950/20 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center border border-gold-500/20">
                             <roleConfig.icon className={`w-5 h-5 ${roleConfig.color.replace('luxury-gold', 'gold-500')}`} />
@@ -292,11 +310,18 @@ const StaffDashboard = () => {
                             <p className="text-[10px] text-gold-500 font-bold uppercase tracking-[0.2em] -mt-1">Staff Command</p>
                         </div>
                     </div>
+                    {/* Mobile Close Button */}
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-2 text-gray-400 hover:text-white transition-colors">
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
 
                 <nav className="flex-1 p-6 space-y-2 mt-4">
                     <button
-                        onClick={() => setActiveTab(user.role === 'cook' ? 'food' : 'service')}
+                        onClick={() => {
+                            setActiveTab(user.role === 'cook' ? 'food' : 'service');
+                            setIsMobileMenuOpen(false);
+                        }}
                         className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 group ${(activeTab === 'service' || activeTab === 'food')
                             ? 'bg-gold-500 text-navy-950 shadow-lg shadow-gold-500/20'
                             : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
@@ -307,7 +332,10 @@ const StaffDashboard = () => {
                     </button>
 
                     <button
-                        onClick={() => setActiveTab('profile')}
+                        onClick={() => {
+                            setActiveTab('profile');
+                            setIsMobileMenuOpen(false);
+                        }}
                         className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'profile'
                             ? 'bg-gold-500 text-navy-950 shadow-lg shadow-gold-500/20'
                             : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
@@ -348,10 +376,21 @@ const StaffDashboard = () => {
             {/* Main Content */}
             <div className="flex-1 lg:ml-72 flex flex-col min-h-screen bg-[#020617]">
                 {/* Header */}
-                <header className="h-24 px-10 flex items-center justify-between bg-navy-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
-                    <div>
-                        <h2 className="text-2xl font-bold text-white font-serif italic capitalize">{roleConfig.label}</h2>
-                        <p className="text-[10px] text-gray-500 uppercase tracking-[0.34em] font-medium mt-1">Uplink: Active • Terminal: {user.email.split('@')[0]}</p>
+                <header className="h-20 lg:h-24 px-6 lg:px-10 flex items-center justify-between bg-navy-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+                    <div className="flex items-center gap-4">
+                        {/* Mobile Menu Toggle */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2 bg-white/5 rounded-xl border border-white/10 text-gold-500 hover:bg-gold-500/10 transition-all"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <div>
+                            <h2 className="text-xl lg:text-2xl font-bold text-white font-serif italic capitalize">{roleConfig.label}</h2>
+                            <p className="text-[8px] lg:text-[10px] text-gray-500 uppercase tracking-[0.2em] lg:tracking-[0.34em] font-medium mt-0.5 lg:mt-1 truncate max-w-[150px] lg:max-w-none">
+                                {user.fullName} • {user.email.split('@')[0]}
+                            </p>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -440,7 +479,7 @@ const StaffDashboard = () => {
                     </div>
                 </header>
 
-                <main className="p-10 flex-1 space-y-10 max-w-7xl mx-auto w-full">
+                <main className="p-6 lg:p-10 flex-1 space-y-10 max-w-7xl mx-auto w-full pb-32 lg:pb-10">
                     {/* Success Banner */}
                     {successMsg && (
                         <div className="p-5 bg-green-500/10 border border-green-500/30 text-green-400 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-500">
@@ -472,7 +511,7 @@ const StaffDashboard = () => {
                     </div>
 
                     {/* CONTENT TABLES */}
-                    <div className="bg-navy-900/50 rounded-3xl border border-white/10 shadow-2xl overflow-hidden min-h-[500px] glass-panel">
+                    <div ref={contentRef} className="bg-navy-900/50 rounded-3xl border border-white/10 shadow-2xl overflow-hidden min-h-[500px] glass-panel">
                         <div className="p-8 border-b border-white/10 bg-white/5 flex items-center justify-between">
                             <h3 className="text-xl font-bold text-white font-serif italic">
                                 {activeTab === 'service' ? 'Service Mission Log' :
@@ -715,9 +754,36 @@ const StaffDashboard = () => {
                     </div>
                 </main>
 
-                <footer className="p-10 text-center opacity-20 border-t border-white/5">
+                <footer className="p-10 pb-32 lg:pb-10 text-center opacity-20 border-t border-white/5">
                     <p className="text-[9px] font-bold uppercase tracking-[0.6em] text-gray-500">Secure Staff Uplink v4.5.1 • Encryption: AES-256 • LuxeStays Internal Network</p>
                 </footer>
+
+                {/* Mobile Bottom Navigation */}
+                <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-navy-950/90 backdrop-blur-2xl border-t border-white/10 px-6 py-4 z-[100] flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+                    <button
+                        onClick={() => setActiveTab(user.role === 'cook' ? 'food' : 'service')}
+                        className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${activeTab !== 'profile' ? 'text-gold-500' : 'text-gray-500 hover:text-white'}`}
+                    >
+                        {user.role === 'cook' ? <Utensils className="w-5 h-5" /> : <ClipboardList className="w-5 h-5" />}
+                        <span className="text-[9px] font-black uppercase tracking-widest">Tasks</span>
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab('profile')}
+                        className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${activeTab === 'profile' ? 'text-gold-500' : 'text-gray-500 hover:text-white'}`}
+                    >
+                        <User className="w-5 h-5" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">Profile</span>
+                    </button>
+
+                    <button
+                        onClick={handleLogout}
+                        className="flex flex-col items-center gap-1.5 text-rose-500 hover:text-rose-400 transition-all duration-300"
+                    >
+                        <LogOut className="w-5 h-5" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">Terminate</span>
+                    </button>
+                </nav>
             </div>
         </div>
     );

@@ -10,8 +10,10 @@ import {
     ChevronRight,
     Star,
     Bell,
-    ShieldCheck
+    ShieldCheck,
+    Loader2
 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -73,6 +75,13 @@ const MenuPage = () => {
             const response = await fetch(url, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+
+            if (response.status === 401) {
+                sessionStorage.clear();
+                navigate('/login');
+                return;
+            }
+
             const data = await response.json();
             if (response.ok) setMenuItems(data);
         } catch (err) {
@@ -127,7 +136,6 @@ const MenuPage = () => {
         try {
             const token = sessionStorage.getItem('userToken');
 
-            // Load Razorpay Script
             const resScript = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
             if (!resScript) {
                 alert('Razorpay SDK failed to load. Are you online?');
@@ -135,7 +143,6 @@ const MenuPage = () => {
                 return;
             }
 
-            // Create Order
             const orderRes = await fetch(`${__API_BASE__}/api/payment/create-order`, {
                 method: 'POST',
                 headers: {
@@ -144,6 +151,12 @@ const MenuPage = () => {
                 },
                 body: JSON.stringify({ amount: cartTotal })
             });
+
+            if (orderRes.status === 401) {
+                sessionStorage.clear();
+                navigate('/login');
+                return;
+            }
 
             if (!orderRes.ok) {
                 alert('Server error creating order.');
@@ -169,7 +182,6 @@ const MenuPage = () => {
                 handler: async function (response) {
                     setIsProcessing(true);
 
-                    // Verify Payment
                     const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
                         method: 'POST',
                         headers: {
@@ -183,9 +195,14 @@ const MenuPage = () => {
                         })
                     });
 
+                    if (verifyRes.status === 401) {
+                        sessionStorage.clear();
+                        navigate('/login');
+                        return;
+                    }
+
                     const verifyData = await verifyRes.json();
                     if (verifyData.success) {
-                        // Place Food Order
                         const responseOrder = await fetch(`${__API_BASE__}/api/auth/food-order`, {
                             method: 'POST',
                             headers: {
@@ -200,10 +217,15 @@ const MenuPage = () => {
                         });
 
                         if (responseOrder.ok) {
-                            alert('Payment successful & Order placed! It will be delivered to your room shortly.');
+                            alert('Order successful! Your gourmet meal will be delivered shortly.');
                             setCart([]);
                             setIsCartOpen(false);
                         } else {
+                            if (responseOrder.status === 401) {
+                                sessionStorage.clear();
+                                navigate('/login');
+                                return;
+                            }
                             alert('Payment successful, but failed to place order. Please contact reception.');
                         }
                     } else {
@@ -212,8 +234,8 @@ const MenuPage = () => {
                     setIsProcessing(false);
                 },
                 prefill: {
-                    name: "LuxeStay Guest",
-                    email: "guest@example.com",
+                    name: user?.fullName || "LuxeStay Guest",
+                    email: user?.email || "",
                 },
                 theme: {
                     color: "#D4AF37"
@@ -235,59 +257,55 @@ const MenuPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-luxury-dark text-white font-sans">
+        <div className="min-h-screen bg-navy-950 text-white font-sans selection:bg-gold-400 selection:text-navy-950">
             {/* Header */}
-            <header className="fixed top-0 inset-x-0 h-24 bg-luxury-dark/80 backdrop-blur-xl border-b border-luxury-border/30 z-50 px-8 flex items-center justify-between">
+            <header className="fixed top-0 inset-x-0 h-24 bg-navy-950/40 backdrop-blur-2xl border-b border-white/5 z-50 px-8 flex items-center justify-between">
                 <div className="flex items-center gap-6">
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="w-11 h-11 rounded-xl border border-luxury-border/30 flex items-center justify-center hover:bg-white/5 transition-all text-luxury-muted hover:text-white"
+                        className="w-11 h-11 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-white/40 hover:text-white"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold font-serif italic tracking-wide">Culinary Palette</h1>
-                        <p className="text-[10px] font-bold text-luxury-blue uppercase tracking-[0.3em] mt-0.5">LuxeStays In-Room Dining</p>
+                        <h1 className="text-2xl font-serif italic text-white tracking-wide">Culinary Palette</h1>
+                        <p className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] mt-1">Private Luxe Dining</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-6">
                     <div className="relative group hidden md:block">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-luxury-muted group-focus-within:text-luxury-blue transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-gold-400 transition-colors" />
                         <input
                             type="text"
                             placeholder="Discover delicacies..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-luxury-card border border-luxury-border/30 rounded-xl py-2.5 pl-11 pr-5 text-sm focus:outline-none focus:border-luxury-blue/50 focus:ring-4 focus:ring-luxury-blue/5 transition-all w-64"
+                            className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-5 text-sm focus:outline-none focus:border-gold-400/40 focus:ring-4 focus:ring-gold-400/5 transition-all w-72 placeholder:text-white/10"
                         />
                     </div>
-                    <button onClick={() => setIsCartOpen(true)} className="relative px-6 py-2.5 bg-luxury-blue text-white rounded-xl font-bold hover:bg-luxury-blue-hover transition-all shadow-xl shadow-luxury-blue/30 active:scale-95 flex items-center gap-2">
-                        <Utensils className="w-4 h-4" />
-                        View Cart
+                    <button onClick={() => setIsCartOpen(true)} className="relative group px-8 py-3 bg-gold-400 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-2xl shadow-gold-400/10 active:scale-95 flex items-center gap-3">
+                        <Utensils className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                        Access Cart
                         {cart.length > 0 && (
-                            <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full font-bold border-2 border-luxury-dark shadow-lg">
+                            <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full font-black border-2 border-navy-950 shadow-lg">
                                 {cart.length}
                             </span>
                         )}
                     </button>
-                    <button className="relative w-11 h-11 bg-luxury-card border border-luxury-border/30 rounded-xl flex items-center justify-center text-luxury-muted hover:text-white transition-all">
-                        <Bell className="w-5 h-5" />
-                        <span className="absolute top-2 right-2.5 w-2 h-2 bg-luxury-blue border-2 border-luxury-card rounded-full"></span>
-                    </button>
                 </div>
             </header>
 
-            <main className="pt-32 pb-20 px-8 max-w-7xl mx-auto">
+            <main className="pt-36 pb-24 px-8 max-w-7xl mx-auto">
                 {/* Categories */}
-                <div className="flex gap-4 overflow-x-auto pb-8 no-scrollbar scroll-smooth">
+                <div className="flex flex-wrap gap-4 pb-12 scroll-smooth">
                     {categories.map(cat => (
                         <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-8 py-3.5 rounded-2xl font-bold text-[10px] uppercase tracking-widest whitespace-nowrap transition-all border ${selectedCategory === cat
-                                ? 'bg-luxury-blue border-luxury-blue text-white shadow-xl shadow-luxury-blue/20'
-                                : 'bg-luxury-card border-luxury-border/30 text-luxury-muted hover:text-white hover:border-luxury-blue/30'
+                            className={`px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all duration-500 border ${selectedCategory === cat
+                                ? 'bg-gold-400 border-gold-400 text-navy-950 shadow-2xl shadow-gold-400/20 scale-105'
+                                : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-gold-400/40'
                                 }`}
                         >
                             {cat}
@@ -295,95 +313,127 @@ const MenuPage = () => {
                     ))}
                 </div>
 
-                {/* Menu Grid */}
+                {/* Menu Sections by Category */}
                 {fetchingMenu ? (
-                    <div className="py-40 text-center">
-                        <div className="w-12 h-12 border-4 border-luxury-blue/20 border-t-luxury-blue rounded-full animate-spin mx-auto mb-6"></div>
-                        <p className="text-luxury-muted uppercase tracking-[0.2em] font-bold text-xs animate-pulse">Synchronizing with Sanctuary Kitchen...</p>
+                    <div className="py-48 text-center bg-white/[0.01] rounded-[3rem] border border-white/5">
+                        <div className="w-12 h-12 border-2 border-gold-400/10 border-t-gold-400 rounded-full animate-spin mx-auto mb-8"></div>
+                        <p className="text-white/20 uppercase tracking-[0.6em] font-black text-[10px] animate-pulse">Syncing Private Registry...</p>
                     </div>
                 ) : filteredItems.length === 0 ? (
-                    <div className="py-40 text-center bg-luxury-card rounded-[3rem] border border-luxury-border/20 border-dashed">
-                        <Utensils className="w-16 h-16 text-luxury-muted/20 mx-auto mb-6" />
-                        <h3 className="text-xl font-bold text-white mb-2">No Delicacies Found</h3>
-                        <p className="text-muted-foreground text-sm">Our chefs are currently curating new inspirations for this category.</p>
+                    <div className="py-48 text-center glass-panel rounded-[3rem] border-dashed">
+                        <Utensils className="w-20 h-20 text-white/5 mx-auto mb-8" />
+                        <h3 className="text-2xl font-serif italic text-white/40 mb-3">No Delicacies Found</h3>
+                        <p className="text-white/20 text-xs font-bold uppercase tracking-widest">Our stewards are curating new inspirations.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredItems.map(item => (
-                            <div key={item._id} className="bg-luxury-card rounded-[2.5rem] border border-luxury-border/30 overflow-hidden group hover:border-luxury-blue/50 transition-all shadow-2xl flex flex-col h-full relative">
-                                {item.isSpecial && (
-                                    <div className="absolute top-6 left-6 z-10 px-4 py-1.5 bg-luxury-blue/90 backdrop-blur-md text-white text-[8px] font-bold uppercase tracking-[0.2em] rounded-full shadow-lg border border-white/20">
-                                        Signature Dish
-                                    </div>
-                                )}
+                    <div className="space-y-24">
+                        {(selectedCategory === 'All Categories'
+                            ? Array.from(new Set(filteredItems.map(i => i.category)))
+                            : [selectedCategory]
+                        ).map(category => {
+                            const itemsInCategory = filteredItems.filter(i => i.category === category);
+                            if (itemsInCategory.length === 0) return null;
 
-                                <div className="h-64 overflow-hidden relative">
-                                    <img
-                                        src={item.image || `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800`}
-                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                                        alt={item.name}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-luxury-dark via-transparent to-transparent opacity-60"></div>
-                                </div>
-
-                                <div className="p-8 flex-1 flex flex-col">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <h3 className="text-xl font-bold text-white font-serif italic group-hover:text-luxury-blue transition-colors line-clamp-1">{item.name}</h3>
-                                        <div className="flex items-center gap-1">
-                                            {item.dietaryType === 'Veg' ? (
-                                                <div className="w-4 h-4 border border-green-500 flex items-center justify-center rounded-[2px] p-[2px]">
-                                                    <div className="w-full h-full bg-green-500 rounded-full"></div>
-                                                </div>
-                                            ) : (
-                                                <div className="w-4 h-4 border border-red-500 flex items-center justify-center rounded-[2px] p-[2px]">
-                                                    <div className="w-full h-full bg-red-500 rounded-full"></div>
-                                                </div>
-                                            )}
-                                        </div>
+                            return (
+                                <section key={category} className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                                    <div className="flex items-center gap-6 mb-12">
+                                        <h2 className="text-[10px] font-black text-gold-400 uppercase tracking-[0.6em] italic whitespace-nowrap">{category}</h2>
+                                        <div className="h-px w-full bg-gradient-to-r from-gold-400/20 to-transparent"></div>
                                     </div>
 
-                                    <p className="text-xs text-luxury-muted leading-relaxed font-medium line-clamp-2 mb-6">{item.description}</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                                        {itemsInCategory.map((item, i) => (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 20 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.05 }}
+                                                key={item._id}
+                                                className="glass-panel rounded-[2.5rem] overflow-hidden group hover:border-gold-400/40 transition-all duration-700 shadow-2xl flex flex-col h-full relative bg-white/[0.01]"
+                                            >
+                                                {item.isSpecial && (
+                                                    <div className="absolute top-6 left-6 z-10 px-5 py-2 bg-gold-400/90 backdrop-blur-xl text-navy-950 text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-2xl border border-white/20 italic">
+                                                        Signature Asset
+                                                    </div>
+                                                )}
 
-                                    <div className="flex flex-wrap gap-4 mb-8">
-                                        <div className="flex items-center gap-2 text-[10px] font-bold text-white/70 uppercase tracking-widest">
-                                            <Clock className="w-3.5 h-3.5 text-luxury-blue" />
-                                            {item.preparationTime || 20} Min
-                                        </div>
-                                        <div className="flex items-center gap-2 text-[10px] font-bold text-white/70 uppercase tracking-widest">
-                                            <Flame className="w-3.5 h-3.5 text-orange-500" />
-                                            {item.calories || 450} Kcal
-                                        </div>
-                                    </div>
+                                                <div className="h-72 overflow-hidden relative">
+                                                    <img
+                                                        src={item.image || `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800`}
+                                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 contrast-125"
+                                                        alt={item.name}
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity"></div>
+                                                </div>
 
-                                    <div className="mt-auto pt-6 border-t border-luxury-border/20 flex items-center justify-between">
-                                        <div>
-                                            {item.isComplimentary ? (
-                                                <div className="bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-lg">
-                                                    <span className="text-xl font-bold text-green-400 font-serif italic">Complimentary</span>
+                                                <div className="p-10 flex-1 flex flex-col">
+                                                    <div className="flex items-start justify-between mb-4">
+                                                        <h3 className="text-2xl font-serif italic text-white group-hover:text-gold-400 transition-colors leading-tight">{item.name}</h3>
+                                                        <div className="pt-1">
+                                                            {item.dietaryType === 'Veg' ? (
+                                                                <div className="w-4 h-4 border border-emerald-500 flex items-center justify-center rounded-[3px] p-[2px]">
+                                                                    <div className="w-full h-full bg-emerald-500 rounded-full"></div>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="w-4 h-4 border border-rose-500 flex items-center justify-center rounded-[3px] p-[2px]">
+                                                                    <div className="w-full h-full bg-rose-500 rounded-full"></div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="text-[11px] text-white/30 leading-relaxed font-medium uppercase tracking-wider mb-8 flex-1 line-clamp-2">{item.description}</p>
+
+                                                    <div className="flex items-center gap-6 mb-10 pt-6 border-t border-white/5">
+                                                        <div className="flex items-center gap-2.5 text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">
+                                                            <Clock className="w-4 h-4 text-gold-400/60" />
+                                                            {item.preparationTime || 20} Min Wait
+                                                        </div>
+                                                        <div className="flex items-center gap-2.5 text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">
+                                                            <Flame className="w-4 h-4 text-rose-500/60" />
+                                                            {item.calories || 450} Cal
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-wrap items-center justify-between gap-4 mt-auto">
+                                                        <div className="min-w-fit">
+                                                            {item.isComplimentary ? (
+                                                                <div className="flex flex-col gap-1">
+                                                                    <p className="text-lg font-serif italic text-white/20 line-through decoration-gold-400/20 flex items-baseline gap-1">
+                                                                        <span className="text-[10px] font-black uppercase tracking-tighter">INR</span>
+                                                                        {item.price}
+                                                                    </p>
+                                                                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-lg border border-emerald-400/20 italic">Executive Benefit</span>
+                                                                </div>
+                                                            ) : (
+                                                                <p className="text-2xl font-serif italic text-white flex items-baseline gap-1">
+                                                                    <span className="text-xs font-black uppercase tracking-tighter text-gold-400/50">INR</span>
+                                                                    {item.price}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        {(() => {
+                                                            const cartItem = cart.find(c => c.menuItem._id === item._id);
+                                                            return cartItem ? (
+                                                                <div className="flex items-center bg-white/5 rounded-xl border border-white/10 p-1 backdrop-blur-md">
+                                                                    <button onClick={() => decreaseQuantity(item._id)} className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-all active:scale-90 text-xl font-light">-</button>
+                                                                    <span className="w-8 text-center text-xs font-black text-white tracking-widest">{cartItem.quantity}</span>
+                                                                    <button onClick={() => addToCart(item)} className="w-8 h-8 flex items-center justify-center text-gold-400 hover:bg-gold-400/10 rounded-lg transition-all active:scale-90 text-xl font-light">+</button>
+                                                                </div>
+                                                            ) : (
+                                                                <button onClick={() => addToCart(item)} className="px-6 py-3 bg-gold-400 text-navy-950 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-white transition-all shadow-xl shadow-gold-400/10 active:scale-95 whitespace-nowrap">
+                                                                    Add to Order
+                                                                </button>
+                                                            );
+                                                        })()}
+                                                    </div>
                                                 </div>
-                                            ) : (
-                                                <p className="text-2xl font-bold text-white font-serif">₹{item.price}</p>
-                                            )}
-                                        </div>
-                                        {(() => {
-                                            const cartItem = cart.find(c => c.menuItem._id === item._id);
-                                            return cartItem ? (
-                                                <div className="flex items-center bg-[#1A1D27] rounded-xl border border-luxury-border/30 p-1">
-                                                    <button onClick={() => decreaseQuantity(item._id)} className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors active:scale-95 text-xl font-medium leading-none mb-0.5">-</button>
-                                                    <span className="w-8 text-center text-sm font-bold text-white">{cartItem.quantity}</span>
-                                                    <button onClick={() => addToCart(item)} className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors active:scale-95 text-xl font-medium leading-none mb-0.5">+</button>
-                                                </div>
-                                            ) : (
-                                                <button onClick={() => addToCart(item)} className="flex items-center gap-2 px-6 py-2.5 bg-luxury-blue text-white rounded-xl font-bold text-xs hover:bg-luxury-blue-hover transition-all shadow-lg active:scale-95 group/btn">
-                                                    Add to Cart
-                                                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                                </button>
-                                            );
-                                        })()}
+                                            </motion.div>
+                                        ))}
                                     </div>
-                                </div>
-                            </div>
-                        ))}
+                                </section>
+                            );
+                        })}
                     </div>
                 )}
             </main>
@@ -391,70 +441,86 @@ const MenuPage = () => {
             {/* Cart Sidebar */}
             {isCartOpen && (
                 <div className="fixed inset-0 z-[100] flex justify-end">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
-                    <div className="relative w-full max-w-md bg-luxury-dark border-l border-luxury-border/30 h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-                        <div className="p-8 border-b border-luxury-border/30 flex items-center justify-between bg-luxury-card/50">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-navy-950/80 backdrop-blur-xl" onClick={() => setIsCartOpen(false)}></motion.div>
+                    <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        className="relative w-full max-w-lg bg-navy-900 border-l border-white/5 h-full shadow-2xl flex flex-col"
+                    >
+                        <div className="p-12 border-b border-white/5 flex items-center justify-between">
                             <div>
-                                <h2 className="text-2xl font-bold text-white font-serif italic">Your Plate</h2>
-                                <p className="text-[10px] text-luxury-muted uppercase tracking-widest font-bold mt-1">{cart.length} Items Selected</p>
+                                <h2 className="text-4xl font-serif italic text-white">Your Selection</h2>
+                                <p className="text-[10px] text-gold-400 uppercase tracking-[0.4em] font-black mt-2">{cart.length} Assets Identified</p>
                             </div>
-                            <button onClick={() => setIsCartOpen(false)} className="w-10 h-10 rounded-full border border-luxury-border/30 flex items-center justify-center text-luxury-muted hover:text-white hover:bg-white/5 transition-all">
-                                ✕
+                            <button onClick={() => setIsCartOpen(false)} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all">
+                                <ArrowLeft className="w-5 h-5 opacity-40 rotate-180" />
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+                        <div className="flex-1 overflow-y-auto p-12 space-y-8 custom-scrollbar">
                             {cart.length === 0 ? (
-                                <div className="text-center text-luxury-muted italic mt-20">Your plate is currently empty.</div>
+                                <div className="text-center py-20">
+                                    <Utensils className="w-20 h-20 text-white/5 mx-auto mb-6" />
+                                    <p className="text-white/20 font-serif italic">Your plate is currently vacant.</p>
+                                </div>
                             ) : (
                                 cart.map((cartItem, index) => (
-                                    <div key={index} className="flex gap-4 items-center bg-luxury-card p-4 rounded-2xl border border-luxury-border/30">
-                                        <img src={cartItem.menuItem.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200"} className="w-20 h-20 object-cover rounded-xl" alt={cartItem.menuItem.name} />
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-bold text-white line-clamp-1">{cartItem.menuItem.name}</h4>
+                                    <div key={index} className="flex gap-8 items-center glass-panel p-6 rounded-3xl border-white/5 group">
+                                        <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-2xl shrink-0">
+                                            <img src={cartItem.menuItem.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200"} className="w-full h-full object-cover contrast-110" alt={cartItem.menuItem.name} />
+                                        </div>
+                                        <div className="flex-1 space-y-4">
+                                            <div className="flex justify-between items-start">
+                                                <h4 className="text-lg font-serif italic text-white group-hover:text-gold-400 transition-colors uppercase tracking-tighter">{cartItem.menuItem.name}</h4>
+                                                <button onClick={() => removeFromCart(cartItem.menuItem._id)} className="text-white/10 hover:text-rose-500 transition-colors p-1">
+                                                    ✕
+                                                </button>
+                                            </div>
 
-                                            <div className="flex items-center justify-between mt-3">
-                                                <div className="flex items-center bg-[#1A1D27] rounded-lg border border-luxury-border/30 p-1">
-                                                    <button onClick={() => decreaseQuantity(cartItem.menuItem._id)} className="w-7 h-7 flex items-center justify-center text-white hover:bg-white/10 rounded-md transition-colors active:scale-95 text-lg font-medium leading-none">-</button>
-                                                    <span className="w-8 text-center text-xs font-bold text-white">{cartItem.quantity}</span>
-                                                    <button onClick={() => addToCart(cartItem.menuItem)} className="w-7 h-7 flex items-center justify-center text-white hover:bg-white/10 rounded-md transition-colors active:scale-95 text-lg font-medium leading-none">+</button>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center bg-white/5 rounded-xl border border-white/5 p-1">
+                                                    <button onClick={() => decreaseQuantity(cartItem.menuItem._id)} className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white transition-colors">-</button>
+                                                    <span className="w-8 text-center text-[10px] font-black text-white">{cartItem.quantity}</span>
+                                                    <button onClick={() => addToCart(cartItem.menuItem)} className="w-8 h-8 flex items-center justify-center text-gold-400">+</button>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-[10px] text-luxury-muted font-bold tracking-wider uppercase">₹{cartItem.priceAtOrder} each</p>
-                                                    <p className="text-sm font-bold text-luxury-blue mt-0.5">₹{cartItem.priceAtOrder * cartItem.quantity}</p>
+                                                    <p className="text-[9px] text-white/20 font-black tracking-widest uppercase">Portfolio Value</p>
+                                                    <p className="text-lg font-serif italic text-gold-400 leading-none mt-1">₹{(cartItem.priceAtOrder * cartItem.quantity).toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={() => removeFromCart(cartItem.menuItem._id)} className="text-luxury-muted hover:text-red-500 transition-colors p-2">
-                                            ✕
-                                        </button>
                                     </div>
                                 ))
                             )}
                         </div>
 
-                        <div className="p-8 border-t border-luxury-border/30 bg-luxury-card/50 mt-auto">
-                            <div className="flex items-center justify-between mb-6">
-                                <span className="text-sm font-bold text-luxury-muted uppercase tracking-widest">Total Bill</span>
-                                <span className="text-3xl font-bold text-white font-serif italic">₹{cartTotal.toLocaleString()}</span>
+                        <div className="p-12 border-t border-white/5 bg-navy-950/40 mt-auto">
+                            <div className="flex items-center justify-between mb-10">
+                                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">Consolidated Total</span>
+                                <span className="text-5xl font-serif italic text-white">₹{cartTotal.toLocaleString()}</span>
                             </div>
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={cart.length === 0 || isProcessing}
-                                className="w-full py-4 bg-luxury-blue text-white rounded-xl font-bold text-sm shadow-xl shadow-luxury-blue/20 hover:bg-luxury-blue-hover transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                className="w-full py-6 bg-gold-400 text-navy-950 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] overflow-hidden shadow-[0_20px_50px_rgba(212,175,55,0.2)] hover:bg-white hover:scale-[1.02] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
                             >
-                                {isProcessing ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                ) : (
-                                    'Proceed to Payment'
-                                )}
+                                <span className="relative z-10 flex items-center justify-center gap-4">
+                                    {isProcessing ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                        <>
+                                            Initiate Provisioning Flow
+                                            <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-3 transition-transform duration-500" />
+                                        </>
+                                    )}
+                                </span>
                             </button>
-                            <div className="flex items-center justify-center gap-1.5 mt-4 text-green-500">
-                                <ShieldCheck className="w-3.5 h-3.5" />
-                                <p className="text-[10px] font-bold uppercase tracking-widest">Secured by Razorpay</p>
+                            <div className="flex items-center justify-center gap-2 mt-8 text-white/10 group">
+                                <ShieldCheck className="w-4 h-4 group-hover:text-gold-400 transition-colors" />
+                                <p className="text-[9px] font-black uppercase tracking-[0.2em] group-hover:text-white/40 transition-colors">Secured Executive Protocol</p>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </div>
