@@ -63,13 +63,6 @@ const SignUpPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-950/20 to-navy-950" />
             </div>
 
-            {/* Back to Home Link */}
-            <Link to="/" className="absolute top-10 left-10 z-20 flex items-center gap-4 group">
-                <div className="w-10 h-10 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-gold-400 transition-all duration-500">
-                    <Building2 className="w-5 h-5 text-gold-400 group-hover:text-navy-950 transition-colors" />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-gold-400 transition-colors">Return to Pavilion</span>
-            </Link>
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -83,10 +76,20 @@ const SignUpPage = () => {
                     </div>
 
                     <div className="mb-12">
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className="h-px w-8 bg-gold-400/50" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gold-400">Membership Enrollment</span>
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                            <div className="flex items-center gap-4">
+                                <span className="h-px w-8 bg-gold-400/50" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gold-400">Membership Enrollment</span>
+                            </div>
+
+                            <Link to="/" className="flex items-center gap-3 group">
+                                <div className="w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-gold-400 transition-all duration-500">
+                                    <Building2 className="w-4 h-4 text-gold-400 group-hover:text-navy-950 transition-colors" />
+                                </div>
+                                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 group-hover:text-gold-400 transition-colors">Return Home</span>
+                            </Link>
                         </div>
+
                         <h2 className="text-5xl font-serif text-white mb-4 italic">Request <span className="text-gold-400">Access</span></h2>
                         <p className="text-white/40 text-sm font-light leading-relaxed">Join our inner circle of distinguished guests and unlock personalized luxury across the globe.</p>
                     </div>
@@ -182,30 +185,6 @@ const SignUpPage = () => {
                         </div>
                     </form>
 
-                    <div className="mt-12 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
-                            Already recognized?{' '}
-                            <Link to={loginUrl} className="text-gold-400 hover:text-white transition-colors ml-2">
-                                Provide Identity
-                            </Link>
-                        </p>
-
-                        <div className="flex items-center gap-6">
-                            <span className="text-[10px] font-bold text-white/10 uppercase tracking-widest leading-none">Social Link:</span>
-                            <div className="flex gap-4">
-                                {[
-                                    { name: 'Google', icon: 'M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z' },
-                                    { name: 'Twitter', icon: 'M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z' }
-                                ].map(social => (
-                                    <button key={social.name} className="w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center hover:bg-gold-400 group transition-all duration-500">
-                                        <svg className="w-4 h-4 text-white/40 group-hover:text-navy-950 transition-colors" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d={social.icon} />
-                                        </svg>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </motion.div>
         </div>

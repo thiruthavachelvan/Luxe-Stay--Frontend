@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, Coffee, Check, AlertCircle, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -12,6 +13,7 @@ const loadScript = (src) => {
 };
 
 const TableReservationForm = ({ user, onSuccess, userBookings }) => {
+    const navigate = useNavigate();
     // Merge user Bookings into user prop for easy access
     user = { ...user, userBookings };
     const [date, setDate] = useState('');
@@ -151,11 +153,18 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                     return;
                 }
 
+                const token = sessionStorage.getItem('userToken');
                 const orderRes = await fetch(`${__API_BASE__}/api/payment/create-order`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ amount: totalAmount })
                 });
+
+                if (orderRes.status === 401) {
+                    sessionStorage.clear();
+                    navigate('/login');
+                    return;
+                }
 
                 if (!orderRes.ok) throw new Error('Could not create payment order');
                 const orderData = await orderRes.json();
@@ -170,15 +179,22 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                     handler: async function (response) {
                         setLoading(true);
                         // Verify
+                        const token = sessionStorage.getItem('userToken');
                         const verifyRes = await fetch(`${__API_BASE__}/api/payment/verify`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                             body: JSON.stringify({
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature
                             })
                         });
+
+                        if (verifyRes.status === 401) {
+                            sessionStorage.clear();
+                            navigate('/login');
+                            return;
+                        }
 
                         const verifyData = await verifyRes.json();
                         if (verifyData.success) {
@@ -213,11 +229,12 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
     };
 
     const processReservation = async (preBookedMealsList, totalPreBookedAmount, transactionId) => {
+        const token = sessionStorage.getItem('userToken');
         const response = await fetch(`${__API_BASE__}/api/reservations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 date,
@@ -229,6 +246,12 @@ const TableReservationForm = ({ user, onSuccess, userBookings }) => {
                 transactionId // Note: if backend is updated to store this for reservations
             })
         });
+
+        if (response.status === 401) {
+            sessionStorage.clear();
+            navigate('/login');
+            return;
+        }
 
         if (response.ok) {
             setSuccess(true);

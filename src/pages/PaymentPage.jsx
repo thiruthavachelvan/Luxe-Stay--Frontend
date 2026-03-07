@@ -131,9 +131,10 @@ const PaymentPage = () => {
         setIsLoading(true);
 
         const token = sessionStorage.getItem('userToken');
+        console.log('PaymentPage: Attempting to create order. Token present:', !!token, 'Token length:', token?.length);
         if (!token) return navigate('/login');
 
-        const { room, checkIn, checkOut } = bookingDetails;
+        const { room, checkIn, checkOut, addOns } = bookingDetails;
 
         try {
             const resScript = await loadScript('https://checkout.razorpay.com/v1/checkout.js');

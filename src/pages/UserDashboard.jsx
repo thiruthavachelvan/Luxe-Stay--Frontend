@@ -169,6 +169,11 @@ const UserDashboard = () => {
         return () => window.removeEventListener('storage', handleGlobalLogout);
     }, [navigate, window.location.search]);
 
+    const handleUnauthorized = () => {
+        sessionStorage.clear();
+        navigate('/login');
+    };
+
     const fetchAllData = async () => {
         setLoading(true);
         const token = sessionStorage.getItem('userToken');
@@ -180,9 +185,7 @@ const UserDashboard = () => {
             if (profileRes.ok) {
                 setProfile(await profileRes.json());
             } else if (profileRes.status === 401) {
-                // If token is invalid/expired, redirect to login
-                sessionStorage.clear();
-                navigate('/login');
+                handleUnauthorized();
                 return;
             }
 
@@ -200,11 +203,21 @@ const UserDashboard = () => {
 
             // Fetch Payments
             const paymentsRes = await fetch(`${__API_BASE__}/api/auth/payment-history`, { headers });
-            if (paymentsRes.ok) setPayments(await paymentsRes.json());
+            if (paymentsRes.ok) {
+                setPayments(await paymentsRes.json());
+            } else if (paymentsRes.status === 401) {
+                handleUnauthorized();
+                return;
+            }
 
             // Fetch Queries
             const queriesRes = await fetch(`${__API_BASE__}/api/support/my-queries`, { headers });
-            if (queriesRes.ok) setQueries(await queriesRes.json());
+            if (queriesRes.ok) {
+                setQueries(await queriesRes.json());
+            } else if (queriesRes.status === 401) {
+                handleUnauthorized();
+                return;
+            }
 
             const notifRes = await fetch(`${__API_BASE__}/api/auth/notifications`, { headers });
             if (notifRes.ok) {
@@ -454,9 +467,29 @@ const UserDashboard = () => {
         }
     };
 
+    const handleDeleteQuery = async (id) => {
+        if (!window.confirm('Erase this message from your archives?')) return;
+        try {
+            const token = sessionStorage.getItem('userToken');
+            const res = await fetch(`${__API_BASE__}/api/contact/my/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                toast.success('Message archived');
+                setQueries(prev => prev.filter(q => q._id !== id));
+            } else {
+                toast.error('Failed to remove message');
+            }
+        } catch (error) {
+            console.error('Error deleting query:', error);
+            toast.error('Network error removing message');
+        }
+    };
+
     const handleLogout = () => {
-        localStorage.removeItem('userData');
-        localStorage.removeItem('userToken');
+        sessionStorage.removeItem('userData');
+        sessionStorage.removeItem('userToken');
         navigate('/');
     };
 
@@ -630,7 +663,7 @@ const UserDashboard = () => {
     const renderDashboardOverview = () => (
         <div className="space-y-12">
             {/* Hero Section */}
-            <section className="relative h-[22rem] rounded-[2.5rem] overflow-hidden group shadow-2xl">
+            <section className="relative h-auto min-h-[16rem] md:h-[22rem] rounded-[2.5rem] overflow-hidden group shadow-2xl">
                 <motion.div
                     initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
@@ -642,24 +675,24 @@ const UserDashboard = () => {
                         className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
                         alt="Resort"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-navy-950/90 via-navy-950/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-navy-950/90 via-navy-950/40 to-transparent md:bg-gradient-to-r md:from-navy-950/90 md:via-navy-950/40 md:to-transparent bg-navy-950/60" />
                 </motion.div>
 
-                <div className="relative z-10 h-full p-12 flex flex-col justify-center">
+                <div className="relative z-10 h-full p-6 md:p-12 flex flex-col justify-center items-center md:items-start text-center md:text-left">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-3 text-gold-400 mb-6"
+                        className="flex items-center gap-3 text-gold-400 mb-4 md:mb-6"
                     >
-                        <Sparkles className="w-5 h-5 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em]">{displayedBooking?.location?.city || 'Aria Collections'} • Experience Reimagined</span>
+                        <Sparkles className="w-4 h-4 md:w-5 md:h-5 animate-pulse" />
+                        <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em]">{displayedBooking?.location?.city || 'Aria Collections'} • Experience Reimagined</span>
                     </motion.div>
 
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="text-5xl font-serif italic text-white mb-6 tracking-tight leading-tight"
+                        className="text-3xl md:text-5xl font-serif italic text-white mb-4 md:mb-6 tracking-tight leading-tight"
                     >
                         Welcome back,<br />
                         <span className="text-gold-400">{profile?.fullName || 'Esteemed Guest'}</span>
@@ -669,7 +702,7 @@ const UserDashboard = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-lg text-white/60 max-w-xl mb-10 font-light leading-relaxed"
+                        className="text-sm md:text-lg text-white/60 max-w-sm md:max-w-xl mb-8 md:mb-10 font-light leading-relaxed"
                     >
                         {hasActiveStay ? 'Your sanctuary is prepared. Immerse yourself in the pinnacle of luxury and bespoke service.' : 'Your next extraordinary journey awaits. Discover our curated collections of world-class retreats.'}
                     </motion.p>
@@ -678,9 +711,9 @@ const UserDashboard = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6 }}
-                        className="flex gap-6"
+                        className="flex flex-col sm:flex-row gap-4 md:gap-6 w-full sm:w-auto"
                     >
-                        <button onClick={() => setActiveSection('bookings')} className="premium-button bg-gold-400 text-navy-950 px-8 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-xl shadow-gold-400/10 active:scale-95 flex items-center gap-2">
+                        <button onClick={() => setActiveSection('bookings')} className="premium-button bg-gold-400 text-navy-950 px-8 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-xl shadow-gold-400/10 active:scale-95 flex items-center justify-center gap-2">
                             {hasActiveStay ? 'Manage Active Stay' : 'Explore Journeys'}
                             <ChevronRight className="w-4 h-4" />
                         </button>
@@ -694,9 +727,57 @@ const UserDashboard = () => {
                 <div className="absolute top-1/2 right-0 w-64 h-64 bg-gold-400/20 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-12">
+                {/* Right Column: In-Stay Services - Moved up for mobile visibility */}
+                <div className="order-1 lg:order-2 space-y-12">
+                    <section>
+                        <div className="flex items-center gap-3 mb-6 md:mb-8 justify-center lg:justify-start">
+                            <h3 className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em]">Bespoke Services</h3>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                            {[
+                                { title: 'Culinary In-Suite', sub: 'Master-chef creations', icon: Utensils, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); navigate('/menu'); } },
+                                { title: 'Sanctuary Care', sub: 'Turndown & Refresh', icon: Wind, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Cleaning'); } },
+                                { title: 'Elite Chauffeur', sub: 'Luxury Fleet', icon: Car, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Transport'); } },
+                                { title: 'Grand Spa', sub: 'Bespoke Wellness', icon: Flower2, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); setSpaBillBooking(displayedBooking); } },
+                            ].map((service, i) => (
+                                <motion.button
+                                    key={i}
+                                    whileHover={{ x: 8 }}
+                                    onClick={service.action}
+                                    className="w-full glass-panel bg-white/5 border-white/5 p-4 md:p-6 flex items-center justify-between group hover:border-gold-400/40 hover:bg-gold-400/5 transition-all duration-500 overflow-hidden relative"
+                                >
+                                    <div className="flex items-center gap-4 md:gap-5 relative z-10">
+                                        <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 group-hover:bg-gold-400/10 group-hover:text-gold-400 transition-all duration-500">
+                                            <service.icon className="w-5 h-5 md:w-6 md:h-6" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h4 className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest group-hover:text-gold-400 transition-colors duration-500">{service.title}</h4>
+                                            <p className="text-[8px] md:text-[9px] text-white/20 font-black uppercase tracking-[0.2em] mt-0.5 md:mt-1 group-hover:text-gold-400/40 transition-colors duration-500">{service.sub}</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-white/10 group-hover:text-gold-400 transition-all duration-500 relative z-10" />
+
+                                    {/* Hover Shine Effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
+                                </motion.button>
+                            ))}
+                        </div>
+                    </section>
+                    <section className="glass-panel overflow-hidden relative group">
+                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1449156001437-3a16d1dfda0e?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center grayscale opacity-10 group-hover:opacity-20 transition-all duration-1000 group-hover:scale-110" />
+                        <div className="relative z-10 p-8 h-64 flex flex-col justify-end">
+                            <h4 className="text-xl font-serif italic text-white mb-2">Discover New Horizons</h4>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-6">Explore our global locations</p>
+                            <button onClick={() => navigate('/locations')} className="w-full py-4 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-gold-400 hover:text-navy-950 hover:border-gold-400 transition-all duration-500">
+                                View Locations
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
                 {/* Left Column: Stays & Timeline */}
-                <div className="lg:col-span-2 space-y-12">
+                <div className="order-2 lg:order-1 lg:col-span-2 space-y-12">
                     {/* Stay Overview */}
                     <section>
                         <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
@@ -837,54 +918,6 @@ const UserDashboard = () => {
                     </section>
                 </div>
 
-                {/* Right Column: In-Stay Services */}
-                <div className="space-y-12">
-                    <section>
-                        <div className="flex items-center gap-3 mb-8">
-                            <h3 className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em]">Bespoke Services</h3>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4">
-                            {[
-                                { title: 'Culinary In-Suite', sub: 'Master-chef creations', icon: Utensils, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); navigate('/menu'); } },
-                                { title: 'Sanctuary Care', sub: 'Turndown & Refresh', icon: Wind, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Cleaning'); } },
-                                { title: 'Elite Chauffeur', sub: 'Luxury Fleet', icon: Car, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); handleServiceRequest('Transport'); } },
-                                { title: 'Grand Spa', sub: 'Bespoke Wellness', icon: Flower2, action: () => { if (!hasActiveStay) return toast.error('Available during active stays only.'); setSpaBillBooking(displayedBooking); } },
-                            ].map((service, i) => (
-                                <motion.button
-                                    key={i}
-                                    whileHover={{ x: 8 }}
-                                    onClick={service.action}
-                                    className="w-full glass-panel bg-white/5 border-white/5 p-6 flex items-center justify-between group hover:border-gold-400/40 hover:bg-gold-400/5 transition-all duration-500 overflow-hidden relative"
-                                >
-                                    <div className="flex items-center gap-5 relative z-10">
-                                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 group-hover:bg-gold-400/10 group-hover:text-gold-400 transition-all duration-500">
-                                            <service.icon className="w-6 h-6" />
-                                        </div>
-                                        <div className="text-left">
-                                            <h4 className="text-xs font-black text-white uppercase tracking-widest group-hover:text-gold-400 transition-colors duration-500">{service.title}</h4>
-                                            <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.2em] mt-1 group-hover:text-gold-400/40 transition-colors duration-500">{service.sub}</p>
-                                        </div>
-                                    </div>
-                                    <ChevronRight className="w-5 h-5 text-white/10 group-hover:text-gold-400 transition-all duration-500 relative z-10" />
-
-                                    {/* Hover Shine Effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
-                                </motion.button>
-                            ))}
-                        </div>
-                    </section>
-
-                    <section className="glass-panel overflow-hidden relative group">
-                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1449156001437-3a16d1dfda0e?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center grayscale opacity-10 group-hover:opacity-20 transition-all duration-1000 group-hover:scale-110" />
-                        <div className="relative z-10 p-8 h-64 flex flex-col justify-end">
-                            <h4 className="text-xl font-serif italic text-white mb-2">Discover New Horizons</h4>
-                            <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-6">Explore our global locations</p>
-                            <button onClick={() => navigate('/locations')} className="w-full py-4 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-gold-400 hover:text-navy-950 hover:border-gold-400 transition-all duration-500">
-                                View Locations
-                            </button>
-                        </div>
-                    </section>
-                </div>
             </div>
         </div>
     );
@@ -1475,23 +1508,28 @@ const UserDashboard = () => {
                         <div className="absolute inset-0 border border-white/5 rounded-full -m-8 animate-[spin_30s_linear_infinite_reverse]" />
                     </div>
 
-                    <div className="text-center md:text-left space-y-4">
-                        <motion.div
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center justify-center md:justify-start gap-3"
-                        >
-                            <Crown className="w-4 h-4 text-gold-400" />
-                            <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.5em]">Esteemed Member</span>
-                        </motion.div>
-                        <h2 className="text-5xl md:text-6xl font-serif italic text-white tracking-tight">{profile.fullName}</h2>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-6 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
-                            <span className="flex items-center gap-2">
-                                <ShieldAlert className="w-3 h-3 text-gold-400/40" />
-                                ID: LS-2026-{profile._id?.slice(-4) || '7721'}
-                            </span>
-                            <span className="w-1 h-1 rounded-full bg-white/10 self-center" />
-                            <span>Patron since {new Date(profile.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                    <div className="relative group">
+                        <div className="absolute -inset-8 bg-gradient-to-r from-gold-400/10 via-white/5 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                        <div className="relative space-y-4">
+                            <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="flex items-center justify-center md:justify-start gap-4 mb-2"
+                            >
+                                <div className="w-8 h-[1px] bg-gold-400/30" />
+                                <span className="text-[9px] font-black text-gold-400 uppercase tracking-[0.6em] italic">Established Resident</span>
+                                <div className="w-8 md:hidden h-[1px] bg-gold-400/30" />
+                            </motion.div>
+                            <h2 className="text-5xl md:text-7xl font-serif italic text-white tracking-tighter leading-tight">
+                                Salutations, <span className="text-gold-400/90">{profile.fullName?.split(' ')[0]}</span>
+                            </h2>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-8 items-center text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">
+                                <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                                    <ShieldAlert className="w-3 h-3 text-gold-400/60" />
+                                    <span>Portfolio: LS-{profile._id?.slice(-6).toUpperCase()}</span>
+                                </div>
+                                <span className="italic">Member since {new Date(profile.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1827,18 +1865,23 @@ const UserDashboard = () => {
                 )}
 
                 <div className="space-y-6">
-                    <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Historical Transactions</h3>
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Historical Transactions</h3>
+                        <div className="hidden md:block h-px flex-1 mx-8 bg-gradient-to-r from-white/5 to-transparent" />
+                    </div>
+
                     <div className="glass-panel border-white/10 overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse min-w-[800px]">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block">
+                            <table className="w-full text-left border-collapse table-fixed">
                                 <thead>
                                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                                        <th className="p-8 text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">ID</th>
-                                        <th className="p-8 text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Particulars</th>
-                                        <th className="p-8 text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Date</th>
-                                        <th className="p-8 text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Method</th>
-                                        <th className="p-8 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-right">Debit / Credit</th>
-                                        <th className="p-8 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-center">Status</th>
+                                        <th className="w-[12%] p-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Transaction</th>
+                                        <th className="w-[35%] p-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Particulars</th>
+                                        <th className="w-[15%] p-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Date</th>
+                                        <th className="w-[13%] p-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Method</th>
+                                        <th className="w-[15%] p-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] text-right">Amount</th>
+                                        <th className="w-[10%] p-6 text-[8px] font-black text-white/20 uppercase tracking-[0.2em] text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1903,6 +1946,58 @@ const UserDashboard = () => {
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+
+                        {/* Mobile Card Layout */}
+                        <div className="md:hidden divide-y divide-white/5">
+                            {payments.length === 0 ? (
+                                <div className="p-16 text-center">
+                                    <CreditCard className="w-10 h-10 text-white/5 mx-auto mb-4" />
+                                    <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">No transactions recorded.</p>
+                                </div>
+                            ) : (
+                                payments.map((payment, idx) => (
+                                    <motion.div
+                                        key={payment._id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        className="p-6 space-y-4"
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <div className="space-y-1">
+                                                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">#{payment.transactionId?.slice(-8) || payment._id.slice(-8)}</p>
+                                                {payment.booking ? (
+                                                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Stay at {payment.booking.location?.city || 'LuxeStays'}</h4>
+                                                ) : payment.tableReservation ? (
+                                                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Dining Experience</h4>
+                                                ) : payment.foodOrder ? (
+                                                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Sanctuary Dining</h4>
+                                                ) : (
+                                                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Ancillary Charge</h4>
+                                                )}
+                                            </div>
+                                            <span className={`px-3 py-0.5 rounded-full text-[6px] font-black tracking-[0.2em] uppercase border ${payment.status === 'Success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                                                {payment.status}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between items-end pt-2 border-t border-white/[0.02]">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="w-3 h-3 text-white/20" />
+                                                    <span className="text-[9px] font-bold text-white/40">{new Date(payment.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-gold-400 scale-75" />
+                                                    <span className="text-[8px] font-black text-gold-400 uppercase tracking-widest">{payment.method}</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-lg font-serif italic text-white">₹{payment.amount?.toLocaleString()}</p>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
@@ -2016,7 +2111,7 @@ const UserDashboard = () => {
                                 transition={{ delay: idx * 0.1 }}
                                 className="glass-panel p-8 space-y-6 group hover:border-gold-400/30 transition-all duration-700 relative overflow-hidden"
                             >
-                                <div className="flex items-start justify-between relative z-10">
+                                <div className="flex items-start justify-between relative z-10 w-full">
                                     <div className="space-y-2">
                                         <h4 className="text-lg font-serif italic text-white group-hover:text-gold-400 transition-colors uppercase tracking-tight">{q.subject}</h4>
                                         <div className="flex items-center gap-3">
@@ -2029,12 +2124,21 @@ const UserDashboard = () => {
                                             <span className="text-[10px] text-white/20 font-black uppercase tracking-widest">{new Date(q.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </div>
-                                    <span className={`px-4 py-1.5 rounded-full text-[8px] font-black tracking-widest uppercase border ${q.status === 'Open' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                        q.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                            'bg-white/5 text-white/20 border-white/10'
-                                        }`}>
-                                        {q.status}
-                                    </span>
+                                    <div className="flex items-center gap-4">
+                                        <span className={`px-4 py-1.5 rounded-full text-[8px] font-black tracking-widest uppercase border ${q.status === 'Open' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                            q.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                                'bg-white/5 text-white/20 border-white/10'
+                                            }`}>
+                                            {q.status}
+                                        </span>
+                                        <button
+                                            onClick={() => handleDeleteQuery(q._id)}
+                                            className="p-2 text-white/10 hover:text-rose-400 transition-colors group/del"
+                                            title="Remove from your stream"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <p className="text-xs text-white/60 leading-relaxed font-medium relative z-10">{q.message}</p>
@@ -2617,7 +2721,7 @@ const UserDashboard = () => {
                                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                                        className="absolute top-16 right-0 w-96 glass-panel border-white/10 shadow-2xl z-[100] overflow-hidden"
+                                        className="fixed md:absolute top-24 md:top-16 inset-x-4 md:inset-x-auto md:right-0 md:w-96 bg-navy-950 border border-white/20 shadow-2xl z-[100] rounded-[2rem] overflow-hidden"
                                     >
                                         <div className="p-5 border-b border-white/5 flex justify-between items-center bg-white/5">
                                             <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white">Notifications</h3>
