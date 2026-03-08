@@ -780,8 +780,8 @@ const UserDashboard = () => {
                 <div className="order-2 lg:order-1 lg:col-span-2 space-y-12">
                     {/* Stay Overview */}
                     <section>
-                        <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
-                            <div className="flex gap-10">
+                        <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-white/5 pb-6 gap-6">
+                            <div className="flex gap-6 md:gap-10">
                                 {['Active', 'Upcoming', 'Past'].map((tab) => (
                                     <button
                                         key={tab}
@@ -808,9 +808,9 @@ const UserDashboard = () => {
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
-                                    className="glass-panel overflow-hidden flex group min-h-[16rem]"
+                                    className="glass-panel overflow-hidden flex flex-col md:flex-row group min-h-[16rem]"
                                 >
-                                    <div className="w-72 overflow-hidden relative">
+                                    <div className="w-full md:w-72 h-48 md:h-auto overflow-hidden relative">
                                         <img
                                             src={displayedBooking.location?.image || "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800"}
                                             className="h-full w-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
@@ -818,14 +818,14 @@ const UserDashboard = () => {
                                         />
                                         <div className="absolute inset-0 bg-navy-950/20 group-hover:bg-transparent transition-colors duration-500" />
                                     </div>
-                                    <div className="flex-1 p-8 flex flex-col">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div>
+                                    <div className="flex-1 p-6 md:p-8 flex flex-col items-center md:items-start text-center md:text-left">
+                                        <div className="flex flex-col md:flex-row items-center md:items-start justify-between mb-4 w-full gap-4">
+                                            <div className="flex flex-col items-center md:items-start">
                                                 <div className="flex items-center gap-3 mb-3">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
                                                     <span className="text-[9px] font-black text-gold-400/80 uppercase tracking-[0.3em]">{displayedBooking.location?.city} Hotel</span>
                                                 </div>
-                                                <h3 className="text-3xl font-serif italic text-white mb-2 leading-tight">{displayedBooking.room?.roomType}</h3>
+                                                <h3 className="text-2xl md:text-3xl font-serif italic text-white mb-2 leading-tight">{displayedBooking.room?.roomType}</h3>
                                                 <div className="flex items-center gap-4 text-white/40 text-[10px] uppercase tracking-widest font-black">
                                                     <span>{new Date(displayedBooking.checkIn).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} — {new Date(displayedBooking.checkOut).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
                                                     <span className="w-1 h-1 rounded-full bg-white/20" />
@@ -837,13 +837,13 @@ const UserDashboard = () => {
                                             </div>
                                         </div>
 
-                                        <div className="mt-auto pt-8 border-t border-white/5 flex items-center justify-between">
+                                        <div className="mt-auto pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between w-full gap-6">
                                             <div className="flex gap-8">
-                                                <div className="flex flex-col gap-1">
+                                                <div className="flex flex-col items-center md:items-start gap-1">
                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Occupancy</span>
                                                     <span className="text-[10px] font-bold text-white/80">{displayedBooking.guests?.adults} Adults • {displayedBooking.guests?.children} Child</span>
                                                 </div>
-                                                <div className="flex flex-col gap-1">
+                                                <div className="flex flex-col items-center md:items-start gap-1">
                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Services</span>
                                                     <div className="flex gap-3">
                                                         <Utensils className="w-3.5 h-3.5 text-gold-400/60" />
@@ -1348,9 +1348,9 @@ const UserDashboard = () => {
 
     const renderBookings = () => (
         <div className="space-y-12">
-            <div className="flex items-center justify-between border-b border-white/5 pb-8">
-                <div>
-                    <h2 className="text-3xl font-serif italic text-white mb-2">My Journeys</h2>
+            <div className="flex flex-col md:flex-row items-center justify-between border-b border-white/5 pb-8 gap-6 text-center md:text-left">
+                <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                    <h2 className="text-2xl md:text-3xl font-serif italic text-white mb-2">My Journeys</h2>
                     <p className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black">A testament to your travels with us</p>
                 </div>
                 <button
@@ -1403,23 +1403,23 @@ const UserDashboard = () => {
                                 </div>
 
                                 {/* Booking Details */}
-                                <div className="flex-1 p-10 flex flex-col">
-                                    <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-white/5 pb-8 mb-8">
-                                        <div className="space-y-4">
+                                <div className="flex-1 p-6 md:p-10 flex flex-col items-center md:items-start text-center md:text-left">
+                                    <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-6 border-b border-white/5 pb-8 mb-8 w-full">
+                                        <div className="space-y-4 flex flex-col items-center md:items-start">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />
                                                 <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">{booking.location?.city} Hotel</span>
                                             </div>
-                                            <h3 className="text-4xl font-serif italic text-white leading-tight">
+                                            <h3 className="text-3xl md:text-4xl font-serif italic text-white leading-tight">
                                                 {booking.room?.roomType}
-                                                <span className="block text-sm font-sans not-italic text-white/40 uppercase tracking-[0.3em] mt-2">Suite #{booking.room?.roomNumber}</span>
+                                                <span className="block text-xs md:text-sm font-sans not-italic text-white/40 uppercase tracking-[0.3em] mt-2">Suite #{booking.room?.roomNumber}</span>
                                             </h3>
                                         </div>
 
-                                        <div className="text-left md:text-right space-y-4">
+                                        <div className="text-center md:text-right space-y-4 flex flex-col items-center md:items-end">
                                             <div className="space-y-1">
                                                 <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Total Consideration</p>
-                                                <p className="text-3xl font-serif italic text-gold-400">₹{booking.totalPrice?.toLocaleString()}</p>
+                                                <p className="text-2xl md:text-3xl font-serif italic text-gold-400">₹{booking.totalPrice?.toLocaleString()}</p>
                                             </div>
                                             <span className={`inline-block px-3 py-1 rounded-lg text-[8px] font-black tracking-[0.2em] uppercase border ${booking.paymentStatus === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                                                 booking.paymentStatus === 'Advance Paid' ? 'bg-gold-400/10 text-gold-400 border-gold-400/20' :
@@ -1430,7 +1430,7 @@ const UserDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-10 w-full text-center md:text-left">
                                         <div className="space-y-2">
                                             <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">Arrival</span>
                                             <p className="text-xs font-bold text-white uppercase tracking-tighter">{new Date(booking.checkIn).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
@@ -1449,28 +1449,28 @@ const UserDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto flex flex-wrap gap-4 pt-8 border-t border-white/5">
+                                    <div className="mt-auto flex flex-wrap justify-center md:justify-start gap-4 pt-8 border-t border-white/5 w-full">
                                         {(booking.paymentStatus === 'Advance Paid' || booking.paymentStatus === 'Pending') && ['Confirmed', 'CheckedIn'].includes(booking.status) && (
-                                            <button onClick={() => handleSettleFolio(booking)} className="px-6 py-3 bg-gold-400/10 text-gold-400 border border-gold-400/30 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-gold-400 hover:text-navy-950 transition-all">
+                                            <button onClick={() => handleSettleFolio(booking)} className="px-5 md:px-6 py-2.5 md:py-3 bg-gold-400/10 text-gold-400 border border-gold-400/30 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-gold-400 hover:text-navy-950 transition-all">
                                                 Settle Portfolio
                                             </button>
                                         )}
                                         {booking.status === 'Confirmed' && new Date() >= new Date(new Date(booking.checkIn).setHours(0, 0, 0, 0)) && (
-                                            <button onClick={() => handleCheckIn(booking._id)} className="px-6 py-3 bg-white text-navy-950 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-gold-400 transition-all">
+                                            <button onClick={() => handleCheckIn(booking._id)} className="px-5 md:px-6 py-2.5 md:py-3 bg-white text-navy-950 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-gold-400 transition-all">
                                                 Initiate Check-in
                                             </button>
                                         )}
                                         {booking.status === 'CheckedIn' && (
-                                            <button onClick={() => handleCheckOut(booking._id)} className="px-6 py-3 bg-rose-500 text-white rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-rose-600 transition-all">
+                                            <button onClick={() => handleCheckOut(booking._id)} className="px-5 md:px-6 py-2.5 md:py-3 bg-rose-500 text-white rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-rose-600 transition-all">
                                                 Conclude Stay
                                             </button>
                                         )}
                                         {booking.status === 'Confirmed' && (
-                                            <button onClick={() => openCancelModal(booking)} className="px-6 py-3 bg-white/5 text-white/40 border border-white/10 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-400/30 transition-all">
+                                            <button onClick={() => openCancelModal(booking)} className="px-5 md:px-6 py-2.5 md:py-3 bg-white/5 text-white/40 border border-white/10 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-400/30 transition-all">
                                                 Relinquish Stay
                                             </button>
                                         )}
-                                        <button onClick={() => setViewingBooking(booking)} className="px-6 py-3 bg-white/5 text-white/80 border border-white/10 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-white/10 transition-all ml-auto">
+                                        <button onClick={() => setViewingBooking(booking)} className="px-5 md:px-6 py-2.5 md:py-3 bg-white/5 text-white/80 border border-white/10 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-white/10 transition-all sm:ml-auto">
                                             Archive Details
                                         </button>
                                     </div>
@@ -2684,7 +2684,7 @@ const UserDashboard = () => {
             {/* Main Content */}
             <main className="flex-1 lg:ml-80 relative z-10 flex flex-col h-screen overflow-hidden">
                 {/* Header */}
-                <header className="h-24 flex items-center justify-between px-8 lg:px-12 border-b border-white/5 bg-navy-950/20 backdrop-blur-md relative z-50">
+                <header className="h-20 md:h-24 flex items-center justify-between px-4 md:px-8 lg:px-12 border-b border-white/5 bg-navy-950/20 backdrop-blur-md relative z-50">
                     <div className="flex items-center gap-6">
                         <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden w-11 h-11 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-white/60 hover:text-white transition-all">
                             <Menu className="w-5 h-5" />
@@ -2692,24 +2692,25 @@ const UserDashboard = () => {
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col"
                         >
-                            <h2 className="text-sm font-serif italic text-white/60">Welcome back,</h2>
-                            <p className="text-lg font-serif italic text-white">{profile?.fullName?.split(' ')[0] || 'Esteemed Guest'}</p>
+                            <h2 className="text-[10px] md:text-sm font-serif italic text-white/60 hidden xs:block">Welcome back,</h2>
+                            <p className="text-sm md:text-lg font-serif italic text-white">{profile?.fullName?.split(' ')[0] || 'Esteemed Guest'}</p>
                         </motion.div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         {/* Notifications */}
                         <div className="relative">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                className={`w-11 h-11 flex items-center justify-center rounded-xl border transition-all duration-300 ${isNotificationOpen ? 'bg-gold-400 border-gold-400 text-navy-950' : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20'}`}
+                                className={`w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl border transition-all duration-300 ${isNotificationOpen ? 'bg-gold-400 border-gold-400 text-navy-950' : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20'}`}
                             >
-                                <Bell className="w-5 h-5" />
+                                <Bell className="w-4 h-4 md:w-5 md:h-5" />
                                 {unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 border-2 border-navy-950 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg">
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 bg-rose-500 border-2 border-navy-950 rounded-full flex items-center justify-center text-[8px] md:text-[10px] font-bold text-white shadow-lg">
                                         {unreadCount}
                                     </span>
                                 )}
@@ -2759,24 +2760,24 @@ const UserDashboard = () => {
                             </AnimatePresence>
                         </div>
 
-                        <button onClick={() => setActiveSection('profile')} className="w-11 h-11 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-white/60 hover:text-white hover:border-white/20 transition-all cursor-pointer">
-                            <Settings className="w-5 h-5" />
+                        <button onClick={() => setActiveSection('profile')} className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-white/60 hover:text-white hover:border-white/20 transition-all cursor-pointer">
+                            <Settings className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
 
-                        <div className="h-8 w-px bg-white/5 mx-2" />
+                        <div className="h-6 md:h-8 w-px bg-white/5 mx-1 md:mx-2" />
 
                         <button
                             onClick={handleLogout}
-                            className="group flex items-center gap-3 px-6 py-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-500 font-bold text-[10px] uppercase tracking-widest"
+                            className="group flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-500 font-bold text-[10px] uppercase tracking-widest"
                         >
                             <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                            <span>Departure</span>
+                            <span className="hidden sm:inline">Departure</span>
                         </button>
                     </div>
                 </header>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar relative">
-                    <div className="px-8 lg:px-12 py-12 pb-32 max-w-7xl mx-auto">
+                    <div className="px-4 md:px-8 lg:px-12 py-8 md:py-12 pb-32 max-w-7xl mx-auto w-full">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeSection}

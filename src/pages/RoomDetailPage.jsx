@@ -351,7 +351,7 @@ const RoomDetailPage = () => {
                 </AnimatePresence>
 
                 {/* Hero Info Overlay */}
-                <div className="absolute inset-0 flex flex-col justify-end pb-20">
+                <div className="absolute inset-0 flex flex-col justify-end pb-36 md:pb-20">
                     <div className="max-w-7xl mx-auto px-8 w-full">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
@@ -427,8 +427,9 @@ const RoomDetailPage = () => {
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
+                            className="flex flex-col items-center lg:items-start"
                         >
-                            <div className="flex items-center gap-6 mb-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                            <div className="flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 mb-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
                                 <span className="flex items-center gap-2 text-gold-400">
                                     <Sparkles className="w-3 h-3" />
                                     Elite Residence
@@ -441,8 +442,8 @@ const RoomDetailPage = () => {
                                     {isAvailable ? 'Available' : 'Reserved'}
                                 </span>
                             </div>
-                            <h2 className="text-5xl font-serif text-white mb-6">Mastering <span className="text-gold-400 italic">Comfort</span></h2>
-                            <p className="text-white/40 leading-relaxed text-sm font-light max-w-2xl">
+                            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 text-center lg:text-left">Mastering <span className="text-gold-400 italic">Comfort</span></h2>
+                            <p className="text-white/40 leading-relaxed text-sm font-light max-w-2xl text-center lg:text-left mx-auto lg:mx-0">
                                 {room.description || `A masterclass in contemporary elegance, the ${room.type} at LuxeStay ${room.location?.city} defines the higher standard of living. Curated with hand-selected materials and state-of-the-art technology.`}
                             </p>
                         </motion.div>
@@ -455,7 +456,7 @@ const RoomDetailPage = () => {
                                 { icon: Users, label: 'Occupancy', value: `${room.capacity?.adults || 2} Adults` },
                                 { icon: Eye, label: 'Perspective', value: room.viewType || 'Unending View' },
                             ].map(({ icon: Icon, label, value }) => (
-                                <div key={label} className="glass-panel p-6 border-white/5 group hover:bg-gold-400 transition-all duration-500">
+                                <div key={label} className="glass-panel p-6 border-white/5 group hover:bg-gold-400 transition-all duration-500 flex flex-col items-center lg:items-start text-center lg:text-left">
                                     <Icon className="w-5 h-5 text-gold-400 group-hover:text-navy-950 mb-4 transition-colors" />
                                     <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1 group-hover:text-navy-950/60 font-bold transition-colors">{label}</p>
                                     <p className="text-xs font-bold text-white group-hover:text-navy-950 transition-colors">{value}</p>
@@ -464,7 +465,7 @@ const RoomDetailPage = () => {
                         </div>
 
                         {/* Tabs - Reimagined */}
-                        <div className="flex gap-12 border-b border-white/5">
+                        <div className="flex justify-center lg:justify-start gap-8 lg:gap-12 border-b border-white/5">
                             {[['description', 'Overview'], ['amenities', 'Amenities'], ['reviews', 'Guest Reviews']].map(([id, label]) => (
                                 <button
                                     key={id}
@@ -481,9 +482,9 @@ const RoomDetailPage = () => {
 
                         {/* Description */}
                         <div ref={descRef} className="scroll-mt-40">
-                            <h3 className="text-3xl font-serif text-white mb-8 italic">The Essence</h3>
+                            <h3 className="text-3xl font-serif text-white mb-8 italic text-center lg:text-left">The Essence</h3>
                             <div className="prose prose-invert max-w-none">
-                                <p className="text-white/60 leading-[2] text-lg font-light">
+                                <p className="text-white/60 leading-[2] text-lg font-light text-center lg:text-left mx-auto lg:mx-0">
                                     {room.description ||
                                         `The ${room.type} represents the absolute pinnacle of our architectural philosophy. Every corner has been considered to provide not just a room, but a rhythmic sequence of experiences. The materials speak of heritage, while the amenities hum with modern precision.`
                                     }
@@ -493,7 +494,7 @@ const RoomDetailPage = () => {
 
                         {/* Amenities */}
                         <div ref={amenRef} className="scroll-mt-40">
-                            <h3 className="text-3xl font-serif text-white mb-10 italic">Curation of Comfort</h3>
+                            <h3 className="text-3xl font-serif text-white mb-10 italic text-center lg:text-left">Curation of Comfort</h3>
                             {room.amenities?.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     {room.amenities.map((amenity, i) => {
@@ -515,8 +516,8 @@ const RoomDetailPage = () => {
 
                         {/* Reviews */}
                         <div ref={reviewRef} className="scroll-mt-40">
-                            <div className="flex items-center justify-between mb-12">
-                                <h3 className="text-3xl font-serif text-white italic">Guest Chronicles</h3>
+                            <div className="flex flex-col md:flex-row items-center justify-center lg:justify-between mb-12 gap-6 lg:gap-0">
+                                <h3 className="text-3xl font-serif text-white italic text-center lg:text-left">Guest Chronicles</h3>
                                 {avgRating > 0 && (
                                     <div className="flex items-center gap-4">
                                         <div className="flex -space-x-2">

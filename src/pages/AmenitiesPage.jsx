@@ -127,7 +127,7 @@ const AmenitiesPage = () => {
             </section>
 
             {/* Elevated Sticky Tabs */}
-            <section className="sticky top-20 z-40 py-6">
+            <section className="relative lg:sticky lg:top-20 z-40 py-6">
                 <div className="container mx-auto px-6">
                     <div className="glass-panel p-2 flex flex-wrap justify-center gap-2 border-white/5 bg-navy-950/40 backdrop-blur-2xl">
                         {categories.map((cat) => (

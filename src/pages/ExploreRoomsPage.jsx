@@ -289,7 +289,7 @@ const ExploreRoomsPage = () => {
         <div className="min-h-screen bg-navy-950 text-slate-200 font-sans flex flex-col selection:bg-gold-400 selection:text-navy-950">
 
             {/* ── Topbar ─────────────────────────────────────── */}
-            <div className="sticky top-0 z-40 bg-navy-950/80 backdrop-blur-xl border-b border-white/5">
+            <div className="relative lg:sticky lg:top-0 z-40 bg-navy-950/80 backdrop-blur-xl border-b border-white/5">
                 {/* brand + search + dates + user */}
                 <div className="flex items-center gap-6 px-6 h-20">
                     {/* Brand + Home */}
