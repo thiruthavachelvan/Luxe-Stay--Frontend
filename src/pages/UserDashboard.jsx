@@ -166,7 +166,19 @@ const UserDashboard = () => {
         };
 
         window.addEventListener('storage', handleGlobalLogout);
-        return () => window.removeEventListener('storage', handleGlobalLogout);
+
+        // Safety timeout — force loading to false after 8 seconds if somehow stuck
+        const safetyTimeout = setTimeout(() => {
+            setLoading(prev => {
+                if (prev) console.warn('Safety timeout: Forcing dashboard loading to false');
+                return false;
+            });
+        }, 8000);
+
+        return () => {
+            window.removeEventListener('storage', handleGlobalLogout);
+            clearTimeout(safetyTimeout);
+        };
     }, [navigate, window.location.search]);
 
     const handleUnauthorized = () => {
