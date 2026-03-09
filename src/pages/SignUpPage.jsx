@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Building2, Mail, Lock, Eye, EyeOff, Loader2, User, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
+import DocumentationDownload from '../components/DocumentationDownload';
 
 const SignUpPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -53,6 +54,7 @@ const SignUpPage = () => {
 
     return (
         <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-navy-950 font-sans selection:bg-gold-400 selection:text-navy-950">
+            <DocumentationDownload />
             {/* Cinematic Background */}
             <div className="absolute inset-0 z-0">
                 <img
