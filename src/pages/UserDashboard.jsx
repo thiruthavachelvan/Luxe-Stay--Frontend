@@ -2780,10 +2780,10 @@ const UserDashboard = () => {
 
                         <button
                             onClick={handleLogout}
-                            className="group flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-500 font-bold text-[10px] uppercase tracking-widest"
+                            className="group flex items-center gap-2 px-3 md:px-6 py-2 md:py-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-500 font-bold text-[9px] md:text-[10px] uppercase tracking-widest whitespace-nowrap"
                         >
-                            <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                            <span className="hidden sm:inline">Departure</span>
+                            <LogOut className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:rotate-12 transition-transform" />
+                            <span className="inline">Departure</span>
                         </button>
                     </div>
                 </header>

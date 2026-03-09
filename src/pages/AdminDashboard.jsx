@@ -853,7 +853,7 @@ const AdminDashboard = () => {
         setFetchingReviews(true);
         try {
             const token = sessionStorage.getItem('userToken');
-            const res = await fetch(`${__API_BASE__}/api/reviews/admin/all`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`${__API_BASE__}/api/auth/admin/reviews`, { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) {
                 setAdminReviews(await res.json());
             } else if (res.status === 401) {
@@ -878,7 +878,7 @@ const AdminDashboard = () => {
     const handleDeleteReview = async (id) => {
         if (!window.confirm('Delete this review?')) return;
         const token = sessionStorage.getItem('userToken');
-        const res = await fetch(`${__API_BASE__}/api/reviews/admin/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${__API_BASE__}/api/auth/admin/reviews/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) { setSuccess('Review deleted'); fetchAdminReviews(); setTimeout(() => setSuccess(''), 3000); }
     };
 
@@ -1521,43 +1521,43 @@ const AdminDashboard = () => {
                                         .filter(b => b.status === occupancyStatusFilter)
                                         .filter(b => branchOccupancyFilter === 'all' || b.location?._id === branchOccupancyFilter)
                                         .map(booking => (
-                                            <div key={booking._id} className="bg-navy-900/40 backdrop-blur-xl border border-gold-500/10 p-8 rounded-[2.5rem] hover:border-gold-500/30 transition-all duration-500 flex flex-col gap-8 shadow-2xl relative group">
+                                            <div key={booking._id} className="bg-navy-900/40 backdrop-blur-xl border border-gold-500/10 p-5 sm:p-8 rounded-3xl md:rounded-[2.5rem] hover:border-gold-500/30 transition-all duration-500 flex flex-col gap-6 md:gap-8 shadow-2xl relative group overflow-hidden">
                                                 <div className="absolute top-0 right-0 w-32 h-32 bg-gold-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-gold-500/10 transition-all"></div>
 
-                                                <div className="flex items-start justify-between relative z-10">
-                                                    <div className="flex items-center gap-6">
-                                                        <div className="w-16 h-16 rounded-2xl bg-navy-950 border border-gold-500/20 flex items-center justify-center text-gold-400 text-2xl font-serif italic shadow-2xl">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
+                                                    <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto">
+                                                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-navy-950 border border-gold-500/20 flex items-center justify-center text-gold-400 text-xl md:text-2xl font-serif italic shadow-2xl shrink-0">
                                                             {booking.user?.fullName?.charAt(0) || 'G'}
                                                         </div>
-                                                        <div>
-                                                            <h3 className="text-2xl font-bold text-white font-serif tracking-wide">{booking.user?.fullName || 'Distinguished Guest'}</h3>
-                                                            <p className="text-[10px] text-gold-400 font-bold uppercase tracking-widest mt-1 opacity-70">{booking.user?.email}</p>
+                                                        <div className="min-w-0 flex-1">
+                                                            <h3 className="text-xl md:text-2xl font-bold text-white font-serif tracking-wide truncate">{booking.user?.fullName || 'Distinguished Guest'}</h3>
+                                                            <p className="text-[10px] text-gold-400 font-bold uppercase tracking-widest mt-1 opacity-70 truncate">{booking.user?.email}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <div className="flex items-center gap-3 text-gold-400 justify-end mb-1">
-                                                            <MapPin className="w-4 h-4" />
-                                                            <span className="text-xs font-bold uppercase tracking-widest">{booking.location?.city}</span>
+                                                    <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gold-500/10">
+                                                        <div className="flex items-center gap-2 md:gap-3 text-gold-400 sm:justify-end">
+                                                            <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                                            <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest leading-none">{booking.location?.city}</span>
                                                         </div>
-                                                        <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold">Primary Hub</p>
+                                                        <p className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold hidden sm:block mt-1">Primary Hub</p>
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-gold-500/10 relative z-10">
-                                                    <div>
+                                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-4 md:gap-8 pt-6 md:pt-8 border-t border-gold-500/10 relative z-10">
+                                                    <div className="min-w-0">
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Suite Unit</p>
-                                                        <p className="text-white text-base font-bold font-serif">{booking.room?.roomNumber || '—'}</p>
-                                                        <p className="text-[10px] text-luxury-muted font-medium tracking-tight truncate">{booking.room?.type}</p>
+                                                        <p className="text-white text-sm md:text-base font-bold font-serif truncate">{booking.room?.roomNumber || '—'}</p>
+                                                        <p className="text-[9px] md:text-[10px] text-luxury-muted font-medium tracking-tight truncate">{booking.room?.type}</p>
                                                     </div>
                                                     <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Delegation</p>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            <div className="flex items-center gap-2 text-white text-[11px] font-bold bg-gold-500/10 border border-gold-500/20 px-3 py-1.5 rounded-xl">
-                                                                <Users className="w-3.5 h-3.5 text-gold-400" />
+                                                        <div className="flex flex-wrap gap-1.5 md:gap-2">
+                                                            <div className="flex items-center gap-1.5 md:gap-2 text-white text-[10px] md:text-[11px] font-bold bg-gold-500/10 border border-gold-500/20 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl">
+                                                                <Users className="w-3 md:w-3.5 h-3 md:h-3.5 text-gold-400" />
                                                                 <span>{booking.guests?.adults || 1}A</span>
                                                             </div>
                                                             {booking.guests?.children > 0 && (
-                                                                <div className="flex items-center gap-2 text-white/50 text-[11px] font-bold bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+                                                                <div className="flex items-center gap-1.5 md:gap-2 text-white/50 text-[10px] md:text-[11px] font-bold bg-white/5 border border-white/10 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl">
                                                                     <span>{booking.guests.children}C</span>
                                                                 </div>
                                                             )}
@@ -1565,22 +1565,22 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Stay Protocol</p>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-white text-xs font-bold tracking-tight">{new Date(booking.checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                                                            <span className="text-white/30 text-[10px]">to {new Date(booking.checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="text-white text-[11px] md:text-xs font-bold tracking-tight whitespace-nowrap">{new Date(booking.checkIn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                            <span className="text-white/30 text-[9px] md:text-[10px] whitespace-nowrap">to {new Date(booking.checkOut).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <p className="text-[9px] text-gold-500/40 uppercase tracking-[0.2em] font-bold">Account</p>
-                                                        <p className="text-gold-400 text-base font-bold font-serif">₹{booking.totalPrice?.toLocaleString()}</p>
+                                                        <p className="text-gold-400 text-sm md:text-base font-bold font-serif whitespace-nowrap">₹{booking.totalPrice?.toLocaleString()}</p>
                                                         <div className="pt-1">
                                                             {booking.paymentStatus === 'Paid' ? (
-                                                                <span className="text-[9px] font-black tracking-widest uppercase text-emerald-400 flex items-center gap-1.5">
-                                                                    <Crown className="w-2.5 h-2.5" /> Settled
+                                                                <span className="text-[8px] md:text-[9px] font-black tracking-widest uppercase text-emerald-400 flex items-center gap-1">
+                                                                    <Crown className="w-2 md:w-2.5 h-2 md:h-2.5" /> SETTLED
                                                                 </span>
                                                             ) : (
-                                                                <span className="text-[9px] font-black tracking-widest uppercase text-amber-500 flex items-center gap-1.5">
-                                                                    <Clock className="w-2.5 h-2.5" /> Due
+                                                                <span className="text-[8px] md:text-[9px] font-black tracking-widest uppercase text-amber-500 flex items-center gap-1">
+                                                                    <Clock className="w-2 md:w-2.5 h-2 md:h-2.5" /> DUE
                                                                 </span>
                                                             )}
                                                         </div>
@@ -1725,13 +1725,13 @@ const AdminDashboard = () => {
                                                 <div className="absolute top-0 right-0 w-24 h-24 bg-gold-500/[0.02] rounded-full blur-2xl"></div>
 
                                                 <div className="flex justify-between items-start relative z-10">
-                                                    <div className="flex items-center gap-5">
-                                                        <div className="w-14 h-14 rounded-2xl bg-navy-900 border border-gold-500/10 flex items-center justify-center text-gold-400 font-serif italic text-2xl shadow-2xl">
+                                                    <div className="flex items-center gap-5 min-w-0">
+                                                        <div className="w-14 h-14 rounded-2xl bg-navy-900 border border-gold-500/10 flex items-center justify-center text-gold-400 font-serif italic text-2xl shadow-2xl flex-shrink-0">
                                                             {staff.fullName?.charAt(0) || staff.email.charAt(0)}
                                                         </div>
-                                                        <div>
-                                                            <h4 className="text-lg font-bold text-white font-serif italic whitespace-nowrap">{staff.fullName || staff.email.split('@')[0]}</h4>
-                                                            <p className="text-[10px] text-gold-500/40 font-black uppercase tracking-widest mt-1">Joined {new Date(staff.createdAt).toLocaleDateString()}</p>
+                                                        <div className="min-w-0 flex-1 overflow-hidden">
+                                                            <h4 className="text-lg font-bold text-white font-serif italic truncate">{staff.fullName || staff.email.split('@')[0]}</h4>
+                                                            <p className="text-[10px] text-gold-500/40 font-black uppercase tracking-widest mt-1 truncate">Joined {new Date(staff.createdAt).toLocaleDateString()}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-3">
@@ -1766,8 +1766,8 @@ const AdminDashboard = () => {
                                                     </p>
                                                     <div className="space-y-3">
                                                         <div className="flex justify-between items-center text-[10px]">
-                                                            <span className="text-white/30 font-bold uppercase tracking-tighter">ID Tag</span>
-                                                            <span className="font-mono text-gold-400 truncate ml-4 max-w-[180px]">{staff.email}</span>
+                                                            <span className="text-white/30 font-bold uppercase tracking-tighter flex-shrink-0">ID Tag</span>
+                                                            <span className="font-mono text-gold-400 break-all text-right ml-4">{staff.email}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center text-[10px]">
                                                             <span className="text-white/30 font-bold uppercase tracking-tighter">Cipher</span>
@@ -1980,8 +1980,8 @@ const AdminDashboard = () => {
                 return (
                     <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 flex flex-col min-h-[calc(100vh-200px)] lg:h-[calc(100vh-180px)] lg:overflow-hidden">
                         {/* Room Header with Hub Selector */}
-                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-12 pb-10 border-b border-gold-500/10 pt-8">
-                            <div className="space-y-4 text-center lg:text-left">
+                        <div className="flex flex-col items-center gap-10 mb-12 pb-10 border-b border-gold-500/10 pt-8 text-center">
+                            <div className="space-y-4">
                                 <div className="flex items-center justify-center lg:justify-start gap-4 text-gold-400">
                                     <div className="w-12 h-[1px] bg-gold-500/30"></div>
                                     <span className="text-[10px] font-black uppercase tracking-[0.5em] italic">Asset Inventory</span>
@@ -1994,7 +1994,7 @@ const AdminDashboard = () => {
                                 </p>
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 lg:gap-10 mt-10 lg:mt-0">
+                            <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-10">
                                 <div className="space-y-3 w-full sm:w-auto">
                                     <label className="block text-[10px] font-black text-gold-500/40 uppercase tracking-[0.3em] ml-1">Sector Deployment</label>
                                     <div className="relative">
@@ -2039,9 +2039,9 @@ const AdminDashboard = () => {
                         {/* Main Room Navigation Grid */}
                         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 flex-1 min-h-0">
                             {/* Floor Sidebar Navigator */}
-                            <div className="w-full lg:w-72 flex flex-col border-b lg:border-b-0 lg:border-r border-gold-500/5 pb-10 lg:pb-0 lg:pr-6 shrink-0">
+                            <div className="w-full lg:w-72 flex flex-col border-b lg:border-b-0 lg:border-r border-gold-500/5 pb-10 lg:pb-0 lg:pr-6 shrink-0 lg:sticky lg:top-24 h-fit">
                                 <h3 className="text-[11px] font-black text-gold-500/40 tracking-[0.4em] mb-6 uppercase text-center lg:text-left italic">Vertical Navigator</h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-col gap-4 pb-6 lg:pb-8 transition-all outline-none">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-col gap-4 pb-6 lg:pb-8 transition-all outline-none">
                                     {floors.map((f) => (
                                         <button
                                             key={f}
@@ -2079,149 +2079,151 @@ const AdminDashboard = () => {
                             </div>
 
                             {/* Room Display Grid */}
-                            <div className="flex-1 overflow-y-auto pr-6 pb-20 scrollbar-thin scrollbar-thumb-gold-500/10 hover:scrollbar-thumb-gold-500/20 transition-all">
-                                {fetchingRooms ? (
-                                    <div className="p-32 text-center flex flex-col items-center justify-center h-full space-y-10">
-                                        <div className="w-20 h-20 rounded-[2.5rem] border-2 border-gold-500/10 border-t-gold-500 animate-[spin_1.5s_linear_infinite] shadow-2xl relative">
-                                            <div className="absolute inset-4 rounded-2xl border border-gold-500/5 animate-[pulse_2s_infinite]"></div>
+                            <div className="flex-1 overflow-y-auto w-full lg:pr-6 pb-20 scrollbar-thin scrollbar-thumb-gold-500/10 hover:scrollbar-thumb-gold-500/20 transition-all flex flex-col items-center">
+                                <div className="w-full max-w-[1400px]">
+                                    {fetchingRooms ? (
+                                        <div className="p-32 text-center flex flex-col items-center justify-center h-full space-y-10">
+                                            <div className="w-20 h-20 rounded-[2.5rem] border-2 border-gold-500/10 border-t-gold-500 animate-[spin_1.5s_linear_infinite] shadow-2xl relative">
+                                                <div className="absolute inset-4 rounded-2xl border border-gold-500/5 animate-[pulse_2s_infinite]"></div>
+                                            </div>
+                                            <p className="text-[11px] text-gold-500/40 uppercase tracking-[0.6em] font-black animate-pulse italic">Mapping Floor Schematics...</p>
                                         </div>
-                                        <p className="text-[11px] text-gold-500/40 uppercase tracking-[0.6em] font-black animate-pulse italic">Mapping Floor Schematics...</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-16">
-                                        {rooms.length > 0 ? (
-                                            <div className="flex flex-col gap-4">
-                                                {rooms.map((room) => {
-                                                    const viewDate = new Date(roomsViewDate);
-                                                    viewDate.setHours(0, 0, 0, 0);
+                                    ) : (
+                                        <div className="space-y-16">
+                                            {rooms.length > 0 ? (
+                                                <div className="flex flex-col gap-4">
+                                                    {rooms.map((room) => {
+                                                        const viewDate = new Date(roomsViewDate);
+                                                        viewDate.setHours(0, 0, 0, 0);
 
-                                                    const activeBooking = adminBookings.find(b => {
-                                                        const checkIn = new Date(b.checkIn);
-                                                        checkIn.setHours(0, 0, 0, 0);
-                                                        const checkOut = new Date(b.checkOut);
-                                                        checkOut.setHours(0, 0, 0, 0);
+                                                        const activeBooking = adminBookings.find(b => {
+                                                            const checkIn = new Date(b.checkIn);
+                                                            checkIn.setHours(0, 0, 0, 0);
+                                                            const checkOut = new Date(b.checkOut);
+                                                            checkOut.setHours(0, 0, 0, 0);
 
-                                                        return b.room?._id === room._id &&
-                                                            ['Confirmed', 'CheckedIn'].includes(b.status) &&
-                                                            checkIn <= viewDate &&
-                                                            checkOut >= viewDate;
-                                                    });
+                                                            return b.room?._id === room._id &&
+                                                                ['Confirmed', 'CheckedIn'].includes(b.status) &&
+                                                                checkIn <= viewDate &&
+                                                                checkOut >= viewDate;
+                                                        });
 
-                                                    const displayStatus = activeBooking ? (activeBooking.status === 'CheckedIn' ? 'Occupied' : 'Reserved') : room.status;
+                                                        const displayStatus = activeBooking ? (activeBooking.status === 'CheckedIn' ? 'Occupied' : 'Reserved') : room.status;
 
-                                                    return (
-                                                        <div key={room._id} className="bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-[2rem] overflow-hidden hover:border-gold-500/20 transition-all duration-700 group grid grid-cols-1 lg:grid-cols-[200px_1fr_auto] min-h-[140px] shadow-2xl relative active:scale-[0.995]">
-                                                            {/* Column 1: Image & Visual ID */}
-                                                            <div className="relative w-full lg:w-[200px] lg:h-full overflow-hidden bg-navy-950">
-                                                                <img
-                                                                    src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80"
-                                                                    alt={room.type}
-                                                                    className="w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:scale-110 group-hover:opacity-80 transition-all duration-[2000ms]"
-                                                                />
-                                                                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-navy-950/80 via-transparent to-transparent"></div>
+                                                        return (
+                                                            <div key={room._id} className="bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-[2rem] overflow-hidden hover:border-gold-500/20 transition-all duration-700 group grid grid-cols-1 lg:grid-cols-[200px_1fr_auto] min-h-[140px] shadow-2xl relative active:scale-[0.995]">
+                                                                {/* Column 1: Image & Visual ID */}
+                                                                <div className="relative w-full lg:w-[200px] lg:h-full overflow-hidden bg-navy-950">
+                                                                    <img
+                                                                        src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80"
+                                                                        alt={room.type}
+                                                                        className="w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:scale-110 group-hover:opacity-80 transition-all duration-[2000ms]"
+                                                                    />
+                                                                    <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-navy-950/80 via-transparent to-transparent"></div>
 
-                                                                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-navy-950/20">
-                                                                    <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] mb-0.5">Room</span>
-                                                                    <span className="text-3xl font-bold text-gold-400 font-serif italic drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">{room.roomNumber}</span>
-                                                                </div>
-
-                                                                <div className="absolute top-4 left-4">
-                                                                    <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em] border backdrop-blur-md shadow-xl ${displayStatus === 'Available' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : displayStatus === 'Occupied' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}`}>
-                                                                        {displayStatus}
+                                                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-navy-950/20">
+                                                                        <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] mb-0.5">Room</span>
+                                                                        <span className="text-3xl font-bold text-gold-400 font-serif italic drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">{room.roomNumber}</span>
                                                                     </div>
-                                                                </div>
-                                                            </div>
 
-                                                            {/* Column 2: Content Middle */}
-                                                            <div className="flex-1 p-6 lg:p-8 flex flex-col justify-center gap-4 min-w-0">
-                                                                <div className="space-y-1">
-                                                                    <h4 className="text-xl lg:text-2xl font-bold text-white font-serif italic truncate tracking-tight group-hover:text-gold-400 transition-colors uppercase">{room.type}</h4>
-                                                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                                                                        <div className="flex items-center gap-1.5 text-[9px] font-black text-white/40 uppercase tracking-widest">
-                                                                            <MapPin className="w-3 h-3 text-gold-500/50" />
-                                                                            <span>{room.viewType}</span>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-1.5 text-[9px] font-black text-white/40 uppercase tracking-widest">
-                                                                            <Users className="w-3 h-3 text-gold-500/50" />
-                                                                            <span>{room.capacity.adults + room.capacity.children} Souls</span>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-1.5 text-[9px] font-black text-white/40 uppercase tracking-widest">
-                                                                            <Shield className="w-3 h-3 text-gold-500/50" />
-                                                                            <span>Tier {room.luxuryLevel}</span>
+                                                                    <div className="absolute top-4 left-4">
+                                                                        <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em] border backdrop-blur-md shadow-xl ${displayStatus === 'Available' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : displayStatus === 'Occupied' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}`}>
+                                                                            {displayStatus}
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Metrics Row */}
-                                                                <div className="flex items-center gap-8 pt-4 border-t border-gold-500/5">
-                                                                    <div className="space-y-0.5">
-                                                                        <p className="text-[8px] font-black text-gold-500/30 uppercase tracking-[0.3em]">Market Rate</p>
-                                                                        <p className="text-2xl font-bold text-gold-400 font-serif italic tracking-wide">₹{room.price?.toLocaleString()}</p>
-                                                                    </div>
-
-                                                                    {activeBooking && (
-                                                                        <div className="flex items-center gap-3 pl-8 border-l border-gold-500/10">
-                                                                            <div className="w-10 h-10 rounded-lg bg-gold-400/10 border border-gold-500/20 flex items-center justify-center text-gold-400 shadow-inner overflow-hidden">
-                                                                                {activeBooking.user?.profilePic ? (
-                                                                                    <img src={activeBooking.user.profilePic} alt="" className="w-full h-full object-cover" />
-                                                                                ) : (
-                                                                                    <span className="font-bold text-sm">{activeBooking.user?.fullName?.charAt(0)}</span>
-                                                                                )}
+                                                                {/* Column 2: Content Middle */}
+                                                                <div className="flex-1 p-6 lg:p-8 flex flex-col justify-center gap-4 min-w-0">
+                                                                    <div className="space-y-1">
+                                                                        <h4 className="text-xl lg:text-2xl font-bold text-white font-serif italic truncate tracking-tight group-hover:text-gold-400 transition-colors uppercase">{room.type}</h4>
+                                                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                                                            <div className="flex items-center gap-1.5 text-[9px] font-black text-white/40 uppercase tracking-widest">
+                                                                                <MapPin className="w-3 h-3 text-gold-500/50" />
+                                                                                <span>{room.viewType}</span>
                                                                             </div>
-                                                                            <div>
-                                                                                <p className="text-[9px] font-black text-white/80 uppercase tracking-widest truncate max-w-[100px]">{activeBooking.user?.fullName}</p>
-                                                                                <p className="text-[7px] font-black text-gold-500/40 uppercase italic">{new Date(activeBooking.checkIn).toLocaleDateString()}</p>
+                                                                            <div className="flex items-center gap-1.5 text-[9px] font-black text-white/40 uppercase tracking-widest">
+                                                                                <Users className="w-3 h-3 text-gold-500/50" />
+                                                                                <span>{room.capacity.adults + room.capacity.children} Souls</span>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-1.5 text-[9px] font-black text-white/40 uppercase tracking-widest">
+                                                                                <Shield className="w-3 h-3 text-gold-500/50" />
+                                                                                <span>Tier {room.luxuryLevel}</span>
                                                                             </div>
                                                                         </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                                                    </div>
 
-                                                            {/* Column 3: Actions Right */}
-                                                            <div className="lg:w-[280px] p-6 lg:p-8 flex lg:flex-col items-center lg:justify-center gap-3 bg-navy-950/40 border-t lg:border-t-0 lg:border-l border-gold-500/10 h-full shrink-0">
-                                                                <div className="flex-1 w-full flex items-center gap-3">
-                                                                    {activeBooking ? (
+                                                                    {/* Metrics Row */}
+                                                                    <div className="flex items-center gap-8 pt-4 border-t border-gold-500/5">
+                                                                        <div className="space-y-0.5">
+                                                                            <p className="text-[8px] font-black text-gold-500/30 uppercase tracking-[0.3em]">Market Rate</p>
+                                                                            <p className="text-2xl font-bold text-gold-400 font-serif italic tracking-wide">₹{room.price?.toLocaleString()}</p>
+                                                                        </div>
+
+                                                                        {activeBooking && (
+                                                                            <div className="flex items-center gap-3 pl-8 border-l border-gold-500/10">
+                                                                                <div className="w-10 h-10 rounded-lg bg-gold-400/10 border border-gold-500/20 flex items-center justify-center text-gold-400 shadow-inner overflow-hidden">
+                                                                                    {activeBooking.user?.profilePic ? (
+                                                                                        <img src={activeBooking.user.profilePic} alt="" className="w-full h-full object-cover" />
+                                                                                    ) : (
+                                                                                        <span className="font-bold text-sm">{activeBooking.user?.fullName?.charAt(0)}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p className="text-[9px] font-black text-white/80 uppercase tracking-widest truncate max-w-[100px]">{activeBooking.user?.fullName}</p>
+                                                                                    <p className="text-[7px] font-black text-gold-500/40 uppercase italic">{new Date(activeBooking.checkIn).toLocaleDateString()}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Column 3: Actions Right */}
+                                                                <div className="lg:w-[280px] p-6 lg:p-8 flex lg:flex-col items-center lg:justify-center gap-3 bg-navy-950/40 border-t lg:border-t-0 lg:border-l border-gold-500/10 h-full shrink-0">
+                                                                    <div className="flex-1 w-full flex items-center gap-3">
+                                                                        {activeBooking ? (
+                                                                            <button
+                                                                                onClick={() => handleAdminBookingAction(activeBooking._id, activeBooking.status === 'Confirmed' ? 'check-in' : 'check-out')}
+                                                                                className={`flex-1 h-12 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${activeBooking.status === 'Confirmed'
+                                                                                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 text-navy-950 hover:from-emerald-500 hover:to-emerald-300 shadow-emerald-500/20'
+                                                                                    : 'bg-gradient-to-r from-amber-600 to-amber-400 text-navy-950 hover:from-amber-500 hover:to-amber-300 shadow-amber-500/20'
+                                                                                    }`}
+                                                                            >
+                                                                                {activeBooking.status === 'Confirmed' ? 'Initiate Check-In' : 'Confirm Check-Out'}
+                                                                            </button>
+                                                                        ) : (
+                                                                            <div className="flex-1 h-12 rounded-xl bg-navy-950/60 border border-gold-500/10 flex items-center justify-center text-[9px] font-black text-gold-500/20 uppercase tracking-[0.4em] italic">
+                                                                                Ready for Deployment
+                                                                            </div>
+                                                                        )}
+
                                                                         <button
-                                                                            onClick={() => handleAdminBookingAction(activeBooking._id, activeBooking.status === 'Confirmed' ? 'check-in' : 'check-out')}
-                                                                            className={`flex-1 h-12 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${activeBooking.status === 'Confirmed'
-                                                                                ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 text-navy-950 hover:from-emerald-500 hover:to-emerald-300 shadow-emerald-500/20'
-                                                                                : 'bg-gradient-to-r from-amber-600 to-amber-400 text-navy-950 hover:from-amber-500 hover:to-amber-300 shadow-amber-500/20'
-                                                                                }`}
+                                                                            onClick={() => handleEditRoomClick(room)}
+                                                                            className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:bg-gold-500 hover:text-navy-950 hover:border-gold-500 transition-all duration-500 shadow-xl"
+                                                                            title="Modify Unit Parameters"
                                                                         >
-                                                                            {activeBooking.status === 'Confirmed' ? 'Initiate Check-In' : 'Confirm Check-Out'}
+                                                                            <Settings className="w-4 h-4" />
                                                                         </button>
-                                                                    ) : (
-                                                                        <div className="flex-1 h-12 rounded-xl bg-navy-950/60 border border-gold-500/10 flex items-center justify-center text-[9px] font-black text-gold-500/20 uppercase tracking-[0.4em] italic">
-                                                                            Ready for Deployment
-                                                                        </div>
-                                                                    )}
-
-                                                                    <button
-                                                                        onClick={() => handleEditRoomClick(room)}
-                                                                        className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:bg-gold-500 hover:text-navy-950 hover:border-gold-500 transition-all duration-500 shadow-xl"
-                                                                        title="Modify Unit Parameters"
-                                                                    >
-                                                                        <Settings className="w-4 h-4" />
-                                                                    </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        ) : (
-                                            <div className="py-60 text-center flex flex-col items-center justify-center space-y-10 group opacity-40 hover:opacity-100 transition-opacity duration-1000">
-                                                <div className="w-32 h-32 rounded-[3.5rem] bg-navy-900 border-2 border-dashed border-gold-500/10 flex items-center justify-center group-hover:border-gold-500/40 transition-all rotate-45 group-hover:rotate-0 duration-1000">
-                                                    <Bed className="w-12 h-12 text-gold-500/20 -rotate-45 group-hover:rotate-0 transition-transform duration-1000" />
+                                                        );
+                                                    })}
                                                 </div>
-                                                <div className="space-y-4">
-                                                    <p className="text-gold-500/30 font-serif italic text-2xl tracking-widest underline decoration-gold-500/5 underline-offset-[16px]">"The floorplates remain unmapped in this hub."</p>
-                                                    <p className="text-[9px] text-gold-500/20 uppercase tracking-[0.5em] font-black">Begin unit induction to populate high-altitude suites.</p>
+                                            ) : (
+                                                <div className="py-60 text-center flex flex-col items-center justify-center space-y-10 group opacity-40 hover:opacity-100 transition-opacity duration-1000">
+                                                    <div className="w-32 h-32 rounded-[3.5rem] bg-navy-900 border-2 border-dashed border-gold-500/10 flex items-center justify-center group-hover:border-gold-500/40 transition-all rotate-45 group-hover:rotate-0 duration-1000">
+                                                        <Bed className="w-12 h-12 text-gold-500/20 -rotate-45 group-hover:rotate-0 transition-transform duration-1000" />
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        <p className="text-gold-500/30 font-serif italic text-2xl tracking-widest underline decoration-gold-500/5 underline-offset-[16px]">"The floorplates remain unmapped in this hub."</p>
+                                                        <p className="text-[9px] text-gold-500/20 uppercase tracking-[0.5em] font-black">Begin unit induction to populate high-altitude suites.</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3840,78 +3842,99 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                                     {coupons.map(c => (
-                                        <div key={c._id} className="bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-[3rem] p-10 hover:border-gold-500 transition-all duration-700 group relative overflow-hidden flex flex-col shadow-2xl">
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-gold-500/[0.03] rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-gold-500/10 transition-colors"></div>
+                                        <div key={c._id} className="group relative bg-navy-900/40 backdrop-blur-3xl border border-gold-500/10 rounded-[2.5rem] overflow-hidden hover:border-gold-500/30 transition-all duration-700 flex flex-col shadow-2xl">
+                                            {/* Card Header Background Decor */}
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-gold-500/[0.03] rounded-full blur-3xl group-hover:bg-gold-500/[0.08] transition-all duration-1000 -mr-10 -mt-10"></div>
 
-                                            <div className="flex items-start justify-between mb-8 relative z-10">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-2">
-                                                        <span className={`px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em] border shadow-lg ${c.isActive ? 'bg-gold-500 text-navy-950 border-gold-400' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>{c.isActive ? 'OPERATIVE' : 'SUSPENDED'}</span>
-                                                        {c.isFeatured && <span className="px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em] bg-navy-950 text-gold-400 border border-gold-500/30 flex items-center gap-2 shadow-lg"><Star className="w-3 h-3 fill-gold-400" /> EXHIBIT</span>}
-                                                    </div>
-                                                    <h3 className="text-4xl font-bold text-white font-mono tracking-[0.1em] mt-2 group-hover:text-gold-400 transition-colors">
-                                                        {c.code}
-                                                    </h3>
+                                            {/* Top Status & Actions Bar */}
+                                            <div className="p-8 flex items-center justify-between relative z-10">
+                                                <div className="flex flex-wrap gap-2">
+                                                    <span className={`px-3 py-1 rounded-full text-[7px] font-black tracking-[0.2em] uppercase border ${c.isActive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                                                        {c.isActive ? 'Operative' : 'Suspended'}
+                                                    </span>
+                                                    {c.isFeatured && (
+                                                        <span className="px-3 py-1 rounded-full text-[7px] font-black tracking-[0.2em] uppercase bg-gold-500/10 text-gold-400 border border-gold-400/20 flex items-center gap-1.5">
+                                                            <Star className="w-2.5 h-2.5 fill-gold-400" /> Exhibit
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={() => { setEditingCouponId(c._id); setCouponForm({ code: c.code, description: c.description, discountType: c.discountType, discountValue: c.discountValue, maxUses: c.maxUses || '', minOrderValue: c.minOrderValue, expiresAt: c.expiresAt ? c.expiresAt.split('T')[0] : '', appliesTo: c.appliesTo, isActive: c.isActive, isFeatured: c.isFeatured || false, featuredTitle: c.featuredTitle || '', featuredSubtitle: c.featuredSubtitle || '', featuredDescription: c.featuredDescription || '', featuredTag: c.featuredTag || '', featuredImage: c.featuredImage || '', featuredColor: c.featuredColor || 'from-blue-900/60 to-[#0F1626]' }); setCouponFormMode('edit'); setShowCouponForm(true); }} className="w-10 h-10 rounded-xl bg-navy-950 border border-gold-500/10 flex items-center justify-center text-gold-500/40 hover:text-gold-400 hover:border-gold-500 transition-all shadow-xl active:scale-90"><Edit2 className="w-4 h-4" /></button>
-                                                    <button onClick={() => handleDeleteCoupon(c._id)} className="w-10 h-10 rounded-xl bg-navy-950 border border-gold-500/10 flex items-center justify-center text-red-500/40 hover:text-red-400 hover:border-red-500 transition-all shadow-xl active:scale-90"><Trash2 className="w-4 h-4" /></button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setEditingCouponId(c._id); setCouponForm({ code: c.code, description: c.description, discountType: c.discountType, discountValue: c.discountValue, maxUses: c.maxUses || '', minOrderValue: c.minOrderValue, expiresAt: c.expiresAt ? c.expiresAt.split('T')[0] : '', appliesTo: c.appliesTo, isActive: c.isActive, isFeatured: c.isFeatured || false, featuredTitle: c.featuredTitle || '', featuredSubtitle: c.featuredSubtitle || '', featuredDescription: c.featuredDescription || '', featuredTag: c.featuredTag || '', featuredImage: c.featuredImage || '', featuredColor: c.featuredColor || 'from-blue-900/60 to-[#0F1626]' }); setCouponFormMode('edit'); setShowCouponForm(true); }}
+                                                        className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:bg-gold-500 hover:text-navy-950 hover:border-gold-500 transition-all duration-500"
+                                                    >
+                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleDeleteCoupon(c._id); }}
+                                                        className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:bg-red-500 hover:text-white hover:border-rose-500 transition-all duration-500"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-6 flex-1 relative z-10">
-                                                <div className="p-6 bg-navy-950/60 border border-gold-500/5 rounded-[2rem] flex items-center justify-between">
+                                            {/* Promo Code & Value */}
+                                            <div className="px-8 pb-8 space-y-4 relative z-10">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[10px] font-black text-gold-500/20 uppercase tracking-[0.4em]">Asset Designation</span>
+                                                    <h3 className="text-4xl font-bold text-white font-mono tracking-widest uppercase group-hover:text-gold-400 transition-colors duration-700">{c.code}</h3>
+                                                </div>
+
+                                                <div className="bg-navy-950/60 border border-gold-500/5 rounded-3xl p-6 flex items-center justify-between shadow-inner">
                                                     <div className="space-y-1">
-                                                        <p className="text-[8px] text-gold-500/20 uppercase tracking-[0.3em] font-black">Valuation Reduction</p>
+                                                        <p className="text-[8px] text-gold-500/20 uppercase tracking-widest font-black">Valuation Reduction</p>
                                                         <p className="text-2xl font-black text-white">{c.discountType === 'percent' ? `${c.discountValue}%` : `₹${c.discountValue.toLocaleString()}`}</p>
                                                     </div>
-                                                    <div className="h-10 w-[1px] bg-gold-500/10"></div>
-                                                    <div className="space-y-1 text-right">
-                                                        <p className="text-[8px] text-gold-500/20 uppercase tracking-[0.3em] font-black italic">Utilization</p>
+                                                    <div className="w-px h-8 bg-gold-500/10"></div>
+                                                    <div className="text-right space-y-1">
+                                                        <p className="text-[8px] text-gold-500/20 uppercase tracking-widest font-black">Utilization Rate</p>
                                                         <p className="text-sm font-black text-gold-400">{c.usedCount} <span className="opacity-40 text-xs">/ {c.maxUses || '∞'}</span></p>
                                                     </div>
                                                 </div>
-
-                                                <p className="text-gold-500/40 font-serif italic text-base leading-relaxed h-[3rem] line-clamp-2 overflow-hidden px-2">
-                                                    "{c.description || 'No formal narrative provided for this incentive.'}"
-                                                </p>
-
-                                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gold-500/5">
-                                                    <div className="space-y-2">
-                                                        <div className="flex items-center gap-2 text-[8px] text-gold-500/20 font-black uppercase tracking-widest italic animate-pulse">
-                                                            <Clock className="w-3 h-3" />
-                                                            Registry Expiry
-                                                        </div>
-                                                        <p className="text-xs font-black text-white/60">{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'PERPETUAL'}</p>
-                                                    </div>
-                                                    <div className="space-y-2 text-right">
-                                                        <div className="flex items-center justify-end gap-2 text-[8px] text-gold-500/20 font-black uppercase tracking-widest italic">
-                                                            Target Vector
-                                                            <MapPin className="w-3 h-3" />
-                                                        </div>
-                                                        <p className="text-xs font-black text-gold-400 capitalize">{c.appliesTo}</p>
-                                                    </div>
-                                                </div>
                                             </div>
 
-                                            <button
-                                                onClick={async () => {
-                                                    const token = sessionStorage.getItem('userToken');
-                                                    await fetch(`${__API_BASE__}/api/auth/admin/coupons/${c._id}`, {
-                                                        method: 'PUT',
-                                                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                                                        body: JSON.stringify({ isFeatured: !c.isFeatured })
-                                                    });
-                                                    fetchCoupons();
-                                                }}
-                                                className={`mt-10 py-4 w-full rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 border relative z-10 flex items-center justify-center gap-3 overflow-hidden group/btn ${c.isFeatured ? 'bg-gold-500/10 border-gold-400 text-gold-400' : 'bg-navy-950 border-gold-500/10 text-gold-500/30 hover:border-gold-500/50 hover:text-white'}`}
-                                            >
-                                                <div className="absolute inset-0 bg-gold-500 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500"></div>
-                                                <Star className={`w-4 h-4 relative z-10 transition-colors group-hover/btn:text-navy-950 ${c.isFeatured ? 'fill-gold-400' : ''}`} />
-                                                <span className="relative z-10 group-hover/btn:text-navy-950">{c.isFeatured ? '撤回 EXHIBIT STATUS' : '提升 TO EXHIBIT'}</span>
-                                            </button>
+                                            {/* Description Section */}
+                                            <div className="px-10 pb-10 flex-1 relative z-10 flex flex-col justify-between gap-8">
+                                                <p className="text-gold-500/40 font-serif italic text-base leading-relaxed line-clamp-2">
+                                                    "{c.description || 'Global fiscal incentive for bespoke resident experiences.'}"
+                                                </p>
+
+                                                <div className="space-y-6">
+                                                    <div className="flex items-center justify-between text-[8px] font-black tracking-[0.3em] uppercase border-t border-gold-500/5 pt-6">
+                                                        <div className="flex items-center gap-3 text-gold-500/30 font-black">
+                                                            <Clock className="w-3.5 h-3.5 animate-pulse" />
+                                                            <span>Exp: {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Perpetual'}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-gold-400 capitalize">
+                                                            <span>{c.appliesTo} Hub</span>
+                                                            <MapPin className="w-3.5 h-3.5" />
+                                                        </div>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
+                                                            const token = sessionStorage.getItem('userToken');
+                                                            await fetch(`${__API_BASE__}/api/auth/admin/coupons/${c._id}`, {
+                                                                method: 'PUT',
+                                                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                                                body: JSON.stringify({ isFeatured: !c.isFeatured })
+                                                            });
+                                                            fetchCoupons();
+                                                        }}
+                                                        className={`w-full py-4 rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] transition-all duration-500 border relative overflow-hidden group/btn flex items-center justify-center gap-3 ${c.isFeatured ? 'bg-gold-500/10 border-gold-500/30 text-gold-400' : 'bg-navy-950 border-gold-500/10 text-gold-500/30 hover:border-gold-500/60 hover:text-white'}`}
+                                                    >
+                                                        <div className="absolute inset-x-0 bottom-0 top-full bg-gold-400 group-hover/btn:top-0 transition-all duration-700 ease-out"></div>
+                                                        <Star className={`w-4 h-4 relative z-10 transition-colors duration-500 group-hover/btn:text-navy-950 ${c.isFeatured ? 'fill-gold-400' : ''}`} />
+                                                        <span className="relative z-10 transition-colors duration-500 group-hover/btn:text-navy-950">
+                                                            {c.isFeatured ? 'Retract Exhibition' : 'Elevate to Exhibit'}
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -4183,7 +4206,7 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-luxury-dark text-luxury-text selection:bg-luxury-gold selection:text-white flex overflow-hidden">
+        <div className="min-h-screen bg-luxury-dark text-luxury-text selection:bg-luxury-gold selection:text-white flex overflow-x-hidden">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -4255,15 +4278,28 @@ const AdminDashboard = () => {
                         </div>
                         <Settings className="w-4 h-4 text-luxury-muted group-hover:text-gold-400 transition-all flex-shrink-0" />
                     </div>
+                    {/* Logout Action */}
+                    <div className="flex-shrink-0 px-6 pb-8 w-full mt-6">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-red-500/5 hover:bg-red-500/10 text-red-400 border border-red-500/20 transition-all group"
+                        >
+                            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-black uppercase tracking-[0.2em]">Terminate Session</span>
+                        </button>
+                        <div className="mt-4 px-4">
+                            <p className="text-[8px] text-luxury-muted/30 uppercase tracking-[0.4em] font-black text-center italic">LuxeStay Security Protocol v2.4</p>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
 
-            <main className="flex-1 lg:ml-72 min-h-screen overflow-y-auto bg-navy-950/50 custom-scrollbar relative">
+            <main className="flex-1 lg:ml-72 min-h-screen overflow-y-auto overflow-x-hidden bg-navy-950/50 custom-scrollbar relative">
                 <div className="max-w-[1600px] w-full mx-auto px-4 md:px-12 pb-20 relative z-10">
                     {/* Header / Top Bar */}
                     <div className="flex items-center justify-between py-8 border-b border-gold-500/10 mb-12 sticky top-0 bg-navy-950/80 backdrop-blur-md z-40">
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 md:gap-6">
                             {/* Mobile Toggle */}
                             <button
                                 onClick={() => setIsSidebarOpen(true)}
@@ -4274,16 +4310,16 @@ const AdminDashboard = () => {
                             <div className="flex flex-col">
                                 <div className="flex items-center gap-2">
                                     <span className="text-[10px] font-black text-gold-500/30 uppercase tracking-[0.4em] italic">Command</span>
-                                    <div className="w-1 h-[1px] bg-gold-500/20"></div>
+                                    <div className="w-1 h-[1px] bg-gold-500/20 hidden sm:block"></div>
                                     <span className="text-[10px] font-black text-gold-400 uppercase tracking-[0.4em] italic leading-none">{activeSection.replace('-', ' ')}</span>
                                 </div>
-                                <h1 className="text-xl md:text-2xl font-bold text-white mt-1.5 font-serif italic tracking-tight">
+                                <h1 className="text-lg md:text-2xl font-bold text-white mt-1.5 font-serif italic tracking-tight">
                                     Strategic <span className="text-gold-400">Portal</span>
                                 </h1>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 md:gap-6">
                             {/* Notification Hub */}
                             <div className="relative">
                                 <button
@@ -4304,7 +4340,7 @@ const AdminDashboard = () => {
                                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute right-0 mt-4 w-96 bg-navy-900/95 backdrop-blur-2xl border border-gold-500/20 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-[100]"
+                                            className="fixed inset-x-4 top-24 md:absolute md:right-0 md:top-full md:mt-4 md:w-96 md:inset-x-auto bg-navy-900/95 backdrop-blur-2xl border border-gold-500/20 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-[100]"
                                         >
                                             <div className="p-8 border-b border-gold-500/10 flex items-center justify-between bg-gradient-to-r from-gold-500/10 to-transparent">
                                                 <h4 className="text-xs font-bold text-white uppercase tracking-[0.2em] flex items-center gap-3">
